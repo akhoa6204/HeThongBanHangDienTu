@@ -72,10 +72,16 @@ class Purchased(models.Model):
 class Review(models.Model):
     product=models.ForeignKey(Product, on_delete=models.CASCADE)
     user=models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    description=models.TextField()
+    content=models.TextField()
     star_count = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+class ReviewReply(models.Model):
+    review = models.OneToOneField(Review, on_delete=models.CASCADE)  # Mỗi đánh giá chỉ có 1 phản hồi
+    admin = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_staff': True})  # Chỉ admin mới có thể phản hồi
+    content = models.TextField()  # Nội dung phản hồi
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
