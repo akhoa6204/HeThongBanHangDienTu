@@ -78,12 +78,39 @@ class Review(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 class ReviewReply(models.Model):
     review = models.OneToOneField(Review, on_delete=models.CASCADE)  # Mỗi đánh giá chỉ có 1 phản hồi
     admin = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'is_staff': True})  # Chỉ admin mới có thể phản hồi
     content = models.TextField()  # Nội dung phản hồi
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class Order(models.Model):
+    STATUS_CHOICES=[
+        ('pending', 'Chờ xác nhận'),
+        ('processing', 'Đang xử lý'),
+        ('shipped', 'Đã giao hàng'),
+        ('cancelled', 'Đã hủy'),
+    ]
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    status =models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def calculate_total_price(self):
+        total = sum(item.total_price() for item in self.order_items.all())
+        self.total_price = total
+        self.save()
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
+    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def total_price(self):
+        return self.option.final_price() * self.quantity
 
 # class Payment(models.Model):
 
