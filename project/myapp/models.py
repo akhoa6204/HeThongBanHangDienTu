@@ -25,6 +25,7 @@ class Product(models.Model):
     category =models.ForeignKey(Category, on_delete=models.CASCADE)
     purchased_count = models.PositiveIntegerField(default=0)
     description = models.TextField(null=True, blank=True)  # Mô tả sản phẩm chi tiết
+    img = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Option(models.Model):
@@ -41,6 +42,7 @@ class Option(models.Model):
     warranty = models.CharField(max_length=150, null=True, blank=True)  # Bảo hành
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Giá
     updated_at = models.DateTimeField(auto_now=True)
+    img = models.URLField(null=True, blank=True)
 
 class Cart(models.Model):
     option =models.ForeignKey(Option, on_delete=models.CASCADE)
