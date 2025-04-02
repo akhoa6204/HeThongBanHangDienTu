@@ -44,6 +44,16 @@ class Option(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     img = models.URLField(null=True, blank=True)
 
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Giảm giá (ví dụ: 10%)
+    promotion_start_date = models.DateTimeField(null=True, blank=True)  # Ngày bắt đầu khuyến mãi
+    promotion_end_date = models.DateTimeField(null=True, blank=True)  # Ngày kết thúc khuyến mãi
+    promotion_description = models.TextField(null=True, blank=True)  # Mô tả chương trình khuyến mãi
+
+    def final_price(self):
+        if self.discount:  # Kiểm tra nếu có giảm giá
+            return self.price * (1 - self.discount / 100)  # Giảm giá theo phần trăm
+        return self.price  # Nếu không có giảm giá, trả về giá gốc
+
 class Cart(models.Model):
     option =models.ForeignKey(Option, on_delete=models.CASCADE)
     user=models.ForeignKey(User, on_delete=models.CASCADE)
