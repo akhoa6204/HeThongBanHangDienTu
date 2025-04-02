@@ -37,9 +37,9 @@ class Option(models.Model):
     chipset = models.CharField(max_length=150, null=True, blank=True)  # Chip xử lý
     camera = models.CharField(max_length=150, null=True, blank=True)  # Thông số camera
     os = models.CharField(max_length=150, null=True, blank=True)  # Hệ điều hành
-    charging_type = models.CharField(max_length=150, null=True, blank=True)  # Loại cáp sạc (VD: "USB-C", "Lightning")
-    warranty = models.CharField(max_length=150, null=True, blank=True)  # Bảo hành (VD: "12 tháng", "24 tháng")
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Giá tùy chọn
+    charging_type = models.CharField(max_length=150, null=True, blank=True)  # Loại cáp sạc
+    warranty = models.CharField(max_length=150, null=True, blank=True)  # Bảo hành
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Giá
     updated_at = models.DateTimeField(auto_now=True)
 
 class Cart(models.Model):
