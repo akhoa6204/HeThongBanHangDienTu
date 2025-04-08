@@ -15,7 +15,7 @@ class Category(models.Model):
 
 class Brand(models.Model):
     name=models.CharField(max_length=150)
-    nation=models.CharField(max_length=150)
+    origin=models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -24,35 +24,47 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     category =models.ForeignKey(Category, on_delete=models.CASCADE)
     purchased_count = models.PositiveIntegerField(default=0)
-    description = models.TextField(null=True, blank=True)  # Mô tả sản phẩm chi tiết
     img = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class Option(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    color = models.CharField(max_length=150, null=True, blank=True)  # Màu sắc
-    ram = models.CharField(max_length=150, null=True, blank=True)  # Dung lượng RAM
-    rom = models.CharField(max_length=150, null=True, blank=True)  # Dung lượng ROM
-    screen_size = models.CharField(max_length=50, null=True, blank=True)  # Kích thước màn hình
-    battery = models.CharField(max_length=50, null=True, blank=True)  # Dung lượng pin
-    chipset = models.CharField(max_length=150, null=True, blank=True)  # Chip xử lý
-    camera = models.CharField(max_length=150, null=True, blank=True)  # Thông số camera
-    os = models.CharField(max_length=150, null=True, blank=True)  # Hệ điều hành
-    charging_type = models.CharField(max_length=150, null=True, blank=True)  # Loại cáp sạc
-    warranty = models.CharField(max_length=150, null=True, blank=True)  # Bảo hành
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Giá
-    updated_at = models.DateTimeField(auto_now=True)
-    img = models.URLField(null=True, blank=True)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, help_text="Sản phẩm tương ứng")
 
-    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # Giảm giá (ví dụ: 10%)
-    promotion_start_date = models.DateTimeField(null=True, blank=True)  # Ngày bắt đầu khuyến mãi
-    promotion_end_date = models.DateTimeField(null=True, blank=True)  # Ngày kết thúc khuyến mãi
-    promotion_description = models.TextField(null=True, blank=True)  # Mô tả chương trình khuyến mãi
+    version = models.CharField(max_length=150, null=True, blank=True, help_text="Tên phiên bản sản phẩm")
+    color = models.CharField(max_length=150, null=True, blank=True, help_text="Màu sắc sản phẩm")
+    price = models.DecimalField(max_digits=20, decimal_places=2,null=True, blank=True, help_text="Giá gốc của sản phẩm")
+    img = models.URLField(null=True, blank=True, help_text="Hình ảnh phiên bản")
+
+    # Các trường specs dạng JSON → lưu dưới dạng chuỗi (TextField)
+    memory_and_storage = models.TextField(null=True, blank=True, help_text="Bộ nhớ & Lưu trữ")
+    rear_camera = models.TextField(null=True, blank=True, help_text="Camera sau")
+    front_camera = models.TextField(null=True, blank=True, help_text="Camera trước")
+    os_and_cpu = models.TextField(null=True, blank=True, help_text="Hệ điều hành & CPU")
+    connectivity = models.TextField(null=True, blank=True, help_text="Kết nối")
+    display = models.TextField(null=True, blank=True, help_text="Màn hình")
+    battery_and_charging = models.TextField(null=True, blank=True, help_text="Pin & Sạc")
+    design_and_weight = models.TextField(null=True, blank=True, help_text="Thiết kế & Trọng lượng")
+    general_information = models.TextField(null=True, blank=True, help_text="Thông tin chung")
+    utilities = models.TextField(null=True, blank=True, help_text="Tiện ích")
+    product_overview = models.TextField(null=True, blank=True, help_text="Tổng quan sản phẩm")
+
+    warranty = models.CharField(max_length=150, null=True, blank=True, help_text="Thông tin bảo hành")
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Phần trăm giảm giá")
+    promotion_start_date = models.DateTimeField(null=True, blank=True, help_text="Ngày bắt đầu khuyến mãi")
+    promotion_end_date = models.DateTimeField(null=True, blank=True, help_text="Ngày kết thúc khuyến mãi")
+    promotion_description = models.TextField(null=True, blank=True, help_text="Mô tả khuyến mãi")
+
+    description = models.TextField(null=True, blank=True, help_text="Mô tả chi tiết phiên bản")
+    created_at = models.DateTimeField(null=True, blank=True, help_text="Ngày tạo bản ghi")
+    updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
 
     def final_price(self):
-        if self.discount:  # Kiểm tra nếu có giảm giá
-            return self.price * (1 - self.discount / 100)  # Giảm giá theo phần trăm
-        return self.price  # Nếu không có giảm giá, trả về giá gốc
+        if self.discount:
+            return self.price * (1 - self.discount / 100)
+        return self.price
+
+    def __str__(self):
+        return f"{self.product.name} - {self.version or ''} - {self.color or ''}"
 
 class Cart(models.Model):
     option =models.ForeignKey(Option, on_delete=models.CASCADE)

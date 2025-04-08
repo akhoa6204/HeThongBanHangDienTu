@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="i   e=edge" />
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home.css' %}" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/styles.css' %}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+
+    <title>Document</title>
+  </head>
+  <body>
+    <header id="header">
+      <div class="container">
+        <h1 class="logo">SmartBuy</h1>
+        <div class="search">
+          <label class="material-symbols-outlined" for="search">search</label>
+          <input type="text" name="search" id="search" placeholder="Tìm kiếm" />
+        </div>
+        <div class="box">
+          <div class="cart">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <p>Giỏ hàng</p>
+          </div>
+          <div class="user">
+            <span class="material-symbols-outlined">person</span>
+            <p>Đăng nhập</p>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main id="main">{% block content %} {% endblock %}</main>
+    <footer id="footer">
+      <div class="icon"></div>
+      <div class="container">
+        <div class="first">
+          <h1>SmartBuy</h1>
+          <p>Liên hệ</p>
+          <div class="contact">
+            <span class="material-symbols-outlined">call</span>
+            <p>
+              Số điện thoại <br />
+              +84 245 68 436
+            </p>
+          </div>
+        </div>
+        <div class="second">
+          <h1>Danh mục phổ biến</h1>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
