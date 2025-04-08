@@ -4,8 +4,8 @@
   box-sizing: border-box;
 }
 .container {
-  max-width: 1200px;
-  padding: 16px;
+  max-width: 1024px;
+  padding: 16px 50px;
   margin: 0 auto;
   color: black;
 }

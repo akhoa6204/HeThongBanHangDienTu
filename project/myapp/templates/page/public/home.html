@@ -1,10 +1,56 @@
 {% extends 'components/layout/defaultLayout.html' %}
 {% load static %}
 {% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/subMenu.css' %}">
+  <link rel="stylesheet" href="{% static 'css/product_item.css' %}">
+  <link rel="stylesheet" href="{% static 'css/title_v1.css' %}">
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
-  {% include 'components/components/subMenu.html' %}
-  {% include 'components/components/product.html'  %}
+<main>
+  <section class="sliderContainer">
+      {% include 'components/components/subMenu.html' %}
+      <div class="slider"></div>
+  </section>
+  <section class="productContainer">
+    {% include 'components/components/title_v1.html'  %}
+    <div class="productBox">
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+    </div>
+  </section>
+  <section class="productContainer">
+    {% include 'components/components/title_v1.html'  %}
+    <div class="productBox">
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+    </div>
+  </section>
+  <section class="productContainer">
+    {% include 'components/components/title_v1.html'  %}
+    <div class="productBox">
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+      {% include 'components/components/product.html'  %}
+    </div>
+  </section>
+</main>
 {% endblock %}

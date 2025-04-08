@@ -1,0 +1,9 @@
+.section-title{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.section-title h2{
+    flex-grow: 1
+}

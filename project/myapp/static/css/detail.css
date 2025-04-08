@@ -1,0 +1,168 @@
+main > * {
+  max-width: 1024px;
+  padding: 30px 50px;
+  margin: 0 auto;
+}
+.productBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.productBox .imgBox {
+  display: flex;
+  align-items: center;
+}
+.productBox .imgBox img {
+  width: 100%;
+  border: 1px solid rgba(195, 193, 193, 1);
+}
+.productBox .detail > * {
+  margin-bottom: 15px;
+}
+.productBox .detail .reviewBox {
+  display: flex;
+}
+.productBox .detail .reviewBox .rating {
+  padding-right: 8px;
+  margin-right: 8px;
+  border-right: 1px solid rgba(195, 193, 193, 1);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.productBox .detail .reviewBox .rating .starBox > * {
+  color: rgba(255, 237, 37, 1);
+}
+.productBox .detail .reviewBox .comment {
+  display: flex;
+  align-items: center;
+}
+.productBox .detail .reviewBox .comment p {
+  color: rgba(195, 193, 193, 1);
+}
+.productBox .detail .priceBox {
+  text-align: center;
+  background-color: rgba(245, 245, 245, 1);
+  border-radius: 5px;
+  padding: 6px;
+}
+.productBox .detail .priceBox .afterDiscount {
+  color: rgba(212, 26, 26, 1);
+  font-weight: bold;
+  font-size: 20px;
+}
+.productBox .detail .priceBox .beforeDiscount {
+  color: rgba(195, 193, 193, 1);
+}
+.productBox .detail .categoryBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 10px;
+}
+.productBox .detail .categoryBox > p {
+  grid-column: 1/3;
+}
+.productBox .detail .categoryBox .color {
+  text-align: right;
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: 1px solid rgba(209, 206, 206, 1);
+}
+.productBox .detail .quantityBox {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.productBox .detail .quantityBox .quantity {
+  display: flex;
+  color: rgba(209, 206, 206, 1);
+}
+.productBox .detail .quantityBox .quantity p:not(:nth-child(2)) {
+  padding: 4px 12px;
+  border: 1px solid rgba(209, 206, 206, 1);
+}
+.productBox .detail .quantityBox .quantity p:nth-child(2) {
+  padding: 4px 24px;
+  border-top: 1px solid rgba(209, 206, 206, 1);
+  border-bottom: 1px solid rgba(209, 206, 206, 1);
+}
+.productBox .detail .buttonBox {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.productBox .detail .buttonBox button:first-child {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(212, 26, 26, 1);
+  background-color: rgb(252, 200, 200);
+  color: rgba(215, 0, 24, 1);
+  padding: 4px 8px;
+}
+.productBox .detail .buttonBox button:last-child {
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(212, 26, 26, 1);
+  color: white;
+}
+.contentBox > * {
+  margin-bottom: 20px;
+}
+.detailsBox h3,
+.descriptionBox h3,
+.reviewBox h3 {
+  background-color: rgba(245, 245, 245, 1);
+}
+.detailsBox > *,
+.descriptionBox > *,
+.reviewBox > * {
+  margin-bottom: 10px;
+  padding: 8px 16px;
+}
+.detailsBox .detail {
+  display: grid;
+  grid-template-columns: 3fr 7fr;
+  gap: 20px;
+}
+.detailsBox .detail p:first-child {
+  color: rgba(136, 135, 135, 1);
+}
+.descriptionBox p {
+  line-height: 2;
+}
+.reviewBox .menu {
+  display: grid;
+  grid-template-columns: 3fr 7fr;
+  gap: 10px;
+  padding: 12px;
+  background-color: rgb(255, 226, 226);
+  border: 1px solid rgba(255, 173, 173, 1);
+}
+.reviewBox .menu .rating {
+  color: rgba(212, 26, 26, 1);
+  text-align: center;
+}
+.reviewBox .menu .rating strong {
+  font-size: 24px;
+}
+.reviewBox .menu .rating span {
+  font-size: 14px;
+}
+.reviewBox .menu .filter {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px 10px;
+}
+.reviewBox .menu .filter button:nth-child(7) {
+  grid-column: 1 / 3;
+}
+
+.reviewBox .menu .filter button:nth-child(8) {
+  grid-column: 3 / 5;
+}
+.reviewBox .menu .filter button {
+  padding: 2px;
+  border: 1px solid rgba(209, 206, 206, 1);
+  background-color: white;
+  border-radius: 5px;
+}

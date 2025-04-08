@@ -1,0 +1,39 @@
+{% extends 'components/layout/defaultLayout.html' %}
+{% load static %}
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/product_cart.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="cart-container">
+        <div class="cart-header">
+            <span class="back-icon">←</span>
+            <h2>Giỏ hàng của bạn</h2>
+        </div>
+
+        <div class="cart-options">
+            <div class="removeAll">
+                <input type="checkbox" id="removedAll" required>
+                <label for="removedAll">Bỏ chọn tất cả</label>
+            </div>
+            <a href="#" class="delete-selected">Xóa sản phẩm đã chọn</a>
+        </div>
+        <div class="cartItemBox">
+            <div class="cartItem">
+                <input type="checkbox">
+                {% include 'components/components/product_cart.html' %}
+            </div>
+        </div>
+
+        <div class="cart-summary">
+            <div>
+                <p>Tạm tính: <span class="summary-price">29.490.000đ</span></p>
+                <p class="note">Chưa gồm chiết khấu</p>
+            </div>
+            <button class="buy-btn">Mua ngay (1)</button>
+        </div>
+    </div>
+</main>
+{% endblock %}
