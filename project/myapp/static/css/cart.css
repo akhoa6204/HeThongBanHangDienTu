@@ -38,14 +38,17 @@
         color: #444;
         text-decoration: none;
     }
-
-    .cartItem{
+    .cartItemBox{
+        display:flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 80px;
+    }
+    .cartItemBox .cartItem{
         display: flex;
         gap: 10px;
         align-items: center;
     }
-
-
     .cartItem .product-container{
         flex: 1;
     }
@@ -123,41 +126,51 @@
             cursor: pointer;
         }
     }
+}
+body{
+    position: relative;
+}
+.cart-summary {
+    background-color: white;
+    margin-top: 30px;
+    padding: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    max-width: 480px;
+    min-width: 360px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    bottom: 0;
+}
+.summary-price {
+    color: red;
+    font-weight: bold;
+}
 
-    .cart-summary {
-        margin-top: 30px;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        display: flex;
-        justify-content: space-between;
-    }
+.note {
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+}
 
-    .summary-price {
-        color: red;
-        font-weight: bold;
-    }
+.buy-btn {
+    height: 42px;
+    margin-top: 10px;
+    width: 130px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
 
-    .note {
-        font-size: 12px;
-        color: #777;
-        margin-top: 5px;
-    }
-
-    .buy-btn {
-        height: 42px;
-        margin-top: 10px;
-        width: 130px;
-        background: #2c3e50;
-        color: white;
-        border: none;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-
-    .buy-btn:hover {
-        background: #34495e;
-    }
+.buy-btn:hover {
+    background: #34495e;
 }
