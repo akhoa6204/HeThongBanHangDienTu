@@ -1,0 +1,15 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Trang chủ{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include 'components/components/header.html' %}
+    {% block content %}{% endblock %}
+</body>
+</html>

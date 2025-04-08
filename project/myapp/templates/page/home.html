@@ -1,0 +1,10 @@
+{% extends 'components/layout/defaultLayout.html' %}
+{% load static %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+  {% include 'components/components/subMenu.html' %}
+  {% include 'components/components/product.html' %}
+{% endblock %}
