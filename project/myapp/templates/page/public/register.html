@@ -8,21 +8,21 @@
         <h2>ĐĂNG KÝ</h2>
         <form class="register-form">
             <p>Nhập họ và tên</p>
-            <input type="text" required>
+            <input type="text" required placeholder="Nhập họ và tên">
 
             <p>Nhập số điện thoại</p>
-            <input type="tel" required>
+            <input type="tel" required placeholder="Nhập số điện thoại">
 
             <p>Nhập email (Không bắt buộc)</p>
-            <input type="email">
+            <input type="email" placeholder="Nhập email">
 
             <p>Nhập mật khẩu</p>
-            <input type="password" required>
+            <input type="password" required placeholder="Nhập mật khẩu">
 
             <p class="note">(*) Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ và 1 số (VD: 12345a)</p>
 
             <p>Nhập lại mật khẩu</p>
-            <input type="password" required>
+            <input type="password" required placeholder="Nhập lại mật khẩu">
 
             <div class="checkbox-wrap">
                 <input type="checkbox" required>
@@ -32,7 +32,7 @@
             <button type="submit">Đăng ký</button>
 
             <p class="login-link">
-                Bạn đã có tài khoản <a href=""> Đăng nhập ngay</a>
+                Bạn đã có tài khoản <a href="{% url 'login' %}">Đăng nhập ngay</a>
             </p>
         </form>
     </div>

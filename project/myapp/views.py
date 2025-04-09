@@ -23,3 +23,7 @@ def cart(request):
 
 def info_order(request):
     return render(request, 'page/public/info_order.html')
+
+
+def payment_order(request):
+    return render(request, 'page/public/payment_order.html')
