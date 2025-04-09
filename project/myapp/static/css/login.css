@@ -1,5 +1,3 @@
-
-
 .container {
     padding: 30px 50px;
     margin: 0 auto;
@@ -28,11 +26,11 @@
     color: black;
 }
 .login-form input {
-    background-color: rgb(214, 210, 210);
+    background-color: rgba(237, 235, 235, 1);
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 15px;
-    border: 1px solid rgb(214, 210, 210);
+    border: 1px solid rgba(237, 235, 235, 1);
     border-radius: 5px;
     font-size: 16px;
 }

@@ -1,0 +1,126 @@
+main > *{
+    max-width: 1024px;
+    padding: 20px 50px;
+    margin: 0 auto;
+}
+main .title {
+    display: flex;
+    justify-content: space-between;
+    gap: 100px;
+    align-items: center;
+}
+main .title > *{
+    text-align:center;
+    flex: 1;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(119, 118, 118, 1);
+    font-size: 20px;
+    color: rgba(119, 118, 118, 1)
+}
+main .title > *.active{
+    border-bottom: 1px solid rgba(212, 26, 26, 1);
+    color: rgba(212, 26, 26, 1);
+}
+.infoCustomer .infoCustomer-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.infoCustomer .info-box {
+  background: #f7f7f7;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.infoCustomer .info-box p {
+  margin: 8px 0;
+}
+
+.infoCustomer .checkbox {
+  margin-top: 10px;
+  display: flex:
+  gap: 10px;
+  align-items: center;
+}
+.infoCustomer input[type="checkbox"] {
+  transform: scale(1.1);
+  margin-right: 8px;
+}
+
+.infoCustomer select, .infoCustomer input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.infoCustomer .row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.infoCustomer .row > div {
+  flex: 1;
+}
+
+.note {
+  font-size: 13px;
+  color: #888;
+  margin-top: 10px;
+}
+section.checkbox{
+    padding-top: 0;
+    margin-bottom: 120px;
+}
+body{
+    position: relative;
+}
+.order-summary {
+    background-color: white;
+    margin-top: 30px;
+    padding: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 360px;
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    bottom: 0;
+}
+.order-summary div{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.order-summary .summary-price {
+    color: red;
+    font-weight: bold;
+    font-size: 18px
+}
+
+.order-summary .note {
+    font-size: 12px;
+    color: #777;
+    margin-top: 5px;
+}
+
+.order-summary .buy-btn {
+    background: rgba(212, 26, 26, 1);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.order-summary .buy-btn:hover {
+    background:#2c3e50;
+}

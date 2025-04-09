@@ -19,3 +19,7 @@ def detail(request, nameProduct):
 
 def cart(request):
     return render(request, 'page/public/cart.html')
+
+
+def info_order(request):
+    return render(request, 'page/public/info_order.html')

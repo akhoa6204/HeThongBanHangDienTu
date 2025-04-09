@@ -1,0 +1,82 @@
+{% extends 'components/layout/defaultLayout.html' %}
+{% load static %}
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'css/product_order.css' %}">
+  <link rel="stylesheet" href="{% static 'css/info_order.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="title">
+        <div class="infoBox active">
+            1. Thông tin
+        </div>
+        <div class="paymentBox">
+            2.Thanh toán
+        </div>
+    </section>
+    <section class="productBox">
+        {% include 'components/components/product_order.html'  %}
+        {% include 'components/components/product_order.html'  %}
+        {% include 'components/components/product_order.html'  %}
+    </section>
+    <section class="infoCustomer">
+      <div class="infoCustomer-title">THÔNG TIN KHÁCH HÀNG</div>
+      <div class="info-box">
+        <p><strong>NGUYEN VAN A</strong></p>
+        <p><strong>EMAIL</strong><br>nguyenvana@gmail.com</p>
+        <p class="note">(*) Hóa đơn VAT sẽ được gửi qua email này</p>
+        <div class="checkbox">
+            <input type="checkbox" id="acceptEmail"/>
+            <label for="acceptEmail">Nhận email thông báo và ưu đãi từ Store</label>
+        </div>
+      </div>
+    </section>
+    <section class="infoCustomer">
+      <div class="infoCustomer-title">THÔNG TIN NHẬN HÀNG</div>
+      <div class="info-box">
+        <p><strong>Giao hàng tận nơi</strong></p>
+        <div class="row">
+          <div>
+            <label>TỈNH / THÀNH PHỐ</label>
+            <select>
+              <option>Đà Nẵng</option>
+            </select>
+          </div>
+          <div>
+            <label>Chọn quận/huyện</label>
+            <select>
+              <option>---</option>
+            </select>
+          </div>
+          <div>
+            <label>Chọn phường/xã</label>
+            <select>
+              <option>---</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top: 10px;">
+          <input type="text" placeholder="Nhập địa chỉ chi tiết (Số nhà/thôn/xóm...)">
+        </div>
+        <div style="margin-top: 10px;">
+          <input type="text" placeholder="Ghi chú (nếu có)">
+        </div>
+      </div>
+    </section>
+    <section class="checkbox">
+      <label><input type="checkbox"> Yêu cầu xuất hóa đơn công ty</label>
+        <p class="note">Với đơn hàng trên 20 triệu đồng, vui lòng thanh toán bằng phương thức chuyển khoản từ tài khoản công ty hoặc bằng thẻ công ty. <span class="link">Xem chính sách</span></p>
+    </section>
+</main>
+<section class="order-summary">
+    <div>
+        <p class="note">
+            <strong style="color: black; font-size: 18px;">Tổng tiền tạm tính:</strong><br/>
+            Chưa gồm chiết khấu
+        </p>
+        <p><span class="summary-price">29.490.000đ</span></p>
+    </div>
+    <button class="buy-btn">Tiếp tục</button>
+</section>
+{% endblock %}

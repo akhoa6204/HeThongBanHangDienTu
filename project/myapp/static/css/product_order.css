@@ -1,0 +1,32 @@
+.product {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+}
+
+.product img {
+  width: 100px;
+  height: auto;
+}
+
+.product .product-info {
+  flex: 1;
+}
+
+.product .product-info h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.product .price {
+  color: red;
+  font-weight: bold;
+}
+
+.product  .old-price {
+  text-decoration: line-through;
+  color: #888;
+  margin-left: 10px;
+}
