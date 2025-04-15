@@ -1,19 +1,113 @@
 {% extends 'components/layout/onlyHeader.html' %}
 {% load static %}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/product_order.css' %}">
-  <link rel="stylesheet" href="{% static 'css/payment_order.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_order.css' %}">
+<link rel="stylesheet" href="{% static 'css/payment_order.css' %}">
 {% endblock %}
 
 {% block content %}
 <main>
-  <section class="title">
+    <section class="title">
         <div class="infoBox">
-          <a href="{% url 'info_order' %}">1. Thông tin</a>
+            <a href="{% url 'info_order' %}">1. Thông tin</a>
         </div>
         <div class="paymentBox active">
             2.Thanh toán
         </div>
+    </section>
+    <section class="formPayment">
+        <div class="form bill">
+            <div class="row">
+                <p>
+                    <input
+                            type="text"
+                            placeholder="Nhập mã giảm giá (chỉ áp dụng 1 lần)"
+                    />
+                </p>
+                <p>
+                    <button>Áp dụng</button>
+                </p>
+            </div>
+            <div class="row">
+                <p>Số lượng sản phẩm</p>
+                <p>01</p>
+            </div>
+            <div class="row">
+                <p>Tiền hàng</p>
+                <p>29.490.000đ</p>
+            </div>
+            <div class="row">
+                <p>Phí vận chuyển</p>
+                <p>Miễn phí</p>
+            </div>
+            <div class="row">
+                <p>
+                    <strong style="color: black">Tổng tiền </strong
+                    ><small>(đã gồm VAT)</small>
+                </p>
+                <p>29.490.000đ</p>
+            </div>
+        </div>
+        <div class="info payment">
+            <h3>THÔNG TIN THANH TOÁN</h3>
+            <div class="form">
+                <div class="row">
+                    <p>
+                        <span class="material-symbols-outlined"> credit_card </span>
+                        Chọn phương thức thanh toán
+                    </p>
+                    <p>
+                        <span class="material-symbols-outlined"> chevron_right </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="info customer">
+            <h3>THÔNG TIN NHẬN HÀNG</h3>
+            <div class="form">
+                <div class="row">
+                    <p>Khách hàng</p>
+                    <p>NGUYEN VAN A</p>
+                </div>
+                <div class="row">
+                    <p>Số điện thoại</p>
+                    <p>0911684993</p>
+                </div>
+                <div class="row">
+                    <p>Email</p>
+                    <p>nguyenvana@gmail.com</p>
+                </div>
+                <div class="row">
+                    <p>Nhận hàng tại</p>
+                    <p>71 Ngũ Hành Sơn, Bắc Mỹ Phú, Ngũ Hành Sơn, Đà Nẵng</p>
+                </div>
+            </div>
+        </div>
+        <div class="verify">
+            <div class="row">
+                <input type="checkbox" id="checkBox"/>
+                <label for="checkBox">
+                    Bằng việc Đặt hàng, bạn đồng ý với Điều khoản sử dụng của Store.
+                </label>
+            </div>
+            <div class="row">
+                <p style="padding-left: 30px; color: rgba(119, 118, 118, 1)">
+                    Với các giao dịch từ 10 triệu trở lên, Store xin phép kiểm tra thẻ
+                    cứng và CCCD của đúng chủ thẻ trước khi tiến hành giao hàng nhằm
+                    hạn chế các trường hợp gian lận.
+                </p>
+            </div>
+        </div>
+    </section>
+    <section class="order-summary">
+        <div>
+            <p class="note">
+                <strong style="color: black; font-size: 18px;">Tổng tiền tạm tính:</strong><br/>
+                Chưa gồm chiết khấu
+            </p>
+            <p><span class="summary-price">29.490.000đ</span></p>
+        </div>
+        <button class="buy-btn">Tiếp tục</button>
     </section>
 </main>
 {% endblock %}

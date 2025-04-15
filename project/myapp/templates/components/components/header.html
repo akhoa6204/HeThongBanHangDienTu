@@ -1,22 +1,26 @@
 {% block content %}
-  <header id="header">
-  <div class="container">
-    <h1 class="logo">SmartBuy</h1>
-    <div class="search">
-      <label class="material-symbols-outlined" for="search">search</label>
-      <input type="text" name="search" id="search" placeholder="Tìm kiếm" />
+<header id="header">
+    <div class="container">
+        <h1 class="logo"><a href="{% url 'home' %}">SmartBuy</a></h1>
+        <div class="search">
+            <label class="material-symbols-outlined" for="search">search</label>
+            <input type="text" name="search" id="search" placeholder="Tìm kiếm"/>
+        </div>
+        <div class="box">
+            <a class="cart" href="{% url 'cart' %}">
+                <span class="material-symbols-outlined">shopping_cart</span>
+                <p>Giỏ hàng</p>
+            </a>
+            <a class="loginBox" href="{% url 'login' %}">
+                <span class="material-symbols-outlined">person</span>
+                <p>Đăng nhập</p>
+            </a>
+            <!--            <div class="user">-->
+            <!--                <span class="material-symbols-outlined">person</span>-->
+            <!--                <p>Anh Khoa</p>-->
+            <!--            </div>-->
+        </div>
     </div>
-    <div class="box">
-      <div class="cart">
-        <span class="material-symbols-outlined">shopping_cart</span>
-        <p>Giỏ hàng</p>
-      </div>
-      <div class="user">
-        <span class="material-symbols-outlined">person</span>
-        <p>Đăng nhập</p>
-      </div>
-    </div>
-  </div>
 </header>
 {% endblock %}
 

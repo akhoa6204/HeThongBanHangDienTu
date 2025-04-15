@@ -1,0 +1,55 @@
+{% block content %}
+<div class="itemReviewContainer">
+    <div class="productReview">
+        <div class="product">
+            <div class="info">
+                <img
+                        src="https://s3-alpha-sig.figma.com/img/b58a/b02c/285d7b791bedb56f10845901a8926d68?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ox~tm1kX20xXu9tMvEDwquMr3F9PccCx5BI40WpOLAtYhnmxCi02DNKIpK0TlOx4K-hbQb9cFNXKA6QoZvtBfA-mtX0pbbWF1zAurujs8XBIPExvgZesNngTGL~AtWUZwB7KGI1UP2b3lly-rvzszVS8T2oAujKy0quEQFeGXdCdbGQ4vsc7x5CpUcYiQqdiKWLUr0-yp-nZ6ibniI5Mi7k3x5FyOnw59s68ZG1LkZVaOs4EuzXin3B1CLNlVc-ZVx52YvO5Z0XaicVrtKgnXZzwuBzWBiD8dymt32QMZJuseKSSLK8~BQ-kvml1VoP9Xe~GYO-oocwXGjZ0PLnY9w__"
+                        alt="img product"
+                />
+                <p>Samsung Galaxy S25 Ultra 256GB-Đen</p>
+            </div>
+        </div>
+        <div class="review">
+            <p>Chất lượng sản phẩm</p>
+            <div class="starBox">
+                <span class="material-symbols-outlined star"> kid_star </span>
+                <span class="material-symbols-outlined star"> kid_star </span>
+                <span class="material-symbols-outlined star"> kid_star </span>
+                <span class="material-symbols-outlined star"> kid_star </span>
+                <span class="material-symbols-outlined star"> kid_star </span>
+            </div>
+        </div>
+    </div>
+    <div class="formReview">
+        <form action="" class="content">
+            <div class="formGroup column">
+                <label for="quality">Chất lượng sản phẩm:</label>
+                <input type="text" id="quality" placeholder="Để lại đánh giá."/>
+            </div>
+            <div class="formGroup">
+                <label for="description">Đúng với mô tả:</label>
+                <input type="text" id="description" placeholder="Đúng với mô tả"/>
+            </div>
+            <div class="formGroup">
+                <label for="features">Tính năng nổi bật:</label>
+                <input type="text" id="features" placeholder="Tính năng nổi bật"/>
+            </div>
+        </form>
+        <p>
+            Hãy chia sẻ những điều bạn thích về sản phẩm này với những người mua
+            khác nhé.
+        </p>
+        <form action="" class="image">
+            <div class="formGroup">
+                <label for="file">
+                    <span class="material-symbols-outlined"> photo_camera </span>Thêm
+                    Hình ảnh/ Video</label
+                >
+                <input type="file" id="file"/>
+            </div>
+        </form>
+        <div class="mediaPreviewContainer"></div>
+    </div>
+</div>
+{% endblock %}

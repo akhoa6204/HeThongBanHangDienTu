@@ -50,4 +50,7 @@
   display: flex;
   align-items: center;
 }
-
+#header .container .box a{
+    color: black;
+    text-decoration: none;
+}

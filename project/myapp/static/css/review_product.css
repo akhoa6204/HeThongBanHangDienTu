@@ -1,0 +1,27 @@
+main > *{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 50px;
+    margin-bottom: 20px;
+}
+main{
+    display: flex;
+    flex-direction: column;
+}
+main .nav {
+    width: 640px;
+    text-align: center;
+    position: relative;
+}
+main h2{
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(136, 135, 135, 1);
+}
+main .nav span {
+  position: absolute;
+  top: 0;
+  left: 10%;
+}
+main .submit {
+    width: 640px;
+}

@@ -1,0 +1,27 @@
+{% extends 'components/layout/onlyHeader.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/review_product_item.css' %}">
+<link rel="stylesheet" href="{% static 'css/review_product.css' %}">
+{% endblock %}
+{% block content %}
+<main>
+    <section class="nav">
+        <h2>Đánh giá sản phẩm</h2>
+        <span class="material-symbols-outlined"> arrow_back </span>
+    </section>
+    <section class="reviewBox">
+        {% include 'components/components/review_product_item.html' %}
+        {% include 'components/components/review_product_item.html' %}
+        {% include 'components/components/review_product_item.html' %}
+
+    </section>
+    <section class="submit">
+        <button class="back">Trở lại</button>
+        <button class="success">Hoàn thành</button>
+    </section>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script></script>
+{% endblock %}

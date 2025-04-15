@@ -6,20 +6,21 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
     {% block extra_css %}{% endblock %}
-   <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
-      rel="stylesheet"
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+            rel="stylesheet"
     />
-  <style>
-    *{
-     margin: 0;
-     padding: 0;
-     box-sizing: border-box;
-     }
-  </style>
+    <style>
+        *{
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+         }
+    </style>
 </head>
 <body>
-    {% include 'components/components/header.html' %}
-    {% block content %}{% endblock %}
+{% include 'components/components/header.html' %}
+{% block content %}{% endblock %}
 </body>
+{% block extra_js %}{% endblock %}
 </html>

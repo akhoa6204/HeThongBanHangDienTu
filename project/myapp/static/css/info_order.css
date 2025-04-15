@@ -3,15 +3,15 @@ main > *{
     padding: 20px 50px;
     margin: 0 auto;
 }
-main .title a{
-    color: black;
-    text-decoration: none;
-}
 main .title {
     display: flex;
     justify-content: space-between;
     gap: 100px;
     align-items: center;
+}
+main .title a{
+    color: black;
+    text-decoration: none;
 }
 main .title > *{
     text-align:center;
@@ -19,7 +19,7 @@ main .title > *{
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(119, 118, 118, 1);
     font-size: 20px;
-    color: rgba(119, 118, 118, 1)
+    color: rgba(119, 118, 118, 1);
 }
 main .title > *.active{
     border-bottom: 1px solid rgba(212, 26, 26, 1);
@@ -76,14 +76,12 @@ main .title > *.active{
 }
 section.checkbox{
     padding-top: 0;
-    margin-bottom: 120px;
 }
-body{
+main{
     position: relative;
 }
 .order-summary {
     background-color: white;
-    margin-top: 30px;
     padding: 15px;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -92,10 +90,9 @@ body{
     flex-direction: column;
     gap: 10px;
     width: 360px;
-    position: fixed;
+    position: sticky;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1000;
     bottom: 0;
 }
 .order-summary div{

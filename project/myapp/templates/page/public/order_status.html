@@ -1,0 +1,140 @@
+{% extends 'components/layout/defaultLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order_status.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="orderStatusHeader">
+        <div class="back">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span>Trở lại</span>
+        </div>
+        <div class="infoOrder">
+            <span>Mã đơn hàng: <span style="color:rgba(0, 85, 170, 1);">250316Q431HNTY</span></span>
+            <span>Đang vận chuyển</span>
+        </div>
+    </section>
+    <section class="orderStatusInfo">
+        <div class="box active">
+            <span class="material-symbols-outlined">fact_check</span>
+            <span>Chờ xác nhận</span>
+        </div>
+        <span class="material-symbols-outlined">arrow_forward</span>
+        <div class="box">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <span>Đang đóng gói</span>
+        </div>
+        <span class="material-symbols-outlined">arrow_forward</span>
+        <div class="box">
+            <span class="material-symbols-outlined">local_shipping</span>
+            <span>Đang vận chuyển</span>
+        </div>
+        <span class="material-symbols-outlined">arrow_forward</span>
+        <div class="box">
+            <span class="material-symbols-outlined">shopping_bag</span>
+            <span>Đã giao hàng</span>
+        </div>
+    </section>
+    <section class="orderStatusInfoReceive">
+        <h3>Thông tin nhận hàng</h3>
+        <div class="form">
+            <div class="row">
+                <p>Khách hàng</p>
+                <p>Nguyễn Văn A</p>
+            </div>
+            <div class="row">
+                <p>Số điện thoại</p>
+                <p>0911684993</p>
+            </div>
+            <div class="row">
+                <p>Email</p>
+                <p>nguyenvana@gmail.com</p>
+            </div>
+            <div class="row">
+                <p>Nhận hàng tại</p>
+                <p>71 Ngũ Hành Sơn, Bắc Mỹ Phú, Ngũ Hành Sơn, Đà Nẵng</p>
+            </div>
+
+        </div>
+    </section>
+    <section class="orderStatusInfoOder">
+        <div class="orderItemBox">
+            <div class="orderItem">
+                <div class="imgBox">
+                    <img src="https://s3-alpha-sig.figma.com/img/b58a/b02c/285d7b791bedb56f10845901a8926d68?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ox~tm1kX20xXu9tMvEDwquMr3F9PccCx5BI40WpOLAtYhnmxCi02DNKIpK0TlOx4K-hbQb9cFNXKA6QoZvtBfA-mtX0pbbWF1zAurujs8XBIPExvgZesNngTGL~AtWUZwB7KGI1UP2b3lly-rvzszVS8T2oAujKy0quEQFeGXdCdbGQ4vsc7x5CpUcYiQqdiKWLUr0-yp-nZ6ibniI5Mi7k3x5FyOnw59s68ZG1LkZVaOs4EuzXin3B1CLNlVc-ZVx52YvO5Z0XaicVrtKgnXZzwuBzWBiD8dymt32QMZJuseKSSLK8~BQ-kvml1VoP9Xe~GYO-oocwXGjZ0PLnY9w__"
+                         alt="">
+                </div>
+                <div class="info">
+                    <p class="name">Samsung Galaxy S25 Ultra 256GB-Đen</p>
+                    <div>
+                        <div class="quantity">Số lượng <span style='color: red;'>1</span></div>
+                        <div class="price">
+                            <u style="color:rgba(136, 135, 135, 1);">33.990.000đ</u>
+                            <strong><span style="color:red; font-size: 18px">29.490.000đ</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="orderItem">
+                <div class="imgBox">
+                    <img src="https://s3-alpha-sig.figma.com/img/b58a/b02c/285d7b791bedb56f10845901a8926d68?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ox~tm1kX20xXu9tMvEDwquMr3F9PccCx5BI40WpOLAtYhnmxCi02DNKIpK0TlOx4K-hbQb9cFNXKA6QoZvtBfA-mtX0pbbWF1zAurujs8XBIPExvgZesNngTGL~AtWUZwB7KGI1UP2b3lly-rvzszVS8T2oAujKy0quEQFeGXdCdbGQ4vsc7x5CpUcYiQqdiKWLUr0-yp-nZ6ibniI5Mi7k3x5FyOnw59s68ZG1LkZVaOs4EuzXin3B1CLNlVc-ZVx52YvO5Z0XaicVrtKgnXZzwuBzWBiD8dymt32QMZJuseKSSLK8~BQ-kvml1VoP9Xe~GYO-oocwXGjZ0PLnY9w__"
+                         alt="">
+                </div>
+                <div class="info">
+                    <p class="name">Samsung Galaxy S25 Ultra 256GB-Đen</p>
+                    <div>
+                        <div class="quantity">Số lượng <span style='color: red;'>1</span></div>
+                        <div class="price">
+                            <u style="color:rgba(136, 135, 135, 1);">33.990.000đ</u>
+                            <strong><span style="color:red; font-size: 20px">29.490.000đ</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="orderItem">
+                <div class="imgBox">
+                    <img src="https://s3-alpha-sig.figma.com/img/b58a/b02c/285d7b791bedb56f10845901a8926d68?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=ox~tm1kX20xXu9tMvEDwquMr3F9PccCx5BI40WpOLAtYhnmxCi02DNKIpK0TlOx4K-hbQb9cFNXKA6QoZvtBfA-mtX0pbbWF1zAurujs8XBIPExvgZesNngTGL~AtWUZwB7KGI1UP2b3lly-rvzszVS8T2oAujKy0quEQFeGXdCdbGQ4vsc7x5CpUcYiQqdiKWLUr0-yp-nZ6ibniI5Mi7k3x5FyOnw59s68ZG1LkZVaOs4EuzXin3B1CLNlVc-ZVx52YvO5Z0XaicVrtKgnXZzwuBzWBiD8dymt32QMZJuseKSSLK8~BQ-kvml1VoP9Xe~GYO-oocwXGjZ0PLnY9w__"
+                         alt="">
+                </div>
+                <div class="info">
+                    <p class="name">Samsung Galaxy S25 Ultra 256GB-Đen</p>
+                    <div>
+                        <div class="quantity">Số lượng <span style='color: red;'>1</span></div>
+                        <div class="price">
+                            <u style="color:rgba(136, 135, 135, 1);">33.990.000đ</u>
+                            <strong><span style="color:red; font-size: 20px">29.490.000đ</span></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="orderItemTotalPrice">
+            <div class="row">
+                <p>Tổng tiền hàng</p>
+                <p>29.490.000đ</p>
+            </div>
+            <div class="row">
+                <p>Phí vận chuyển</p>
+                <p>Miễn phí</p>
+            </div>
+            <div class="row">
+                <p>Mã giảm giá</p>
+                <p>0đ</p>
+            </div>
+            <div class="row">
+                <p>Thành tiền</p>
+                <p style="color:red; font-size :18px;">29.490.000đ</p>
+            </div>
+            <div class="row">
+                <p>Tổng tiền hàng</p>
+                <p>29.490.000đ</p>
+            </div>
+            <i>
+                <small>Vui lòng thanh toán <span style="color:red;">29.490.000đ</span> khi nhận hàng</small>
+            </i>
+        </div>
+    </section>
+</main>
+{% endblock %}

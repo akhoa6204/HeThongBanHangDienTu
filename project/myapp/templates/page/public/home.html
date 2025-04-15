@@ -1,56 +1,117 @@
 {% extends 'components/layout/defaultLayout.html' %}
 {% load static %}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/subMenu.css' %}">
-  <link rel="stylesheet" href="{% static 'css/product_item.css' %}">
-  <link rel="stylesheet" href="{% static 'css/title_v1.css' %}">
-  <link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/subMenu.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_item.css' %}">
+<link rel="stylesheet" href="{% static 'css/title_v1.css' %}">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
 <main>
-  <section class="sliderContainer">
-      {% include 'components/components/subMenu.html' %}
-      <div class="slider"></div>
-  </section>
-  <section class="productContainer">
-    {% include 'components/components/title_v1.html'  %}
-    <div class="productBox">
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-    </div>
-  </section>
-  <section class="productContainer">
-    {% include 'components/components/title_v1.html'  %}
-    <div class="productBox">
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-    </div>
-  </section>
-  <section class="productContainer">
-    {% include 'components/components/title_v1.html'  %}
-    <div class="productBox">
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-      {% include 'components/components/product.html'  %}
-    </div>
-  </section>
+    <section class="sliderContainer">
+        {% include 'components/components/subMenu.html' %}
+        <div class="slider">
+            <div class="viewport">
+                <div class="listImg">
+                    <div class="item">
+                        <img src="{% static 'assets/img/slider1.png' %}" alt="">
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'assets/img/slider2.png' %}" alt="">
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'assets/img/slider2.png' %}" alt="">
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'assets/img/slider2.png' %}" alt="">
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'assets/img/slider1.png' %}" alt="">
+                    </div>
+                    <div class="item">
+                        <img src="{% static 'assets/img/slider1.png' %}" alt="">
+                    </div>
+                </div>
+            </div>
+            <div class="buttonBox">
+                <button class="prev">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button class="next">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </div>
+    </section>
+    <section class="productContainer">
+        {% include 'components/components/title_v1.html' %}
+        <div class="productBox">
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+        </div>
+    </section>
+    <section class="productContainer">
+        {% include 'components/components/title_v1.html' %}
+        <div class="productBox">
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+        </div>
+    </section>
+    <section class="productContainer">
+        {% include 'components/components/title_v1.html' %}
+        <div class="productBox">
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+            {% include 'components/components/product.html' %}
+        </div>
+    </section>
 </main>
+{% endblock %}
+{% block extra_js %}
+<script>
+    let activeNow = 0;
+    let listImg = document.querySelector(".listImg");
+    let prevButton = document.querySelector(".buttonBox .prev");
+    let nextButton = document.querySelector(".buttonBox .next");
+    const lenListImg = listImg.children.length;
+    function nextImg(){
+      if (activeNow >= lenListImg - 1){
+        activeNow = 0;
+      }else{
+        activeNow = activeNow + 1;
+      }
+      listImg.style.transform = `translateX(-${activeNow * 100}%)`;
+    }
+    function prevImg(){
+      if (activeNow == 0){
+        activeNow = lenListImg - 1;
+      }else{
+        activeNow = activeNow - 1;
+      }
+      console.log(activeNow)
+      listImg.style.transform = `translateX(-${activeNow * 100}%)`;
+    }
+
+    nextButton.addEventListener("click", nextImg);
+    prevButton.addEventListener("click", prevImg);
+    setInterval(nextImg, 3000);
+</script>
 {% endblock %}

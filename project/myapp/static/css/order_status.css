@@ -1,0 +1,133 @@
+main{
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 30px 50px;
+}
+main > *{
+    margin-bottom: 20px;
+}
+main .orderStatusHeader{
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    background-color: rgba(248, 248, 248, 1);
+    border-radius: 5px;
+    padding:12px;
+    .back{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        span{
+            font-size: 16px
+        }
+    }
+    .infoOrder{
+        > span:first-child{
+            padding-right: 12px;
+            margin-right: 12px;
+            border-right: 1px solid black;
+        }
+    }
+}
+main .orderStatusInfo{
+    background-color: rgba(248, 248, 248, 1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 5px;
+    > span{
+        font-size: 40px;
+        color: rgba(209, 206, 206, 1);
+    }
+    .box{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        align-items: center;
+        span:first-child{
+            width: 70px;
+            height: 70px;
+            line-height: 70px;
+            font-size: 50px;
+            background-color:rgba(230, 230, 230, 1);
+            border-radius: 50%;
+            text-align: center
+        }
+    }
+    .box.active{
+        span:first-child{
+            background-color:rgba(185, 185, 185, 1);
+        }
+    }
+}
+main .orderStatusInfoReceive{
+    h3{
+        margin-bottom: 20px;
+    }
+    .form{
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        background-color:rgba(248, 248, 248, 1);
+        border-radius: 5px;
+        padding: 12px;
+        .row{
+            display: grid;
+            grid-template-columns: 3fr 7fr;
+            gap: 10px;
+            > p:first-child{
+                color:rgba(119, 118, 118, 1);
+            }
+            > p:last-child{
+                text-align: right;
+            }
+        }
+    }
+}
+main .orderStatusInfoOder{
+    background-color: rgba(248, 248, 248, 1);
+    padding: 12px;
+    border-radius: 5px ;
+    .orderItemBox{
+        .orderItem{
+            padding-bottom: 12px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(185, 176, 176, 1);
+            display: flex;
+            gap: 20px;
+            .imgBox{
+                width: 150px;
+                img{
+                    width: 100%
+                }
+            }
+            .info{
+                flex: 1;
+                p{
+                    font-size: 18px;
+                    margin-bottom: 10px;
+                }
+                >div{
+                    display: flex;
+                    justify-content: space-between;
+                }
+            }
+        }
+    }
+    .orderItemTotalPrice{
+        text-align: end;
+        margin-bottom: 10px;
+        .row, i{
+            max-width: 360px;
+        }
+        .row{
+            margin-left: auto;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+    }
+}

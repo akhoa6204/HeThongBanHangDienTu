@@ -44,6 +44,10 @@
             font-size: 16px;
             font-weight: 600;
             color: #636060;
+            a{
+                color: #636060;
+                text-decoration: None;
+            }
         }
 
         .price {
