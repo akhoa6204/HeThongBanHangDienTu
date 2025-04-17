@@ -1,0 +1,58 @@
+main {
+    max-width: 1024px;
+    padding: 30px 50px;
+    margin: 0 auto;
+}
+main > * {
+    margin-bottom: 30px;
+}
+.sliderContainer{
+    display: grid;
+    grid-template-columns: 3fr 7fr;
+    gap: 30px
+}
+.productContainer .productBox {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 30px;
+}
+main .slider {
+    position: relative;
+}
+main .slider .viewport {
+    overflow-x: hidden;
+}
+main .slider .listImg {
+    display: flex;
+    transition: 0.3s;
+    transform: translateX(-100%)
+    transition: all ease .5s;
+}
+
+main .slider .item {
+    min-width: 100%;
+}
+
+main .slider .item img {
+    width: 100%;
+    display: block;
+}
+main .slider .buttonBox {
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    right: -30px;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+main .slider .buttonBox button {
+    pointer-events: auto;
+    padding: 6px 12px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background: rgba(243, 249, 251, 1);
+    color: rgba(0, 142, 204, 1);
+}

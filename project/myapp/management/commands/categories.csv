@@ -1,2 +1,2 @@
-CategoryID,CategoryName
-1,Điện thoại
+CategoryID,CategoryName,slug
+1,Điện thoại,dien-thoai

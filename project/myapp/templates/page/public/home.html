@@ -44,45 +44,17 @@
             </div>
         </div>
     </section>
+    {% for result in results%}
     <section class="productContainer">
-        {% include 'components/components/title_v1.html' %}
+        {% include 'components/components/title_v1.html' with category_name=result.category %}
         <div class="productBox">
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
+            {% for product in result.products %}
+            {% include 'components/components/product.html' with product=product %}
+            {% endfor %}
         </div>
     </section>
-    <section class="productContainer">
-        {% include 'components/components/title_v1.html' %}
-        <div class="productBox">
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-        </div>
-    </section>
-    <section class="productContainer">
-        {% include 'components/components/title_v1.html' %}
-        <div class="productBox">
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-            {% include 'components/components/product.html' %}
-        </div>
-    </section>
+    {% endfor %}
+
 </main>
 {% endblock %}
 {% block extra_js %}

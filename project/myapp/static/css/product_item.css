@@ -32,7 +32,7 @@
             display: flex;
             justify-content: center;
             height: 170px;
-
+            margin-top: 10px;
             img {
                 height: 170px;
                 width: auto;
@@ -55,5 +55,6 @@
             display: flex;
             gap: 10px;
             margin-top: 12px;
+            justify-content: center
         }
     }

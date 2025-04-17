@@ -98,6 +98,7 @@ main > * {
   background-color: rgb(252, 200, 200);
   color: rgba(215, 0, 24, 1);
   padding: 4px 8px;
+  border-radius: 5px;
 }
 .productBox .detail .buttonBox button:last-child {
   border: none;

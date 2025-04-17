@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand, CommandError
 from myapp.models import Category, Brand, Product, Option
 
+
 # python manage.py load_product_data
 # --category path/to/category.csv
 # --brand path/to/brand.csv
@@ -34,7 +35,12 @@ class Command(BaseCommand):
         if options['category']:
             categories = self.read_csv(options['category'])
             for row in categories:
-                c, created = Category.objects.get_or_create(name=row['CategoryName'])
+                c, created = Category.objects.get_or_create(
+                    name=row['CategoryName'],
+                    defaults={
+                        'slug': row.get('slug', '')
+                    }
+                )
                 if created:
                     self.stdout.write(f'Created Category: {c.name}')
                 else:
@@ -44,7 +50,13 @@ class Command(BaseCommand):
         if options['brand']:
             brands = self.read_csv(options['brand'])
             for row in brands:
-                b, created = Brand.objects.get_or_create(name=row['name'], defaults={'origin': row.get('nation', '')})
+                b, created = Brand.objects.get_or_create(
+                    name=row['name'],
+                    defaults={
+                        'origin': row.get('nation', ''),
+                        'slug': row.get('slug', '')
+                    }
+                )
                 if created:
                     self.stdout.write(f'Created Brand: {b.name}')
                 else:
@@ -64,12 +76,13 @@ class Command(BaseCommand):
                     self.stderr.write(f"Brand '{row['brand_id']}' not found for Product {row['name']}")
                     continue
                 p, created = Product.objects.get_or_create(name=row['name'],
-                    defaults={
-                        'category': category,
-                        'brand': brand,
-                        'img': row.get('img', '')
-                    }
-                )
+                                                           defaults={
+                                                               'category': category,
+                                                               'brand': brand,
+                                                               'img': row.get('img', ''),
+                                                               'slug': row.get('slug', '')
+                                                           }
+                                                           )
                 if created:
                     self.stdout.write(f'Created Product: {p.name}')
                 else:
@@ -89,8 +102,9 @@ class Command(BaseCommand):
                         product=product,
                         version=row.get('version', ''),
                         color=row.get('color', ''),
-                        img = row.get('img', None),
+                        img=row.get('img', None),
                         defaults={
+                            'slug': row.get('slug', ''),
                             'price': Decimal(row.get('price', None)),
                             'memory_and_storage': row.get('Memory & Storage', ''),
                             'rear_camera': row.get('Rear Camera', ''),
