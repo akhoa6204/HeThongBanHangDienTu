@@ -12,7 +12,7 @@ class Category(models.Model):
     name = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    slug = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.slug or 'None'}"
@@ -23,7 +23,7 @@ class Brand(models.Model):
     origin = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    slug = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.slug or 'None'}"
@@ -36,21 +36,21 @@ class Product(models.Model):
     purchased_count = models.PositiveIntegerField(default=0)
     img = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    slug = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.slug or 'None'}"
 
 
 class Option(models.Model):
-    slug = models.CharField(max_length=150)
+    slug = models.CharField(max_length=150, null=True, blank=True)
     product = models.ForeignKey('Product', on_delete=models.CASCADE, help_text="Sản phẩm tương ứng")
-
+    quantity = models.PositiveIntegerField(default=5);
     version = models.CharField(max_length=150, null=True, blank=True, help_text="Tên phiên bản sản phẩm")
     color = models.CharField(max_length=150, null=True, blank=True, help_text="Màu sắc sản phẩm")
     price = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True,
                                 help_text="Giá gốc của sản phẩm")
-    img = models.URLField(null=True, blank=True, help_text="Hình ảnh phiên bản")
+    img = models.TextField(null=True, blank=True, help_text="Danh sách URL hình ảnh")
 
     # Các trường specs dạng JSON → lưu dưới dạng chuỗi (TextField)
     memory_and_storage = models.TextField(null=True, blank=True, help_text="Bộ nhớ & Lưu trữ")

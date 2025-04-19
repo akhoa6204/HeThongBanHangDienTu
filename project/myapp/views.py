@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from .models import Product, Option, Category
+from .models import Product, Option, Category, Review, Brand
 
 
 # Create your views here.
@@ -9,7 +9,7 @@ def home(request):
         categories = Category.objects.all()
         result = []
         for category in categories:
-            products = Product.objects.filter(category_id=category.id).order_by('-purchased_count')
+            products = Product.objects.filter(category_id=category.id).order_by('-purchased_count')[: 8]
             final_product = []
             for product in products:
                 option = Option.objects.filter(product_id=product.id).order_by('-discount')[:1]
@@ -18,8 +18,9 @@ def home(request):
                     price = int(option.price) * (1 - (option.discount if option.discount else 0))
                     final_product.append({
                         "slugCategory": category.slug,
-                        'slugProduct': option.slug,
-                        "name": product.name,
+                        'slugProduct': product.slug,
+                        'slugOption': option.slug,
+                        "name": product.name + " (" + option.version + ")",
                         "img": product.img,
                         "discount": option.discount,
                         "price": "{:,.0f}".format(price),
@@ -48,46 +49,62 @@ def search(request, nameProduct):
     return render(request, 'page/public/search.html')
 
 
-def detail(request, slugCategory, slugProduct):
-    try:
-        option = Option.objects.filter(slug=slugProduct).first()
-        if not option:
-            print("Không tìm thấy Option với slug này.")
-        else:
-            product = Product.objects.get(id=option.product_id)
-            options = Option.objects.filter(product_id=product.id)
-            result = {}
-            result['product'] = product
-            for option in options:
-                if option.version not in result:
-                    result[option.version] = []
+def detail(request, slugCategory, slugProduct, slugOption):
+    product = Product.objects.get(slug=slugProduct)
+    versions = Option.objects.filter(product_id=product.id)
+    brand_name = Brand.objects.get(id=product.brand_id).name
+    category_name = Category.objects.get(slug=slugCategory).name
+    options = {}
+    options_color = []
+    selected_slug = slugOption
 
-                result[option.version].append({
-                    'color': option.color,
-                    'price': option.price,
-                    'img': option.img,
-                    'memory_and_storage': option.memory_and_storage,
-                    'rear_camera': option.rear_camera,
-                    'front_camera': option.front_camera,
-                    'os_and_cpu': option.os_and_cpu,
-                    'connectivity': option.connectivity,
-                    'display': option.display,
-                    'battery_and_charging': option.battery_and_charging,
-                    'design_and_weight': option.design_and_weight,
-                    'general_information': option.general_information,
-                    'utilities': option.utilities,
-                    'product_overview': option.product_overview,
-                    'warranty': option.warranty,
-                    'discount': option.discount,
-                    'promotion_start_date': option.promotion_start_date,
-                    'promotion_end_date': option.promotion_end_date,
-                    'promotion_description': option.promotion_description,
-                    'description': option.description
-                })
-    except Exception as e:
-        product = None
-        option = None
-    return render(request, 'page/public/detail.html', {'result': result})
+    current_versions_raw = Option.objects.filter(product_id=product.id, slug=slugOption)
+    selected_color = current_versions_raw.first().color if current_versions_raw else None
+    selected_version = current_versions_raw.first().version if current_versions_raw else None
+
+    current_versions = []
+    for version in current_versions_raw:
+        if version.version == selected_version:
+            imgList = [img.strip(';').strip() for img in version.img.split(',')]
+            current_versions.append({
+                'category_name': category_name,
+                'brand_name': brand_name,
+                'version': version.version,
+                'color': version.color,
+                'img': imgList,
+                'price': version.price,
+                'quantity': version.quantity,
+                'memory_and_storage': version.memory_and_storage,
+                'rear_camera': version.rear_camera,
+                'os_and_cpu': version.os_and_cpu,
+                'display': version.display,
+                'discount': version.discount,
+                'description': version.description,
+            })
+
+    # Xử lý các version và color
+    for version in versions:
+        if version.version not in options:
+            options[version.version] = {
+                "slug": version.slug
+            }
+        if version.slug == slugOption and version.color not in options_color:
+            options_color.append(version.color)
+
+    reviews = Review.objects.filter(product_id=product.id)
+    print(len(reviews))
+    return render(request, 'page/public/detail.html', {
+        'product': product,
+        'options': options,
+        'current_versions': current_versions,
+        'selected_version': selected_version,
+        'reviews': reviews if len(reviews) > 0 else None,
+        'slugCategory': slugCategory,
+        'slugProduct': slugProduct,
+        'selected_slug': selected_slug,
+        'selected_color': selected_color,
+        'options_color': options_color
+    })
 
 
 def cart(request):

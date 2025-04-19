@@ -6,7 +6,7 @@ main > * {
 .productBox {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 30px;
 }
 .productBox .imgBox {
   display: flex;
@@ -54,19 +54,43 @@ main > * {
 .productBox .detail .priceBox .beforeDiscount {
   color: rgba(195, 193, 193, 1);
 }
-.productBox .detail .categoryBox {
+.productBox .detail .categoryBox{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px 10px;
+}
+.productBox .detail .categoryBox > p {
+  grid-column: 1/4;
+}
+.productBox .detail .categoryBox .category{
+    border-radius: 5px;
+    border: 1px solid rgba(209, 206, 206, 1);
+    padding: 6px 12px;
+    text-align: center;
+}
+.productBox .detail .categoryBox a{
+    text-decoration: none;
+    color: black;
+}
+.productBox .detail .categoryBox .category.active{
+        border: 3px solid #00957C;
+}
+.productBox .detail .colorBox {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px 10px;
 }
-.productBox .detail .categoryBox > p {
+.productBox .detail .colorBox > p {
   grid-column: 1/3;
 }
-.productBox .detail .categoryBox .color {
+.productBox .detail .colorBox .color {
   text-align: right;
   padding: 6px 12px;
   border-radius: 5px;
   border: 1px solid rgba(209, 206, 206, 1);
+}
+.productBox .detail .colorBox .color.active{
+        border: 3px solid #00957C;
 }
 .productBox .detail .quantityBox {
   display: flex;
@@ -75,7 +99,6 @@ main > * {
 }
 .productBox .detail .quantityBox .quantity {
   display: flex;
-  color: rgba(209, 206, 206, 1);
 }
 .productBox .detail .quantityBox .quantity p:not(:nth-child(2)) {
   padding: 4px 12px;
@@ -114,7 +137,7 @@ main > * {
 .reviewBox h3 {
   background-color: rgba(245, 245, 245, 1);
 }
-.detailsBox > *,
+.detailsBox > *, .detailsBox > * .detail,
 .descriptionBox > *,
 .reviewBox > * {
   margin-bottom: 10px;
@@ -130,6 +153,13 @@ main > * {
 }
 .descriptionBox p {
   line-height: 2;
+  font-size: 20px;
+}
+.reviewBox .none{
+    text-align: center;
+    p{
+        font-size: 20px;
+    }
 }
 .reviewBox .menu {
   display: grid;
@@ -166,4 +196,45 @@ main > * {
   border: 1px solid rgba(209, 206, 206, 1);
   background-color: white;
   border-radius: 5px;
+}
+main .slider {
+    position: relative;
+    flex-grow: 1 ;
+}
+main .slider .viewport {
+    overflow-x: hidden;
+}
+main .slider .listImg {
+    display: flex;
+    transition: 0.3s;
+    transition: all ease .5s;
+    width: 100%;
+}
+
+main .slider .item {
+    min-width: 100%;
+}
+
+main .slider .item img {
+    width: 100%;
+    display: block;
+}
+main .slider .buttonBox {
+    position: absolute;
+    top: 50%;
+    left: -30px;
+    right: -30px;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+}
+
+main .slider .buttonBox button {
+    pointer-events: auto;
+    padding: 6px 12px;
+    border-radius: 50%;
+    border: 5px solid white;
+    background: rgba(243, 249, 251, 1);
+    color: rgba(0, 142, 204, 1);
 }

@@ -8,12 +8,12 @@
         {% endif %}
     </div>
     <div class="product-image">
-        <a href="{% url 'detail' slugCategory=product.slugCategory slugProduct=product.slugProduct %}">
+        <a href="{% url 'detail_option' slugCategory=product.slugCategory slugProduct=product.slugProduct slugOption=product.slugOption %}">
             <img src="{{product.img}}">
         </a>
     </div>
     <div class="name-product">
-        <a href="{% url 'detail' slugCategory=product.slugCategory slugProduct=product.slugProduct %}">
+        <a href="{% url 'detail_option' slugCategory=product.slugCategory slugProduct=product.slugProduct slugOption=product.slugOption %}">
             <p>{{product.name}}</p>
         </a>
     </div>

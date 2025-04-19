@@ -10,13 +10,23 @@
 <main>
     <section class="productBox">
         <div class="imgBox">
-            <img
-                    src="https://s3-alpha-sig.figma.com/img/e867/7de7/7ddabb62dd6880a5800447feaefa167c?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=Kc1etZdwFHeV6evF8Ry5qWhnOj2xtMCtilJl1gEgrp-itr7sI8DOCf52ucdl1YFPS605zwlnJaG584yVDlCzQtoR7NoIG430CCca7R0Nq8Zr8Naa2Pg~MssUU9uRgRjQ7Bl3N0vnsM0tQWwfX3uZqQjsZmtOvBIkFWCupdwuzd4EzNy2tlrduJ2X8FE6xpjTbB-NRmt09rlwj9PY~rEIJL27acBf1RTtibuV7krIiDJOAWKJn10KgxF3C3kULcJd2b-X0nbgvjUXhN3cMgoEsPVjUJEhwPZO~BvsI4diYU~KUDRJLGdXCIktAPVkml3BaFGSDxrbq41D-jINTX5pHw__"
-                    alt=""
-            />
+            <div class="slider">
+                <div class="viewport">
+                    <div class="listImg">
+                    </div>
+                </div>
+                <div class="buttonBox">
+                    <button class="prev">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </button>
+                    <button class="next">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
         </div>
         <div class="detail">
-            <h3 class="name">{{ result.product.name}}</h3>
+            <h3 class="name">{{ product.name }}</h3>
             <div class="reviewBox">
                 <div class="rating">
                     <p><u>4.9</u></p>
@@ -33,18 +43,33 @@
                 </div>
             </div>
             <div class="priceBox">
-                <p class="afterDiscount">31.290.000đ</p>
-                <p class="beforeDiscount">
-                    <small><s>34.990.000đ</s></small>
-                </p>
             </div>
             <div class="categoryBox">
-                <p>Màu sắc</p>
-                {% for color in result
-                <div class="color">
-                    <p>Titan Đen</p>
-                </div>
+                <p>Phiên bản</p>
+                {% for key, value in options.items %}
+                {% if key == selected_version %}
+                <a href="#" class="category active">
+                    {{ key }}
+                </a>
+                {% else %}
+                <a href="{% url 'detail_option' slugCategory=slugCategory slugProduct=slugProduct slugOption=value.slug %}"
+                   class="category">
+                    {{ key }}
+                </a>
+                {% endif %}
+                {% endfor %}
             </div>
+            <div class="colorBox">
+                <p>Màu sắc</p>
+                {% for color in options_color %}
+                <div class="color {% if color == selected_color %}active{% endif %}" data-color="{{ color }}"
+                     onclick="handleColor(event)">
+                    <p>{{ color }}</p>
+                </div>
+                {% endfor %}
+
+            </div>
+
             <div class="quantityBox">
                 <p>Số lượng</p>
                 <div class="quantity">
@@ -67,58 +92,12 @@
     <section class="contentBox">
         <div class="detailsBox">
             <h3>CHI TIẾT SẢN PHẨM</h3>
-            <div class="detail">
-                <p>Danh mục</p>
-                <p>Điện thoại</p>
-            </div>
-            <div class="detail">
-                <p>Kho</p>
-                <p>23</p>
-            </div>
-            <div class="detail">
-                <p>Thương hiệu</p>
-                <p>Apple</p>
-            </div>
-            <div class="detail">
-                <p>Dung lượng lưu trữ</p>
-                <p>256GB</p>
-            </div>
-            <div class="detail">
-                <p>Loại bảo hành</p>
-                <p>Bảo hành nhà sản xuất</p>
-            </div>
-            <div class="detail">
-                <p>Hạn bảo hành</p>
-                <p>12 tháng</p>
-            </div>
-            <div class="detail">
-                <p>Bộ xử lý</p>
-                <p>Apple A18</p>
-            </div>
-            <div class="detail">
-                <p>Độ phân giải camera chính</p>
-                <p>48 MP</p>
-            </div>
-            <div class="detail">
-                <p>Kích thước màn hình</p>
-                <p>6.9 inches</p>
+            <div class="main">
             </div>
         </div>
         <div class="descriptionBox">
             <h3>MÔ TẢ SẢN PHẨM</h3>
-            <p>
-                - Tính thẩm mỹ cao nhờ kích thước màn hình lớn hơn cùng viền
-                bezelnhỏ hơn.<br/>
-                - Trang bị cảm biến quad-pixel thế hệ 2, độ phân giải 48MP tăng chất
-                lượng quay chụp. <br/>
-                - Camera siêu tele x5 tăng khả năng zoom quang học. <br/>
-                - Sử dụng chipset mới A18 Pro tăng hiệu suất máy. <br/>
-                - Tínhnăng Camera Control như máy ảnh chuyên nghiệp. <br/>
-                - iPhone 16 Pro Max 256GB sử dụng camera fushion 48MP với cảm biến
-                quad-pixel thế hệ thứ 2. Đây chính là điểm cải tiến vượt trội giúp
-                phiên bản iPhone 16 Pro Max nâng cấp khả năng chụp ảnh lên một “tầm
-                cao” mới.
-            </p>
+            <p></p>
         </div>
     </section>
     <section class="reviewBox" style="margin-top: -40px">
@@ -145,6 +124,7 @@
                 <button class="twoColumn">Có hình Ảnh/ Video</button>
             </div>
         </div>
+        {% if reviews %}
         <div class="review">
             {% include 'components/components/review_item.html' %}
             {% include 'components/components/review_item.html' %}
@@ -154,6 +134,17 @@
                 {% include 'components/components/pagination.html' %}
             </div>
         </div>
+        {% else %}
+        <div class="none">
+            <img src="https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/shoprating/3215f6ba1a0e877fa06e.png"
+                 alt="">
+            <p>Chưa có đánh giá về sản phẩm</p>
+        </div>
+        {% endif %}
     </section>
+
 </main>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static '    js/detail.js' %}" type="module"></script>
 {% endblock %}
