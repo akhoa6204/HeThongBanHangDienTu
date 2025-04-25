@@ -4,8 +4,10 @@ from django.db import models
 
 
 class User(AbstractUser):
-    phone = models.CharField(max_length=50)
+    phone = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(unique=True)
     address = models.TextField()
+    img = models.TextField(null=True, blank=True)
 
 
 class Category(models.Model):
@@ -103,20 +105,34 @@ class Purchased(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     content = models.TextField()
+    quality = models.TextField(null=True, blank=True)
+    summary = models.TextField(null=True, blank=True)
+    featureHighlight = models.TextField(null=True, blank=True)
     star_count = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    img = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.img or 'None'}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'option'], name='unique_user_option_review')
+        ]
 
 
 class ReviewReply(models.Model):
-    review = models.OneToOneField(Review, on_delete=models.CASCADE)  # Mỗi đánh giá chỉ có 1 phản hồi
-    admin = models.ForeignKey(User, on_delete=models.CASCADE,
-                              limit_choices_to={'is_staff': True})  # Chỉ admin mới có thể phản hồi
+    review = models.OneToOneField(Review, on_delete=models.CASCADE)
+    # admin = models.ForeignKey(User, on_delete=models.CASCADE,
+    #                           limit_choices_to={'is_staff': True})
+    admin = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()  # Nội dung phản hồi
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

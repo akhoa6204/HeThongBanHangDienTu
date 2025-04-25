@@ -21,16 +21,7 @@
                         <img src="{% static 'assets/img/slider2.png' %}" alt="">
                     </div>
                     <div class="item">
-                        <img src="{% static 'assets/img/slider2.png' %}" alt="">
-                    </div>
-                    <div class="item">
-                        <img src="{% static 'assets/img/slider2.png' %}" alt="">
-                    </div>
-                    <div class="item">
-                        <img src="{% static 'assets/img/slider1.png' %}" alt="">
-                    </div>
-                    <div class="item">
-                        <img src="{% static 'assets/img/slider1.png' %}" alt="">
+                        <img src="{% static 'assets/img/slider3.png' %}" alt="">
                     </div>
                 </div>
             </div>
@@ -44,46 +35,8 @@
             </div>
         </div>
     </section>
-    {% for result in results%}
-    <section class="productContainer">
-        {% include 'components/components/title_v1.html' with category_name=result.category %}
-        <div class="productBox">
-            {% for product in result.products %}
-            {% include 'components/components/product.html' with product=product %}
-            {% endfor %}
-        </div>
-    </section>
-    {% endfor %}
-
 </main>
 {% endblock %}
 {% block extra_js %}
-<script>
-    let activeNow = 0;
-    let listImg = document.querySelector(".listImg");
-    let prevButton = document.querySelector(".buttonBox .prev");
-    let nextButton = document.querySelector(".buttonBox .next");
-    const lenListImg = listImg.children.length;
-    function nextImg(){
-      if (activeNow >= lenListImg - 1){
-        activeNow = 0;
-      }else{
-        activeNow = activeNow + 1;
-      }
-      listImg.style.transform = `translateX(-${activeNow * 100}%)`;
-    }
-    function prevImg(){
-      if (activeNow == 0){
-        activeNow = lenListImg - 1;
-      }else{
-        activeNow = activeNow - 1;
-      }
-      console.log(activeNow)
-      listImg.style.transform = `translateX(-${activeNow * 100}%)`;
-    }
-
-    nextButton.addEventListener("click", nextImg);
-    prevButton.addEventListener("click", prevImg);
-    setInterval(nextImg, 3000);
-</script>
+<script src="{% static 'js/home/home.js' %}" type="module"></script>
 {% endblock %}

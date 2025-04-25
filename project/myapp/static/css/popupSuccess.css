@@ -1,0 +1,32 @@
+.popUp-container{
+    width: 640px;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid rgba(119, 118, 118, 1);
+    text-align: center;
+    padding: 32px;
+    > *{
+        margin-bottom: 20px;
+    }
+    > i{
+      background-color:rgba(53, 202, 40, 1);
+      color: white;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      line-height: 80px;
+      font-size: 40px;
+    }
+    > p{
+        font-size:25px;
+    }
+    > button{
+        background-color: rgba(217, 217, 217, 1);
+        color: black;
+        padding: 8px 32px;
+        border-radius: 5px;
+        border: none;
+        outline: none;
+        font-size: 20px;
+    }
+}

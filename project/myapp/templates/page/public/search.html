@@ -1,30 +1,24 @@
 {% extends 'components/layout/defaultLayout.html' %}
 {% load static %}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/product_item.css' %}">
-  <link rel="stylesheet" href="{% static 'css/pagination.css' %}">
-  <link rel="stylesheet" href="{% static 'css/search.css' %}">
+<link rel="stylesheet" href="{% static 'css/product_item.css' %}">
+<link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
 {% endblock %}
 
 {% block content %}
 <main>
     <section class="resultBox">
-        <p>Tìm thấy <strong>869</strong> sản phẩm cho từ khoá <strong>'Điện thoại iPhone'</strong></p>
+        <!--        <p>Tìm thấy <strong>869</strong> sản phẩm cho từ khoá <strong>'Điện thoại iPhone'</strong></p>-->
     </section>
     <section class="productContainer">
-        <div class="productBox">
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-          {% include 'components/components/product.html'  %}
-        </div>
+        <div class="productBox"></div>
     </section>
-    <section class="paginationBox">
-        {% include 'components/components/pagination.html'  %}
-    </section>
+    <div id="pagination">
+    </div>
 </main>
 {% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/search/search.js' %}" type="module"></script>
+{% endblock %}
+

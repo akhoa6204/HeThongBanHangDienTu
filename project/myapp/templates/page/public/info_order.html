@@ -12,19 +12,16 @@
             1. Thông tin
         </div>
         <div class="paymentBox">
-            <a href="{% url 'payment_order'%}">2.Thanh toán</a>
+            2.Thanh toán
         </div>
     </section>
     <section class="productBox">
-        {% include 'components/components/product_order.html' %}
-        {% include 'components/components/product_order.html' %}
-        {% include 'components/components/product_order.html' %}
     </section>
-    <section class="infoCustomer">
+    <section class="infoCustomer info">
         <div class="infoCustomer-title">THÔNG TIN KHÁCH HÀNG</div>
         <div class="info-box">
-            <p><strong>NGUYEN VAN A</strong></p>
-            <p><strong>EMAIL</strong><br>nguyenvana@gmail.com</p>
+            <p class="nameCustomer"><strong>NGUYEN VAN A</strong></p>
+            <p class="emailCustomer"><strong>EMAIL</strong><br>nguyenvana@gmail.com</p>
             <p class="note">(*) Hóa đơn VAT sẽ được gửi qua email này</p>
             <div class="checkbox">
                 <input type="checkbox" id="acceptEmail"/>
@@ -32,40 +29,35 @@
             </div>
         </div>
     </section>
-    <section class="infoCustomer">
+    <section class="infoCustomer address">
         <div class="infoCustomer-title">THÔNG TIN NHẬN HÀNG</div>
         <div class="info-box">
             <p><strong>Giao hàng tận nơi</strong></p>
             <div class="row">
-                <div>
+                <div class="city">
                     <label>TỈNH / THÀNH PHỐ</label>
-                    <select>
-                        <option>Đà Nẵng</option>
-                    </select>
+                    <select></select>
                 </div>
-                <div>
+                <div class="district">
                     <label>Chọn quận/huyện</label>
-                    <select>
-                        <option>---</option>
-                    </select>
+                    <select></select>
                 </div>
-                <div>
+                <div class="ward">
                     <label>Chọn phường/xã</label>
-                    <select>
-                        <option>---</option>
-                    </select>
+                    <select></select>
                 </div>
             </div>
             <div style="margin-top: 10px;">
-                <input type="text" placeholder="Nhập địa chỉ chi tiết (Số nhà/thôn/xóm...)">
+                <input type="text" required placeholder="Nhập địa chỉ chi tiết (Số nhà/thôn/xóm...)"
+                       id="address_detail">
             </div>
             <div style="margin-top: 10px;">
-                <input type="text" placeholder="Ghi chú (nếu có)">
+                <input type="text" placeholder="Ghi chú (nếu có)" id="note">
             </div>
         </div>
     </section>
     <section class="checkbox">
-        <label><input type="checkbox"> Yêu cầu xuất hóa đơn công ty</label>
+        <label><input type="checkbox" id="acceptBill"> Yêu cầu xuất hóa đơn công ty</label>
         <p class="note">Với đơn hàng trên 20 triệu đồng, vui lòng thanh toán bằng phương thức chuyển khoản từ tài khoản
             công ty hoặc bằng thẻ công ty. <span class="link">Xem chính sách</span></p>
     </section>
@@ -80,4 +72,7 @@
         <button class="buy-btn">Tiếp tục</button>
     </section>
 </main>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/infoOrder/infoOrder.js' %}" type="module"></script>
 {% endblock %}

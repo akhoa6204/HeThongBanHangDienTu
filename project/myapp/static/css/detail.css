@@ -30,7 +30,7 @@ main > * {
   gap: 10px;
   align-items: center;
 }
-.productBox .detail .reviewBox .rating .starBox > * {
+.productBox .detail .reviewBox .rating .starBox .active{
   color: rgba(255, 237, 37, 1);
 }
 .productBox .detail .reviewBox .comment {
@@ -170,8 +170,10 @@ main > * {
   border: 1px solid rgba(255, 173, 173, 1);
 }
 .reviewBox .menu .rating {
-  color: rgba(212, 26, 26, 1);
   text-align: center;
+}
+.reviewBox .menu .rating .active{
+  color: rgba(212, 26, 26, 1);
 }
 .reviewBox .menu .rating strong {
   font-size: 24px;
@@ -237,4 +239,22 @@ main .slider .buttonBox button {
     border: 5px solid white;
     background: rgba(243, 249, 251, 1);
     color: rgba(0, 142, 204, 1);
+}
+body{
+    position: relative;
+}
+.popup-model{
+    position: fixed;
+    top:0;
+    bottom:0;
+    right:0;
+    left: 0;
+    background-color:rgba(217, 217, 217, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+}
+.popup-model.active{
+    display: flex;
 }

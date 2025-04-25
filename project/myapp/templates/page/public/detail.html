@@ -1,6 +1,7 @@
 {% extends 'components/layout/defaultLayout.html' %}
 {% load static %}
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
 <link rel="stylesheet" href="{% static 'css/reviewItem.css' %}">
 <link rel="stylesheet" href="{% static 'css/pagination.css' %}">
 <link rel="stylesheet" href="{% static 'css/detail.css' %}">
@@ -26,50 +27,21 @@
             </div>
         </div>
         <div class="detail">
-            <h3 class="name">{{ product.name }}</h3>
+            <h3 class="name"></h3>
             <div class="reviewBox">
                 <div class="rating">
-                    <p><u>4.9</u></p>
-                    <div class="starBox">
-                        <span class="material-symbols-outlined star"> kid_star </span>
-                        <span class="material-symbols-outlined star"> kid_star </span>
-                        <span class="material-symbols-outlined star"> kid_star </span>
-                        <span class="material-symbols-outlined star"> kid_star </span>
-                        <span class="material-symbols-outlined star"> kid_star </span>
-                    </div>
                 </div>
                 <div class="comment">
-                    <p><u style="color: black">10</u> Đánh giá</p>
                 </div>
             </div>
             <div class="priceBox">
             </div>
             <div class="categoryBox">
                 <p>Phiên bản</p>
-                {% for key, value in options.items %}
-                {% if key == selected_version %}
-                <a href="#" class="category active">
-                    {{ key }}
-                </a>
-                {% else %}
-                <a href="{% url 'detail_option' slugCategory=slugCategory slugProduct=slugProduct slugOption=value.slug %}"
-                   class="category">
-                    {{ key }}
-                </a>
-                {% endif %}
-                {% endfor %}
             </div>
             <div class="colorBox">
                 <p>Màu sắc</p>
-                {% for color in options_color %}
-                <div class="color {% if color == selected_color %}active{% endif %}" data-color="{{ color }}"
-                     onclick="handleColor(event)">
-                    <p>{{ color }}</p>
-                </div>
-                {% endfor %}
-
             </div>
-
             <div class="quantityBox">
                 <p>Số lượng</p>
                 <div class="quantity">
@@ -104,47 +76,29 @@
         <h3>ĐÁNH GIÁ SẢN PHẨM</h3>
         <div class="menu">
             <div class="rating">
-                <p><strong>4.9</strong> trên 5</p>
-                <div class="starBox">
-                    <span class="material-symbols-outlined star"> kid_star </span>
-                    <span class="material-symbols-outlined star"> kid_star </span>
-                    <span class="material-symbols-outlined star"> kid_star </span>
-                    <span class="material-symbols-outlined star"> kid_star </span>
-                    <span class="material-symbols-outlined star"> kid_star </span>
-                </div>
             </div>
             <div class="filter">
-                <button>Tất cả</button>
-                <button>5 sao</button>
-                <button>4 sao</button>
-                <button>3 sao</button>
-                <button>2 sao</button>
-                <button>1 sao</button>
-                <button class="twoColumn">Có bình luận</button>
-                <button class="twoColumn">Có hình Ảnh/ Video</button>
+                <button class='all'>Tất cả</button>
+                <button class='all fiveStar'>5 sao</button>
+                <button class='all fourStar'>4 sao</button>
+                <button class='all threeStar'>3 sao</button>
+                <button class='all twoStar'>2 sao</button>
+                <button class='all oneStar'>1 sao</button>
+                <button class="twoColumn haveComment">Có bình luận</button>
+                <button class="twoColumn haveImg">Có hình Ảnh/ Video</button>
             </div>
         </div>
-        {% if reviews %}
-        <div class="review">
-            {% include 'components/components/review_item.html' %}
-            {% include 'components/components/review_item.html' %}
-            {% include 'components/components/review_item.html' %}
-            {% include 'components/components/review_item.html' %}
-            <div class="paginationBox" style="margin-top: 20px">
-                {% include 'components/components/pagination.html' %}
-            </div>
+        <div class="reviewItemContainer">
         </div>
-        {% else %}
-        <div class="none">
-            <img src="https://deo.shopeemobile.com/shopee/shopee-pcmall-live-sg/shoprating/3215f6ba1a0e877fa06e.png"
-                 alt="">
-            <p>Chưa có đánh giá về sản phẩm</p>
+        <div id="pagination">
         </div>
-        {% endif %}
     </section>
-
 </main>
+<div class="popup-model cart">
+    {% include 'components/components/popupSuccess.html' with title="Sản phẩm đã được thêm vào giỏ" %}
+</div>
 {% endblock %}
 {% block extra_js %}
-<script src="{% static '    js/detail.js' %}" type="module"></script>
+<script src="{% static 'js/detail/detail.js' %}" type="module"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
 {% endblock %}

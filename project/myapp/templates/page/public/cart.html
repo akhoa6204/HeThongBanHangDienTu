@@ -7,66 +7,13 @@
 
 {% block content %}
 <main>
-    <section class="cart-header">
-        <span class="back-icon">←</span>
-        <h2>Giỏ hàng của bạn</h2>
-    </section>
-    {% if check %}
-    <section class="cartMain">
-        <section class="cart-options">
-            <div class="removeAll">
-                <input type="checkbox" id="removedAll" required>
-                <label for="removedAll">Bỏ chọn tất cả</label>
-            </div>
-            <a href="#" class="delete-selected">Xóa sản phẩm đã chọn</a>
-        </section>
-        <section class="cartItemBox">
-            <div class="cartItem">
-                <input type="checkbox">
-                {% include 'components/components/product_cart.html' %}
-            </div>
-            <div class="cartItem">
-                <input type="checkbox">
-                {% include 'components/components/product_cart.html' %}
-            </div>
-            <div class="cartItem">
-                <input type="checkbox">
-                {% include 'components/components/product_cart.html' %}
-            </div>
-            <div class="cartItem">
-                <input type="checkbox">
-                {% include 'components/components/product_cart.html' %}
-            </div>
-            <div class="cartItem">
-                <input type="checkbox">
-                {% include 'components/components/product_cart.html' %}
-            </div>
-            <div class="cartItem">
-                <input type="checkbox">
-                {% include 'components/components/product_cart.html' %}
-            </div>
-        </section>
-    </section>
-    <section class="cart-summary">
-        <div>
-            <p>Tạm tính: <span class="summary-price">29.490.000đ</span></p>
-            <p class="note">Chưa gồm chiết khấu</p>
-        </div>
-        <button class="buy-btn">Mua ngay (6)</button>
-    </section>
-    {% else %}
-    <section class="cartEmpty">
-        <img src="https://s3-alpha-sig.figma.com/img/02d9/1280/979c5d991c0b4f6cb39f5159c55a6f9d?Expires=1745193600&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=jsCtxd1LX0la3gP7R70o92tPbfDCSV4ede~q3WjJRVccOopbLyPEhzl2n8n~rewvRVbflz-hSzVhxaoAMIgVpgy4fzR9~tQMqEdDae5rGily~IEzTHZcL75DFcNwkz~8gz0tTKcJHDws6G2uF1U-yaBEs1Ta3oWKs2INs0is59-GKIuqF6bKkVVHBILd~hXtS7MwXx4qA9iy1owPh-NtYoPw8paNP5fedDqQei5eR6ZMvbbOFmwL~Z0IHA88YaaFh~Hq0H2zGa8Ia~dF-leL181XGTGnFWbTruVfJ6~mLIDc-dBVNQEMDO9DH4tho68~PKYj0z6jlhe~WrFEPopGjQ__"
-             alt="">
-        <p>
-            <strong>
-                Giỏ hàng của bạn đang trống.<br/>Hãy chọn thêm sản phẩm để mua sắm nhé
-            </strong>
-        </p>
-        <button>
-            <a href="{% url 'home'%}"> Quay lại trang chủ</a>
-        </button>
-    </section>
-    {% endif %}
+
 </main>
+{% endblock %}
+{% block extra_js %}
+<script>
+    const staticUrl = "{% static 'assets/img/cartEmpty.png' %}";
+    const homeUrl = "{% url 'home' %}";
+</script>
+<script src="{% static 'js/cart/cart.js' %}" type="module"></script>
 {% endblock %}

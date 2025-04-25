@@ -1,39 +1,40 @@
 {% extends 'components/layout/onlyHeader.html' %}
 {% load static %}
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'css/register.css' %}">
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
 {% endblock %}
 {% block content %}
 <div class="containerRegister">
-        <h2>ĐĂNG KÝ</h2>
-        <form class="register-form">
-            <p>Nhập họ và tên</p>
-            <input type="text" required placeholder="Nhập họ và tên">
+    <h2>ĐĂNG KÝ</h2>
+    <form class="register-form" method="POST" action="">
+        {% csrf_token %}
+        <p>Nhập họ và tên</p>
+        <input type="text" required name='fullName' placeholder="Nhập họ và tên">
 
-            <p>Nhập số điện thoại</p>
-            <input type="tel" required placeholder="Nhập số điện thoại">
+        <p>Nhập số điện thoại</p>
+        <input type="tel" required placeholder="Nhập số điện thoại" name="phone">
 
-            <p>Nhập email (Không bắt buộc)</p>
-            <input type="email" placeholder="Nhập email">
+        <p>Nhập email (Không bắt buộc)</p>
+        <input type="email" placeholder="Nhập email" name="email">
 
-            <p>Nhập mật khẩu</p>
-            <input type="password" required placeholder="Nhập mật khẩu">
+        <p>Nhập mật khẩu</p>
+        <input type="password" required placeholder="Nhập mật khẩu" name="password">
 
-            <p class="note">(*) Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ và 1 số (VD: 12345a)</p>
+        <p class="note">(*) Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ và 1 số (VD: 12345a)</p>
 
-            <p>Nhập lại mật khẩu</p>
-            <input type="password" required placeholder="Nhập lại mật khẩu">
+        <p>Nhập lại mật khẩu</p>
+        <input type="password" required placeholder="Nhập lại mật khẩu" name="comfirmPassword">
 
-            <div class="checkbox-wrap">
-                <input type="checkbox" required>
-                <label>Tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật.</label>
-            </div>
+        <div class="checkbox-wrap">
+            <input type="checkbox" required>
+            <label>Tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật.</label>
+        </div>
 
-            <button type="submit">Đăng ký</button>
+        <Button type="submit">Đăng ký</Button>
 
-            <p class="login-link">
-                Bạn đã có tài khoản <a href="{% url 'login' %}">Đăng nhập ngay</a>
-            </p>
-        </form>
-    </div>
+        <p class="login-link">
+            Bạn đã có tài khoản <a href="{% url 'login' %}">Đăng nhập ngay</a>
+        </p>
+    </form>
+</div>
 {% endblock %}

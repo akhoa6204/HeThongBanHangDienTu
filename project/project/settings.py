@@ -36,9 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'myapp'
 ]
-
+LOGIN_URL = '/login/'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -123,3 +124,20 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Sử dụng Gmail SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # Sử dụng TLS (mã hóa kết nối)
+EMAIL_HOST_USER = 'smartbuyshop25@gmail.com'  # Thay bằng email của bạn
+EMAIL_HOST_PASSWORD = 'SmartbuyShop@2025'  # Thay bằng mật khẩu hoặc mật khẩu ứng dụng
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Đặt địa chỉ gửi mặc định
