@@ -138,6 +138,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Sử dụng Gmail SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True  # Sử dụng TLS (mã hóa kết nối)
-EMAIL_HOST_USER = 'smartbuyshop25@gmail.com'  # Thay bằng email của bạn
-EMAIL_HOST_PASSWORD = 'SmartbuyShop@2025'  # Thay bằng mật khẩu hoặc mật khẩu ứng dụng
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER  # Đặt địa chỉ gửi mặc định
+EMAIL_HOST_USER = 'smartbuyshop25@gmail.com'
+# EMAIL_HOST_PASSWORD = 'SmartbuyShop@2025'
+EMAIL_HOST_PASSWORD = 'gtis urgx gkhk avah'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

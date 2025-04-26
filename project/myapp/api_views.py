@@ -1,14 +1,17 @@
+import threading
+
 from django.db.models import Avg, Exists, OuterRef
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 
-from .models import Option, Category, Brand, ReviewReply, Cart
+from .models import Option, Category, Brand, ReviewReply, Cart, Order, OrderItem
 from .models import Product, Review
 from .serializers import ProductSerializer, OptionSerializer, CategorySerializer, BrandSerializer, AllOptionSerializer, \
     OptionForCategory, OptionForProductSerializer, CartSerializer
 from .serializers import ReviewSerializer
+from .utils import send_order_confirmation_email
 
 
 @api_view(['GET'])
@@ -167,7 +170,7 @@ def apiOrder(request):
         'email': user.email,
         'address': user.address if user.address else "",
     }
-    order_items = request.data
+    order_items = request.session.get('orderInfo', None)
     results = []
     for item in order_items:
         slugProduct = item.get('slugProduct')
@@ -253,3 +256,68 @@ def api_cart_update_quantity_item(request):
     cart.quantity = item['quantity']
     cart.save()
     return Response({"detail": 'Cập nhật sản phẩm thành công'}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_order_product(request):
+    order_info = request.data
+
+    request.session['orderInfo'] = order_info
+
+    return Response({"detail": "Order information has been saved."}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_order_user(request):
+    orderSummary = request.data
+    request.session['userInfo'] = orderSummary.get('userInfo')
+    request.session['bill'] = orderSummary.get('bill')
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_payment(request):
+    userInfo = request.session.get('userInfo', None)
+    bill = request.session.get('bill', None)
+    orderInfo = request.session.get('orderInfo', None)
+    return Response({
+        'userInfo': userInfo,
+        'bill': bill,
+        'orderInfo': orderInfo
+
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_successOrder(request):
+    user = request.user
+    userInfo = request.session.get('userInfo')
+    orderItemList = request.session.get('orderInfo')
+
+    order = Order.objects.create(user=user, status='pending')
+
+    order_details = []  # để gom chi tiết đơn hàng gửi trong email
+
+    for item in orderItemList:
+        print(item)
+        product = Product.objects.get(slug=item['slugProduct'])
+        option = Option.objects.get(product=product, slug=item['slugOption'], color=item['color'])
+        OrderItem.objects.create(order=order, option=option, quantity=item['quantity'])
+
+        order_details.append(f"{product.name} ({option.version}, {option.color}) x {item['quantity']}")
+    for item in order.order_items.all():
+        print(item.option.price, item.option.discount, item.total_price())
+    # Tính tổng tiền
+    order.calculate_total_price()
+    total_price = order.total_price
+
+    threading.Thread(
+        target=send_order_confirmation_email,
+        args=(userInfo, order_details, total_price)
+    ).start()
+
+    return Response({"detail": "Đặt hàng thành công", "order_id": order.id}, status=200)

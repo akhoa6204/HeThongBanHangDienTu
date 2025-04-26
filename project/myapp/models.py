@@ -68,7 +68,7 @@ class Option(models.Model):
     product_overview = models.TextField(null=True, blank=True, help_text="Tổng quan sản phẩm")
 
     warranty = models.CharField(max_length=150, null=True, blank=True, help_text="Thông tin bảo hành")
-    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True,
+    discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0,
                                    help_text="Phần trăm giảm giá")
     promotion_start_date = models.DateTimeField(null=True, blank=True, help_text="Ngày bắt đầu khuyến mãi")
     promotion_end_date = models.DateTimeField(null=True, blank=True, help_text="Ngày kết thúc khuyến mãi")

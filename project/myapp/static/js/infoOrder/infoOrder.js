@@ -1,5 +1,5 @@
-import {fetchApiOrder, fetchApiCity, fetchApiDistricts, fetchApiWards} from '../service/infoOrder/fetchApi.js';
-const orderInfo = JSON.parse(localStorage.getItem('orderInfo')) || [];
+import { fetchApiOrder, fetchApiCity, fetchApiDistricts, fetchApiWards, fetchApiOrderUser } from '../service/infoOrder/fetchApi.js';
+
 const productBox = document.querySelector('.productBox');
 const summaryPrice = document.querySelector('.summary-price');
 const infoCustomer= document.querySelector('.infoCustomer.info');
@@ -15,12 +15,6 @@ function setAddressUser(value){
 function getAddressUser(){
     return addressUser;
 }
-function fetchApi(orderInfo){
-    return fetchApiOrder(orderInfo)
-        .then(data =>{
-            return data;
-        })
-}
 
 function loadData(data){
     if (data.length < 1) {return};
@@ -28,6 +22,7 @@ function loadData(data){
         const srcImg = option.img ? option.img[0] : option.product.img[0];
         const name = option.product.name + ' - ' + option.version + " - " + option.color;
         const quantity = option.quantity;
+        totalQuantity += Number(quantity);
         const price = option.discount ? (option.price - option.price * option.discount) * quantity : option.price * quantity;
         const html = `
             <div class="product">
@@ -108,7 +103,8 @@ function loadAddress(addressUser){
     loadCities(addressUser);
     address_detail.value = addressUser.split(' - ')[3] ? addressUser.split(' - ')[3] : '';
 }
-fetchApiOrder(orderInfo)
+
+fetchApiOrder()
     .then(data => {
         console.log(data);
         loadData(data.options);
@@ -145,7 +141,17 @@ fetchApiOrder(orderInfo)
                 acceptEmail,
                 acceptBill
             };
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            window.location.href = "/payment_order/";
+
+            const bill ={
+                totalPrice : total,
+                totalQuantity: totalQuantity,
+            };
+            fetchApiOrderUser({
+                userInfo,
+                bill
+            })
+            .then(data => {
+                window.location.href = "/payment_order/";
+            })
         })
     });

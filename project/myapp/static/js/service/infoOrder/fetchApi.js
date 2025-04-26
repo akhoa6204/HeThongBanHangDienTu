@@ -49,5 +49,20 @@ function fetchApiWards(code) {
             throw error;
         });
 }
+function fetchApiOrderUser(userInfo){
+    const url = '/api/setOrderUser/';
+    return fetch(url, {
+            method : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            credentials: 'include',
+            body: JSON.stringify(userInfo)
+        })
+        .then(response => {
+            response.json();
+        })
 
-export {fetchApiOrder, fetchApiCity, fetchApiDistricts, fetchApiWards};
+}
+export {fetchApiOrder, fetchApiCity, fetchApiDistricts, fetchApiWards, fetchApiOrderUser};

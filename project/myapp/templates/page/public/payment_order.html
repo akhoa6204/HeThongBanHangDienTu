@@ -17,7 +17,7 @@
     </section>
     <section class="formPayment">
         <div class="form bill">
-            <div class="row">
+            <div class="row discount">
                 <p>
                     <input
                             type="text"
@@ -28,19 +28,19 @@
                     <button>Áp dụng</button>
                 </p>
             </div>
-            <div class="row">
+            <div class="row quantity">
                 <p>Số lượng sản phẩm</p>
                 <p>01</p>
             </div>
-            <div class="row">
+            <div class="row price">
                 <p>Tiền hàng</p>
                 <p>29.490.000đ</p>
             </div>
-            <div class="row">
+            <div class="row ship">
                 <p>Phí vận chuyển</p>
                 <p>Miễn phí</p>
             </div>
-            <div class="row">
+            <div class="row totalPrice">
                 <p>
                     <strong style="color: black">Tổng tiền </strong
                     ><small>(đã gồm VAT)</small>
@@ -56,8 +56,8 @@
                         <span class="material-symbols-outlined"> credit_card </span>
                         Chọn phương thức thanh toán
                     </p>
-                    <p>
-                        <span class="material-symbols-outlined"> chevron_right </span>
+                    <p>Thanh toán khi nhận hàng
+                        <!--                        <span class="material-symbols-outlined"> chevron_right </span>-->
                     </p>
                 </div>
             </div>
@@ -65,19 +65,19 @@
         <div class="info customer">
             <h3>THÔNG TIN NHẬN HÀNG</h3>
             <div class="form">
-                <div class="row">
+                <div class="row name">
                     <p>Khách hàng</p>
                     <p>NGUYEN VAN A</p>
                 </div>
-                <div class="row">
+                <div class="row phone">
                     <p>Số điện thoại</p>
                     <p>0911684993</p>
                 </div>
-                <div class="row">
+                <div class="row email">
                     <p>Email</p>
                     <p>nguyenvana@gmail.com</p>
                 </div>
-                <div class="row">
+                <div class="row address">
                     <p>Nhận hàng tại</p>
                     <p>71 Ngũ Hành Sơn, Bắc Mỹ Phú, Ngũ Hành Sơn, Đà Nẵng</p>
                 </div>
@@ -107,7 +107,13 @@
             </p>
             <p><span class="summary-price">29.490.000đ</span></p>
         </div>
-        <button class="buy-btn">Tiếp tục</button>
+        <button class="buy-btn">Hoàn tất đơn hàng</button>
     </section>
 </main>
+{% endblock %}
+{% block extra_js %}
+<script>
+    const imgSrc = "{% static 'assets/img/Group.png' %}"
+</script>
+<script src="{% static 'js/payment/payment.js' %}" type="module"></script>
 {% endblock %}

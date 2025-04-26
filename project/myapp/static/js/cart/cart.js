@@ -1,5 +1,5 @@
 import { fetchApiCart, fetchApiRemoveCartItem, fetchApiUpdateQuantityCartItem } from '../service/cart/fetchApi.js';
-
+import { fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
 const main = document.querySelector('main');
 let stockData = [];
 function getStockData(indexProduct){
@@ -148,8 +148,10 @@ function attachCartEventHandlers() {
         console.log('click mua hàng')
         const orderInfo = getSelectedProduct();
         if(orderInfo.length > 0){
-            localStorage.setItem('orderInfo', JSON.stringify(orderInfo));
-            window.location.href = "/info_order/";
+            fetchApiSetOrderProduct(orderInfo)
+                .then(data => {
+                    window.location.href = "/info_order/";
+                })
         }else{
             console.log('Không có sản phẩm nào được chọn')
         }

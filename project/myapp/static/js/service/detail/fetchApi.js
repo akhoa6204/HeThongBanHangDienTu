@@ -45,15 +45,35 @@ function fetchApiAddProductCart(product){
         credentials: 'include',
         body: JSON.stringify(product)
     })
-    .then(response => {
-        return response.json()
-        .then(data => {
-        if (!response.ok) {
-            alert(data.detail);
-            throw new Error(data.detail || 'Đã xảy ra lỗi');
-        }
-        return data;
-    });
-})
+        .then(response => {
+            if (response.status === 403){
+                window.location.href = "/login/";
+                return;
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ:", error);
+        });
 }
-export { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart };
+function fetchApiSetOrderProduct(orderInfo){
+    const url = '/api/setOrderProduct/';
+    return fetch(url, {
+            method : 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            credentials: 'include',
+            body: JSON.stringify(orderInfo)
+        })
+        .then(response => {
+            if (response.status === 403){
+                window.location.href = "/login/";
+                return;
+            }
+            return response.json();
+        })
+}
+    export { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct };
+

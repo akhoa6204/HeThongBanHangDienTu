@@ -1,4 +1,4 @@
-import { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart } from '../service/detail/fetchApi.js';
+import { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
 import {
     updatePrice,
     updateDetail,
@@ -360,9 +360,15 @@ function buyProduct(slugProduct, slugOption) {
         color,
         quantity
     });
-    localStorage.setItem('orderInfo', JSON.stringify(orderList));
+    fetchApiSetOrderProduct(orderList)
+    .then(data => {
+        if(data){
+            window.location.href = "/info_order/";
+        }else{
+            window.location.href = "/login/";
+        }
+    })
 
-    window.location.href = "/info_order/";
 }
 function addProductCart(slugProduct, slugOption){
     const color = document.querySelector('.productBox .colorBox .color.active').textContent;
@@ -376,8 +382,13 @@ function addProductCart(slugProduct, slugOption){
     console.log(product);
     fetchApiAddProductCart(product)
         .then(data => {
-            console.log(data);
-            popupModel.classList.add('active')
+            if (data){
+                if (data.detail === 'Sản phẩm đã tồn tại trong giỏ hàng.'){
+                    alert(data.detail);
+                    return;
+                }
+                popupModel.classList.add('active')
+            }
         })
 }
 window.onload = () => {

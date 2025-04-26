@@ -41,8 +41,10 @@ main .title > *.active{
 .formPayment .form .row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
   gap: 10px;
+}
+.formPayment .form .row:not(:last-child) {
+  margin-bottom: 12px;
 }
 .formPayment .form.row p:first-child {
   color: rgba(119, 118, 118, 1);
@@ -115,9 +117,9 @@ main .title > *.active{
 }
 .formPayment .verify .row input:checked {
   background: url(https://img.freepik.com/free-psd/check-symbol-isolated_23-2150500363.jpg);
-  background-size: contain; /* Đảm bảo biểu tượng check vừa vặn */
-  background-position: center; /* Canh giữa hình ảnh trong checkbox */
-  background-repeat: no-repeat; /* Không lặp lại hình ảnh */
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 main{
    position: relative;
@@ -166,4 +168,48 @@ main{
 
 .order-summary .buy-btn:hover {
     background:#2c3e50;
+}
+
+.orderSuccess{
+    display: flex !important;
+    align-items:center;
+    justify-content: center;
+    flex-direction:column;
+    width:640px;
+    position: fixed;
+    bottom: 0;
+    right:0 ;
+    top:0;
+    left: 0;
+    .container{
+        background-color: rgba(245, 245, 245, 1);
+        border-radius: 10px;
+        padding: 32px ;
+        width: 100%;
+        .icon{
+            display:flex;
+            align-items: center;
+            justify-content:center;
+            gap: 10px;
+            margin-bottom: 30px;
+            p{
+                font-size: 18px;
+            }
+        }
+        > p{
+            margin-bottom: 30px;
+        }
+        .button{
+            display:flex;
+            align-items: center;
+            justify-content:center;
+            gap: 10px;
+            button{
+                border: 1px solid rgba(209, 206, 206, 1);
+                border-radius: 10px;
+                padding: 12px 24px;
+                background-color:white;
+            }
+        }
+    }
 }
