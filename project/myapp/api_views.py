@@ -321,3 +321,16 @@ def api_successOrder(request):
     ).start()
 
     return Response({"detail": "Đặt hàng thành công", "order_id": order.id}, status=200)
+
+
+@api_view(['GET'])
+def api_authenticated(request):
+    if request.user.is_authenticated:
+        user = request.user
+        first_name = user.first_name
+        last_name = user.last_name
+        return Response({"is_authenticated": True, "user": {
+            'name': first_name + ' ' + last_name
+        }}, status=200)
+    else:
+        return Response({"is_authenticated": False}, status=401)

@@ -36,44 +36,41 @@ async function fetchApiReviews(slug, page, star){
 }
 function fetchApiAddProductCart(product){
     const url = '/api/cart/addProduct/'
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-        credentials: 'include',
-        body: JSON.stringify(product)
-    })
-        .then(response => {
-            if (response.status === 403){
-                window.location.href = "/login/";
-                return;
-            }
-            return response.json();
+    return cookieStore.get('csrftoken')
+    .then(cookie => {
+        if (!cookie) {
+            throw new Error('Không tìm thấy CSRF token');
+        }
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': cookie.value,
+            },
+            credentials: 'include',
+            body: JSON.stringify(product)
         })
-        .catch(error => {
-            console.error("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ:", error);
-        });
+    })
+    .then(response => response.json())
+    .catch(error => {
+        console.error("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ:", error);
+    });
 }
 function fetchApiSetOrderProduct(orderInfo){
     const url = '/api/setOrderProduct/';
-    return fetch(url, {
-            method : 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            credentials: 'include',
-            body: JSON.stringify(orderInfo)
-        })
-        .then(response => {
-            if (response.status === 403){
-                window.location.href = "/login/";
-                return;
-            }
-            return response.json();
-        })
+    return  cookieStore.get('csrftoken')
+    .then(cookie => {
+        return fetch(url, {
+                method : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': cookie.value,
+                },
+                credentials: 'include',
+                body: JSON.stringify(orderInfo)
+            })
+    })
+    .then(response =>response.json())
 }
     export { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct };
 

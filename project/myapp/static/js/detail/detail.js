@@ -1,4 +1,5 @@
 import { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
+import { fetchApiAuthenticated } from  '../service/header/header.js';
 import {
     updatePrice,
     updateDetail,
@@ -360,15 +361,17 @@ function buyProduct(slugProduct, slugOption) {
         color,
         quantity
     });
-    fetchApiSetOrderProduct(orderList)
-    .then(data => {
-        if(data){
-            window.location.href = "/info_order/";
-        }else{
-            window.location.href = "/login/";
-        }
-    })
-
+    fetchApiAuthenticated()
+        .then(data => {
+            if(data.is_authenticated){
+                fetchApiSetOrderProduct(orderList)
+                    .then(data => {
+                        window.location.href = "/info_order/";
+                    })
+            }else{
+                window.location.href = "/login/";
+            }
+        });
 }
 function addProductCart(slugProduct, slugOption){
     const color = document.querySelector('.productBox .colorBox .color.active').textContent;
@@ -379,15 +382,22 @@ function addProductCart(slugProduct, slugOption){
         color,
         quantity
     };
-    console.log(product);
-    fetchApiAddProductCart(product)
+    fetchApiAuthenticated()
         .then(data => {
-            if (data){
-                if (data.detail === 'Sản phẩm đã tồn tại trong giỏ hàng.'){
-                    alert(data.detail);
-                    return;
+            if (data.is_authenticated){
+                fetchApiAddProductCart(product)
+                    .then(data => {
+                        if (data){
+                            if (data.detail === 'Sản phẩm đã tồn tại trong giỏ hàng.'){
+                                alert(data.detail);
+                                return;
+                            }
+                            popupModel.classList.add('active')
+                        }
+                    })
                 }
-                popupModel.classList.add('active')
+            else{
+                window.location.href ='/login/';
             }
         })
 }

@@ -20,8 +20,10 @@ urlpatterns = [
          name='api_cart_update_quantity_item'),
     path('api/payment/', api_views.api_payment, name='api_payment'),
     path('api/successOrder/', api_views.api_successOrder, name='api_successOrder'),
+    path('api/authenticated/', api_views.api_authenticated, name='api_authenticated'),
 
     path('login/', views.login, name='login'),
+    path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     path('', views.home, name='home'),
     path('search/<str:nameProduct>/', views.search, name='search'),

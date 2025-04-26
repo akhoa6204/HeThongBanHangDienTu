@@ -41,7 +41,7 @@
 #header .container .box {
   display: flex;
 }
-#header .container .box .cart {
+#header .container .box > *:not(:last-child) {
   padding-right: 12px;
   margin-right: 12px;
   border-right: 2px solid #ccc;

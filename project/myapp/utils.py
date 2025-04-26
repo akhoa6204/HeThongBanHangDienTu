@@ -1,5 +1,19 @@
+import re
+
 from django.conf import settings
 from django.core.mail import send_mail
+
+
+def contains_uppercase(password):
+    return bool(re.search(r'[A-Z]', password))
+
+
+def contains_letter(password):
+    return bool(re.search(r'[a-zA-Z]', password))
+
+
+def contains_special_char(password):
+    return bool(re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]', password))
 
 
 def send_order_confirmation_email(userInfo, order_details, total_price):
