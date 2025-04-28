@@ -17,8 +17,9 @@ function getAddressUser(){
 }
 
 function loadData(data){
-    if (data.length < 1) {return};
+    if (data.length < 1) return;
     for(const option of data){
+        if (option.error) return;
         const srcImg = option.img ? option.img[0] : option.product.img[0];
         const name = option.product.name + ' - ' + option.version + " - " + option.color;
         const quantity = option.quantity;
@@ -106,52 +107,61 @@ function loadAddress(addressUser){
 
 fetchApiOrder()
     .then(data => {
-        console.log(data);
-        loadData(data.options);
-        loadInfo(data.user);
-        setAddressUser(data.user.address)
-        loadAddress(getAddressUser());
-        buyBtn.addEventListener('click', ()=>{
-            const citySelect = document.querySelector('.city select');
-            const city= citySelect.options[citySelect.selectedIndex].textContent;
-            const districtSelect = document.querySelector('.district select');
-            const district= districtSelect.options[districtSelect.selectedIndex].textContent;
-            const wardSelect = document.querySelector('.ward select');
-            const ward = wardSelect.options[wardSelect.selectedIndex].textContent;
-            const address_detail = document.querySelector('#address_detail').value;
-            if (!address_detail){
-                alert('Khách hàng cần điền đầy đủ thông tin nhận hàng');
+        if(data){
+            if (data.options.length > 0 && data.options[0].error){
+                window.location.href= '/';
                 return;
             }
-            const note = document.querySelector('#note').value;
-            const checkBoxEmail = document.querySelector('#acceptEmail');
-            const checkBoxBill = document.querySelector('#acceptBill');
-            const acceptEmail = checkBoxEmail.checked;
-            const acceptBill = checkBoxBill.checked;
-            const userInfo = {
-                first_name:  data.user.first_name,
-                last_name:  data.user.last_name,
-                email:  data.user.email,
-                phone:  data.user.phone,
-                city,
-                district,
-                ward,
-                address_detail,
-                note,
-                acceptEmail,
-                acceptBill
-            };
+            console.log(data);
+            loadData(data.options);
+            loadInfo(data.user);
+            setAddressUser(data.user.address)
+            loadAddress(getAddressUser());
+            buyBtn.addEventListener('click', ()=>{
+                const citySelect = document.querySelector('.city select');
+                const city= citySelect.options[citySelect.selectedIndex].textContent;
+                const districtSelect = document.querySelector('.district select');
+                const district= districtSelect.options[districtSelect.selectedIndex].textContent;
+                const wardSelect = document.querySelector('.ward select');
+                const ward = wardSelect.options[wardSelect.selectedIndex].textContent;
+                const address_detail = document.querySelector('#address_detail').value;
+                if (!address_detail){
+                    alert('Khách hàng cần điền đầy đủ thông tin nhận hàng');
+                    return;
+                }
+                const note = document.querySelector('#note').value;
+                const checkBoxEmail = document.querySelector('#acceptEmail');
+                const checkBoxBill = document.querySelector('#acceptBill');
+                const acceptEmail = checkBoxEmail.checked;
+                const acceptBill = checkBoxBill.checked;
+                const userInfo = {
+                    first_name:  data.user.first_name,
+                    last_name:  data.user.last_name,
+                    email:  data.user.email,
+                    phone:  data.user.phone,
+                    city,
+                    district,
+                    ward,
+                    address_detail,
+                    note,
+                    acceptEmail,
+                    acceptBill
+                };
 
-            const bill ={
-                totalPrice : total,
-                totalQuantity: totalQuantity,
-            };
-            fetchApiOrderUser({
-                userInfo,
-                bill
+                const bill ={
+                    totalPrice : total,
+                    totalQuantity: totalQuantity,
+                };
+                fetchApiOrderUser({
+                    userInfo,
+                    bill
+                })
+                .then(data => {
+                    window.location.href = "/payment_order/";
+                })
             })
-            .then(data => {
-                window.location.href = "/payment_order/";
-            })
-        })
+        }else{
+             window.location.href= '/';
+             return;
+        }
     });

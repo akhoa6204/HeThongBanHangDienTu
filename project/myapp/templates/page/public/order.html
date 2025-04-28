@@ -1,0 +1,36 @@
+{% extends 'components/layout/defaultLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/order.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="header">
+        <div class='status  all active' data-status="all">
+            <p>Tất cả</p>
+        </div>
+        <div class='status pending' data-status="pending">
+            <p>Chờ xác nhận</p>
+        </div>
+        <div class='status processing' data-status="processing">
+            <p>Đang xử lý</p>
+        </div>
+        <div class='status shipped' data-status="shipped">
+            <p>Đã giao hàng</p>
+        </div>
+        <div class='status cancelled' data-status="cancelled">
+            <p>Đã hủy</p>
+        </div>
+    </section>
+    <section class="orderContainer">
+    </section>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script>
+    const urlEmptyOrder = "{% static 'assets/img/emptyOrder.png' %}";
+</script>
+<script src="{% static 'js/order/order.js' %}" type="module"></script>
+{% endblock %}
+

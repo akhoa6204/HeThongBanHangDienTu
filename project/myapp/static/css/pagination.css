@@ -5,8 +5,8 @@
     gap: 10px;
     > *{
         display: inline-block;
-        font-size: 20px;
-        padding: 12px 24px ;
+        font-size: 12px;
+        padding: 6px 12px ;
     }
     > *.active{
         background-color:rgba(217, 217, 217, 1);

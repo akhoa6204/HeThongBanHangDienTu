@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart
+from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart, OrderItem, Order
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -100,7 +100,7 @@ class OptionForCategory(serializers.ModelSerializer):
         fields = ['name', 'slug', 'options']
 
     def get_options(self, obj):
-        products = Product.objects.filter(category=obj).order_by('-purchased_count')[:8]
+        products = Product.objects.filter(category=obj).order_by('-purchased_count')[:10]
         options = []
         for product in products:
             top_option = Option.objects.filter(product=product).order_by('-price').first()
@@ -127,4 +127,20 @@ class CartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Cart
-        fields = ['option', 'quantity']
+        fields = ['id', 'option', 'quantity']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    option = OptionSerializer()
+
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderItem = OrderItemSerializer(many=True, source='order_items')
+
+    class Meta:
+        model = Order
+        fields = ['status', 'total_price', 'updated_at', 'orderItem']

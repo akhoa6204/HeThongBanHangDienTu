@@ -9,8 +9,13 @@ function fetchApiPayment(){
             },
             credentials: 'include'
         })
-        .then(response => response.json())
-
+        .then(response => {
+            if (response.status >= 400){
+                window.location.href = '/';
+                return null;
+            }
+            return response.json();
+        })
 }
 
 function fetchApiSuccessOrder(){

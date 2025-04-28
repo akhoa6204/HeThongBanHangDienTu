@@ -28,7 +28,7 @@ function loadProducts(options){
         html += `
             <div class="product-item">
                 <div class="header">
-                    ${option.discount ? `<div class="discount">Giảm ${option.discount}%</div>` : ''}
+                    ${option.discount > 0 ? `<div class="discount">Giảm ${option.discount}%</div>` : ''}
                 </div>
                 <div class="product-image">
                     <a href="/${option.product.category.slug}/${option.product.slug}/${option.slug}/">

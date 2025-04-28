@@ -5,6 +5,7 @@ let prevButton = document.querySelector(".buttonBox .prev");
 let nextButton = document.querySelector(".buttonBox .next");
 const lenListImg = listImg.children.length;
 const main = document.querySelector('main');
+const subMenu = document.querySelector('.sub-menu');
 function nextImg(){
   if (activeNow >= lenListImg - 1){
     activeNow = 0;
@@ -30,6 +31,23 @@ fetchApiHome()
     .then(data => {
         console.log(data);
         for (const category of data) {
+            if (category.name ==="Điện thoại"){
+                subMenu.innerHTML += `
+                    <div class="child-menu">
+                        <span class="material-symbols-outlined">phone_iphone</span>
+                        <span>Điện thoại</span>
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </div>
+                `;
+            }else if(category === "Tai nghe"){
+                subMenu.innerHTML += `
+                  <div class="child-menu">
+                        <span class="material-symbols-outlined">headphones</span>
+                        <span>Tai nghe</span>
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </div>
+                `;
+            }
             const productContainer = document.createElement('section');
             productContainer.classList.add('productContainer');
 

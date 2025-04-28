@@ -1,26 +1,8 @@
 import { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
 import { fetchApiAuthenticated } from  '../service/header/header.js';
-import {
-    updatePrice,
-    updateDetail,
-    updateDescription,
-    updateReviewsForStar,
-    updateImg,
-    updateColor
-} from './function.js';
 const listImg = document.querySelector('.viewport .listImg');
-let selected_color,
-    selected_version,
-    options_color,
-    activeNow = 0,
-    currentQuantity = 1,
-    total = 0,
-    current_version,
-    brand_name,
-    category_name,
-    avgReview = 0,
-    totalPage =1 ,
-    currentPage= 1;
+let selected_color, selected_version, activeNow = 0, currentQuantity = 1, total = 0, current_version, brand_name,
+    category_name, avgReview = 0, totalPage =1 , currentPage= 1, dataCurrentVersions, product;
 const h3 = document.querySelector(".productBox .detail .name");
 const prevButton = document.querySelector(".buttonBox .prev");
 const nextButton = document.querySelector(".buttonBox .next");
@@ -54,6 +36,7 @@ const slug = {
     'product': slugProduct,
     'option': slugOption
 }
+
 function setSelectedColor(color) {
     selected_color = color;
 }
@@ -72,52 +55,190 @@ function setActiveNow(val) {
 function setTotal(val){
     total = val;
 }
-function updateColorUI(data){
-    const colorBox = document.querySelector('.productBox .colorBox');
-    const options_color = data.current_options.map(version => version.color);
-    for (const color of options_color) {
-        const colorSubBox = document.createElement('div');
-        colorSubBox.className = 'color';
-        if (color === selected_color) {
-            colorSubBox.classList.add('active');
-        }
-        colorSubBox.setAttribute('data-color', color);
-        colorSubBox.addEventListener('click', (e) =>
-        {
-            updateColor(e, {
-                current_versions: data.current_options,
-                getCurrentVersion: getCurrentVersion,
-                setCurrentVersion: setCurrentVersion,
-                listImg: listImg,
-                priceBox: priceBox,
-                numberQuantity: numberQuantity,
-                detailsBox: detailsBox,
-                category_name: category_name,
-                brand_name: brand_name,
-                setSelectedColor: setSelectedColor,
-                setCurrentQuantity: setCurrentQuantity,
-                setActiveNow: setActiveNow,
-            });
-        });
-        const p = document.createElement('p');
-        p.innerText = color;
-        colorSubBox.appendChild(p);
+function updateButtonUi(){
+    if (!current_version){
+        buyButton.disabled = true;
+        cartButton.disabled = true;
+    }else{
+        buyButton.disabled = false;
+        cartButton.disabled = false;
+    }
+}
+function updatePrice() {
+    let html = '';
+    let discount ='';
+    let discountedPrice ='';
+    if (current_version){
+        discount = current_version.discount || 0;
+        discountedPrice = current_version.price * (1 - discount);
+    }else{
+        discount = dataCurrentVersions[0].discount || 0;
+        discountedPrice = dataCurrentVersions[0].price * (1 - discount)
+    }
+    html += `
+        <p class="afterDiscount">${Number(discountedPrice).toLocaleString('vi-VN')} <u>đ</u></p>
+        ${discount > 0 ? `
+        <p class="beforeDiscount">
+            <small><s>${Number(result.price).toLocaleString('vi-VN')} ₫</s></small>
+        </p>` : ''}
+    `;
+    if (priceBox) {
+        priceBox.innerHTML = html;
+    }
+}
+function updateDetail() {
+    let memoryData, osCpu, rearCamera, display, quantity;
+    if (!current_version){
+        memoryData = JSON.parse(dataCurrentVersions[0].memory_and_storage);
+        osCpu = JSON.parse(dataCurrentVersions[0].os_and_cpu);
+        rearCamera = JSON.parse(dataCurrentVersions[0].rear_camera);
+        display = JSON.parse(dataCurrentVersions[0].display);
+        quantity = dataCurrentVersions[0].quantity > 0 ? dataCurrentVersions[0].quantity: 'Hết hàng';
+    }
+    else{
+        memoryData = JSON.parse(current_version.memory_and_storage);
+        osCpu = JSON.parse(current_version.os_and_cpu);
+        rearCamera = JSON.parse(current_version.rear_camera);
+        display = JSON.parse(current_version.display);
+        quantity = current_version.quantity > 0 ? current_version.quantity : 'Hết hàng';
+    }
 
-        colorBox.appendChild(colorSubBox);
+    detailsBox.innerHTML = `
+        <div class="detail"><p>Danh mục</p><p>${category_name}</p></div>
+        <div class="detail"><p>Kho</p><p>${quantity}</p></div>
+        <div class="detail"><p>Thương hiệu</p><p>${brand_name}</p></div>
+        <div class="detail"><p>Dung lượng lưu trữ</p><p>${memoryData["Bộ nhớ trong"]}</p></div>
+        <div class="detail"><p>Loại bảo hành</p><p>Bảo hành nhà sản xuất</p></div>
+        <div class="detail"><p>Hạn bảo hành</p><p>12 tháng</p></div>
+        <div class="detail"><p>Bộ xử lý</p><p>${osCpu["Vi xử lý"]}</p></div>
+        <div class="detail"><p>Độ phân giải camera chính</p><p>${rearCamera["Độ phân giải camera"]}</p></div>
+        <div class="detail"><p>Kích thước màn hình</p><p>${display["Kích thước màn hình"].replace(/^"|"$/g, "")} inches</p></div>
+    `;
+}
+function updateDescription() {
+    let formattedDescription = (current_version ? current_version : dataCurrentVersions[0]).description
+        .replace('Hoàng Hà Mobile', '<strong>SmartBuy</strong>')
+        .split('\n')
+        .map(line => {
+            line = line.trim();
+            if (!line) return '';
+
+            const startsWith = ['Bảng thông số', 'Đánh giá chi tiết', 'Thông số', 'Tổng quan'];
+            const keywords = ['?', 'So sánh', 'Mua', 'SmartBuy'];
+
+            const shouldNotDash = startsWith.some(start => line.startsWith(start)) ||
+                                  keywords.some(kw => line.includes(kw));
+
+            return shouldNotDash ? line : `- ${line}`;
+        })
+        .join('<br>');
+
+    descriptionBox.innerHTML = formattedDescription;
+}
+function updateReviewsForStar() {
+    reviewBox.innerHTML = `
+        <h3>ĐÁNH GIÁ SẢN PHẨM</h3>
+        <div class="menu">
+            <div class="rating"></div>
+            <div class="filter">
+                <button onclick="updateReviewsForStar()">Tất cả</button>
+                <button onclick="updateReviewsForStar(5)">5 sao</button>
+                <button onclick="updateReviewsForStar(4)">4 sao</button>
+                <button onclick="updateReviewsForStar(3)">3 sao</button>
+                <button onclick="updateReviewsForStar(2)">2 sao</button>
+                <button onclick="updateReviewsForStar(1)">1 sao</button>
+                <button class="twoColumn">Có bình luận</button>
+                <button class="twoColumn">Có hình Ảnh/ Video</button>
+            </div>
+        </div>
+    `;
+}
+function updateImg() {
+    let html = "";
+    if (current_version){
+        current_version.img.forEach(img => {
+            html += `<div class="item"><img src="${img}" alt=""></div>`;
+        });
+    }else{
+        html += `<div class="item"><img src="${product.img}" alt=""></div>`;
+    }
+    if (listImg) listImg.innerHTML = html;
+}
+function updateUiQuantity(){
+    if(current_version){
+        quantityBox.disabled = false;
+        if(quantityBox.classList.contains('disabled')){
+            quantityBox.classList.remove('disabled');
+        }
+    }
+    else{
+        quantityBox.disabled = true;
+        if(!quantityBox.classList.contains('disabled')){
+            quantityBox.classList.add('disabled');
+        }
+    }
+    setCurrentQuantity(1);
+    numberQuantity.textContent = currentQuantity;
+}
+function updateCurrentColor(e){
+    setSelectedColor(e.currentTarget.getAttribute('data-color'));
+    document.querySelectorAll('.color').forEach(color => {
+        if (color.getAttribute('data-color') === selected_color){
+            if(!color.classList.contains('active')){
+                color.classList.add('active')
+            }
+        }else{
+            color.classList.remove('active')
+        }
+    });
+    setCurrentVersion(dataCurrentVersions.find(version => version.color === selected_color));
+    setTotal(current_version?.quantity || 1);
+    setActiveNow(0);
+    listImg.style.transform = `translateX(0%)`;
+    updatePrice();
+    updateImg();
+    updateDetail();
+    updateButtonUi();
+    updateUiQuantity();
+}
+function updateColorUI(data) {
+    const colorBox = document.querySelector('.productBox .colorBox');
+    for (const option of data) {
+        const html = `
+            <div class="color ${option.color === selected_color ? 'active' : ''} ${option.quantity === 0 ? 'disabled' : ''}"
+                 data-color="${option.color}">
+                <p>${option.color}</p>
+            </div>
+        `;
+        colorBox.innerHTML += html;
+    }
+    colorBox.innerHTML += `<p class='error-message'></p>`;
+    const colors = colorBox.querySelectorAll('.color');
+    for (const color of colors) {
+        if (color.classList.contains('disabled')){
+            color.disabled=true;
+        }else{
+            color.addEventListener('click', (e) => {
+                if(colorBox.classList.contains('notSelected')) colorBox.classList.remove('notSelected');
+                const errorMessage = colorBox.querySelector('.error-message');
+                errorMessage.textContent ='';
+                updateCurrentColor(e);
+            });
+        }
     }
 }
 function updateVersionUI(all_options){
-    for (const version of all_options){
-        const a = document.createElement('a');
-        a.className = 'category';
-        if (version.slug === slugOption){
-            a.classList.add('active');
-            a.setAttribute('href', '#');
-        }else{
-            a.setAttribute('href', `/${slugCategory}/${slugProduct}/${version.slug}/`);
-        }
-        a.textContent = version.version;
-        categoryBox.appendChild(a);
+    for (const version of all_options) {
+        const isActive = version.slug === slugOption;
+        const href = isActive ? '#' : `/${slugCategory}/${slugProduct}/${version.slug}/`;
+        const activeClass = isActive ? 'active' : '';
+
+        const html = `
+            <a href="${href}" class="category ${activeClass}">
+                ${version.version}
+            </a>
+        `;
+        categoryBox.innerHTML += html;
     }
 }
 function updateReviewsUI(reviews){
@@ -352,7 +473,16 @@ function fetchApiReview(slugProduct, pageNumber, star){
         });
 }
 function buyProduct(slugProduct, slugOption) {
-    const color = document.querySelector('.productBox .colorBox .color.active').textContent;
+    if (!current_version) {
+        const colorBox = document.querySelector('.productBox .colorBox');
+        const errorMessage = colorBox.querySelector('.error-message');
+        errorMessage.textContent ='Vui lòng chọn phiên bản';
+        if(!colorBox.classList.contains('notSelected')){
+            colorBox.classList.add('notSelected');
+        }
+        return;
+    };
+    const color = document.querySelector('.productBox .colorBox .color.active').textContent.trim();
     const quantity = document.querySelector('.productBox .quantityBox .quantity p:nth-child(2)').textContent;
     let orderList = [];
     orderList.push({
@@ -374,7 +504,17 @@ function buyProduct(slugProduct, slugOption) {
         });
 }
 function addProductCart(slugProduct, slugOption){
-    const color = document.querySelector('.productBox .colorBox .color.active').textContent;
+    if (!current_version) {
+        const colorBox = document.querySelector('.productBox .colorBox');
+        const errorMessage = colorBox.querySelector('.error-message');
+        errorMessage.textContent ='Vui lòng chọn phiên bản';
+        if(!colorBox.classList.contains('notSelected')){
+            colorBox.classList.add('notSelected');
+        }
+        return;
+    };
+    const color = document.querySelector('.productBox .colorBox .color.active').textContent.trim();
+    console.log(color);
     const quantity = document.querySelector('.productBox .quantityBox .quantity p:nth-child(2)').textContent;
     const product = {
         slugProduct,
@@ -405,24 +545,19 @@ window.onload = () => {
     fetchApiProduct(slug)
         .then(data => {
             if (data) {
-                console.log(data);
-                selected_color = data.current_options[0].color;
-                selected_version = data.current_options[0].version;
-                setCurrentVersion(data.current_options.find((version) => version.color === selected_color));
-                setTotal(current_version.quantity);
+                product = data.product;
+                dataCurrentVersions = data.current_options;
+                console.log(dataCurrentVersions);
                 brand_name = data.brand.name;
                 category_name = data.category.name;
-                // name
                 h3.textContent = data.product.name;
-                // color
-                updateColorUI(data);
-                // version
+                updateImg();
+                updateColorUI(data.current_options);
                 updateVersionUI(data.all_options);
-
-                updatePrice(current_version, priceBox);
-                updateImg(current_version, listImg);
-                updateDetail(current_version, detailsBox, category_name, brand_name);
-                updateDescription(current_version, descriptionBox);
+                updatePrice();
+                updateUiQuantity();
+                updateDetail();
+                updateDescription();
 
                 nextButton.addEventListener("click", () =>{
                     activeNow + 1 < listImg.children.length ? setActiveNow(activeNow + 1): setActiveNow(0);
@@ -441,7 +576,7 @@ window.onload = () => {
                     numberQuantity.textContent = currentQuantity;
                 });
                 cartButton.addEventListener('click', ()=>{
-                   addProductCart(slugProduct, slugOption);
+                    addProductCart(slugProduct, slugOption);
                 })
                 buyButton.addEventListener('click', ()=>{
                     buyProduct(slugProduct, slugOption);

@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .models import Option, Category, Brand, ReviewReply, Cart, Order, OrderItem
 from .models import Product, Review
 from .serializers import ProductSerializer, OptionSerializer, CategorySerializer, BrandSerializer, AllOptionSerializer, \
-    OptionForCategory, OptionForProductSerializer, CartSerializer
+    OptionForCategory, OptionForProductSerializer, CartSerializer, OrderSerializer
 from .serializers import ReviewSerializer
 from .utils import send_order_confirmation_email
 
@@ -145,7 +145,7 @@ def apiSearch(request, slugSearch, numberPage):
             option['product']['img'] = [img.strip() for img in option['product']['img'].split(',') if img.strip()]
 
     # Pagination
-    products_per_page = 12
+    products_per_page = 15
     total_products = len(options_serialized)
     start_index = (numberPage - 1) * products_per_page
     end_index = start_index + products_per_page
@@ -171,6 +171,8 @@ def apiOrder(request):
         'address': user.address if user.address else "",
     }
     order_items = request.session.get('orderInfo', None)
+    if not order_items:
+        return Response({"error": "No order information found in session."}, status=400)
     results = []
     for item in order_items:
         slugProduct = item.get('slugProduct')
@@ -179,8 +181,16 @@ def apiOrder(request):
         quantity = item.get('quantity')
         try:
             product = Product.objects.get(slug=slugProduct)
-            option = Option.objects.get(product=product, slug=slugOption, color=color)
-
+            options = Option.objects.filter(
+                product=product,
+                slug=slugOption,
+                color=color,
+                quantity__gt=0
+            )
+            if not options.exists():
+                results.append({'error': f"No available option for product {slugProduct} with color {color}"})
+                continue
+            option = options.first()
             option_serializer = OptionSerializer(option)
             data = option_serializer.data
 
@@ -195,7 +205,8 @@ def apiOrder(request):
             results.append(data)
         except Exception as e:
             results.append({'error': str(e), 'slugProduct': slugProduct})
-
+    if len(results) == 1 and results[0]['error']:
+        request.session.pop('orderInfo', None)
     return Response({
         "options": results,
         'user': user_final
@@ -225,9 +236,21 @@ def api_cart(request):
     user = request.user
     cart = Cart.objects.filter(user=user)
     cart_serializer = CartSerializer(cart, many=True)
-    total = 0
+    for item in cart_serializer.data:
+        if item['quantity'] > item['option']['quantity']:
+            if item['option']['quantity'] == 0:
+                Cart.objects.filter(user=user, id=item['id']).delete()
+                cart = Cart.objects.filter(user=user)
+                cart_serializer = CartSerializer(cart, many=True)
+            else:
+                item['quantity'] = item['option']['quantity']
+                cart_item = Cart.objects.get(user=user, id=item['id'])
+                cart_item.quantity = item['quantity']
+                cart_item.save()
+
     for item in cart_serializer.data:
         item['option']['img'] = [img.strip(';') for img in item['option']['img'].split(',')]
+
     return Response({
         'cart': cart_serializer.data,
     })
@@ -283,12 +306,14 @@ def api_payment(request):
     userInfo = request.session.get('userInfo', None)
     bill = request.session.get('bill', None)
     orderInfo = request.session.get('orderInfo', None)
+    if not userInfo or not bill or not orderInfo:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
     return Response({
         'userInfo': userInfo,
         'bill': bill,
         'orderInfo': orderInfo
-
-    })
+    }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -300,15 +325,24 @@ def api_successOrder(request):
 
     order = Order.objects.create(user=user, status='pending')
 
-    order_details = []  # để gom chi tiết đơn hàng gửi trong email
+    order_details = []
 
     for item in orderItemList:
-        print(item)
         product = Product.objects.get(slug=item['slugProduct'])
         option = Option.objects.get(product=product, slug=item['slugOption'], color=item['color'])
-        OrderItem.objects.create(order=order, option=option, quantity=item['quantity'])
 
+        if option.quantity < int(item['quantity']):
+            print(f"Sản phẩm {product.name} ({option.version} - {option.color} - {option.quantity}) không đủ hàng.")
+            return Response({"detail": f"Sản phẩm {product.name} ({option.version} - {option.color}) không đủ hàng."},
+                            status=400)
+
+        OrderItem.objects.create(order=order, option=option, quantity=item['quantity'])
+        option.quantity -= int(item['quantity'])
+        product.purchased_count += int(item['quantity'])
+        product.save()
+        option.save()
         order_details.append(f"{product.name} ({option.version}, {option.color}) x {item['quantity']}")
+
     for item in order.order_items.all():
         print(item.option.price, item.option.discount, item.total_price())
     # Tính tổng tiền
@@ -320,17 +354,41 @@ def api_successOrder(request):
         args=(userInfo, order_details, total_price)
     ).start()
 
+    request.session.pop('userInfo', None)
+    request.session.pop('orderInfo', None)
+    request.session.pop('bill', None)
+
     return Response({"detail": "Đặt hàng thành công", "order_id": order.id}, status=200)
 
 
 @api_view(['GET'])
 def api_authenticated(request):
-    if request.user.is_authenticated:
-        user = request.user
-        first_name = user.first_name
-        last_name = user.last_name
-        return Response({"is_authenticated": True, "user": {
-            'name': first_name + ' ' + last_name
-        }}, status=200)
+    return Response({"is_authenticated": request.user.is_authenticated})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_purchase(request, status, page=1):
+    user = request.user
+    if status == 'all':
+        order = Order.objects.filter(user=user)
     else:
-        return Response({"is_authenticated": False}, status=401)
+        order = Order.objects.filter(user=user, status=status)
+    total_order = order.count()
+    order_per_page = 5
+
+    start_index = (page - 1) * order_per_page
+    end_index = start_index + order_per_page
+
+    paginated_orders = order[start_index:end_index]
+
+    order_serializer = OrderSerializer(paginated_orders, many=True)
+
+    for item in order_serializer.data:
+        for orderItem in item['orderItem']:
+            imgList = [img.strip() for img in orderItem['option']['img'].split(',')]
+            orderItem['option']['img'] = imgList
+
+    return Response({
+        'order': order_serializer.data,
+    })

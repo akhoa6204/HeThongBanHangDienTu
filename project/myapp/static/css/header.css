@@ -9,13 +9,18 @@
   margin: 0 auto;
   color: black;
 }
-
+#header{
+    background-color: white;
+}
 #header .container .logo {
   background: linear-gradient(to right, #2b3467, #5667cd);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;
   margin: 0;
+}
+#header .container .logo a{
+    font-size: 20px;
 }
 #header .container {
   display: flex;
@@ -53,4 +58,29 @@
 #header .container .box a{
     color: black;
     text-decoration: none;
+}
+#header .container .box .user{
+    position: relative;
+}
+#header .container .box .user .nav{
+    display: none;
+    position: absolute;
+    background-color: white;
+    padding: 12px;
+    border-radius: 10px;
+    top: calc(100% + 16px);
+    z-index: 100;
+    width: 210px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+#header .container .box .user .nav .subNav{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+#header .container .box .user .nav .subNav:not(:last-child){
+    margin-bottom: 10px;
+}
+#header .container .box .user .nav.active{
+    display: block;
 }

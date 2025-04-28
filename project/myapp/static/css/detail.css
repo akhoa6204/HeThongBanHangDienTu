@@ -75,6 +75,10 @@ main > * {
 .productBox .detail .categoryBox .category.active{
         border: 3px solid #00957C;
 }
+.productBox .detail .colorBox.notSelected{
+    background-color: #fff5f5;
+    padding: 6px 12px ;
+}
 .productBox .detail .colorBox {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -88,7 +92,18 @@ main > * {
   padding: 6px 12px;
   border-radius: 5px;
   border: 1px solid rgba(209, 206, 206, 1);
+  background-color: white;
 }
+.productBox .detail .colorBox .error-message{
+    color: #ff424f;
+
+}
+.productBox .detail .colorBox .color.disabled{
+    background-color: #fafafa;
+    border: 1px solid rgba(0, 0, 0, .09);
+    color: rgba(0, 0, 0, .26);
+}
+
 .productBox .detail .colorBox .color.active{
         border: 3px solid #00957C;
 }
@@ -97,18 +112,23 @@ main > * {
   align-items: center;
   gap: 20px;
 }
-.productBox .detail .quantityBox .quantity {
+.productBox .detail .quantityBox .quantity{
   display: flex;
+  p{
+    padding: 4px 12px;
+    border: 1px solid rgba(209, 206, 206, 1);
+  }
+  p:nth-child(2) {
+    padding: 4px 24px;
+    border-left: none;
+    border-right: none;
+  }
 }
-.productBox .detail .quantityBox .quantity p:not(:nth-child(2)) {
-  padding: 4px 12px;
-  border: 1px solid rgba(209, 206, 206, 1);
+.productBox .detail .quantityBox .quantity.disabled p{
+    color: #ccc;
+    border-color: rgba(0, 0, 0, .09);
 }
-.productBox .detail .quantityBox .quantity p:nth-child(2) {
-  padding: 4px 24px;
-  border-top: 1px solid rgba(209, 206, 206, 1);
-  border-bottom: 1px solid rgba(209, 206, 206, 1);
-}
+
 .productBox .detail .buttonBox {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -153,7 +173,6 @@ main > * {
 }
 .descriptionBox p {
   line-height: 2;
-  font-size: 20px;
 }
 .reviewBox .none{
     text-align: center;

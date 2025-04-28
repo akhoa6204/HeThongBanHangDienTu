@@ -1,12 +1,18 @@
-main > *{
+main{
     max-width: 1024px;
     padding: 30px 50px;
     margin: 0 auto;
 }
+main > *{
+    margin-bottom: 20px;
+}
 .productContainer .productBox{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 30px 30px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 20px 16px;
+}
+.productContainer .productBox > * {
+    max-width: 180px;
 }
 .resultBox p{
     text-align:center;

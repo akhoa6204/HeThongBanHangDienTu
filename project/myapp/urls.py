@@ -21,6 +21,7 @@ urlpatterns = [
     path('api/payment/', api_views.api_payment, name='api_payment'),
     path('api/successOrder/', api_views.api_successOrder, name='api_successOrder'),
     path('api/authenticated/', api_views.api_authenticated, name='api_authenticated'),
+    path('api/purchase/<str:status>/<int:page>/', api_views.api_purchase, name='api_purchase'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -31,7 +32,7 @@ urlpatterns = [
     path('cart/', views.cart, name='cart'),
 
     path('info_order/', views.info_order, name='info_order'),
-
+    path('purchase/', views.order, name='order'),
     path('payment_order/', views.payment_order, name='payment_order'),
     path('order_status/<int:idOrder>/', views.orderStatus, name='order_status'),
     path('info_user/', views.infoUser, name='infoUser'),

@@ -37,6 +37,7 @@ function loadDataUser(user){
 window.onload = () => {
     fetchApiPayment()
         .then(data => {
+            if (data){
               console.log('User Info from session:', data.userInfo);
               console.log('Bill from session:', data.bill);
               console.log('orderInfo from session:', data.orderInfo);
@@ -78,11 +79,15 @@ window.onload = () => {
                             orderSuccess.addEventListener('click', () => {
                                 window.location.href = '/';
                             });
+                            orderButton.addEventListener('click', () => {
+                                window.location.href = '/purchase/';
+                            });
                         }
                     })
                 }else{
                     alert('Khách hàng cần đồng ý với các Điều khoản sử dụng của Store.')
                 }
               })
+            }
         })
 }

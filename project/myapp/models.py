@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -79,8 +81,10 @@ class Option(models.Model):
     updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
 
     def final_price(self):
+        if self.price is None:
+            return Decimal('0.00')
         if self.discount:
-            return self.price * (1 - self.discount / 100)
+            return self.price * (Decimal('1') - self.discount / Decimal('100'))
         return self.price
 
     def __str__(self):
@@ -93,15 +97,6 @@ class Cart(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def total_price(self):
-        return self.option.price * self.quantity
-
-
-class Purchased(models.Model):
-    option = models.ForeignKey(Option, on_delete=models.DO_NOTHING)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    date_purchased = models.DateTimeField(auto_now_add=True)
 
 
 class Review(models.Model):
@@ -147,12 +142,15 @@ class Order(models.Model):
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def calculate_total_price(self):
-        total = sum(item.total_price() for item in self.order_items.all())
+        total = Decimal('0.00')
+        for item in self.order_items.all():
+            item_total = item.total_price() or Decimal('0.00')
+            total += item_total
         self.total_price = total
         self.save()
 

@@ -137,3 +137,7 @@ def register(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+def order(request):
+    return render(request, 'page/public/order.html')

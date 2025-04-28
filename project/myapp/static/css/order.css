@@ -1,0 +1,122 @@
+body{
+    background-color: #f5f5f5;
+}
+main {
+    max-width: 1024px;
+    padding: 30px 50px;
+    margin: 0 auto;
+}
+main > *{
+    margin-bottom: 20px;
+}
+main .header{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    text-align: center;
+    background-color: white;
+}
+main .header .status{
+    padding: 12px 12px;
+
+}
+main .header .status.active{
+    color: rgba(212, 26, 26, 1);
+    border-bottom: 2px solid rgba(212, 26, 26, 1);
+}
+main .header p{
+    font-size: 14px;
+}
+.orderContainer > *{
+    margin-bottom: 20px;
+}
+.orderContainer .orderBox{
+    background-color: white;
+    padding: 12px 24px;
+}
+.orderContainer .orderBox .status{
+    display:flex;
+    align-items: center;
+    justify-content: right;
+    padding-bottom: 12px;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.2);
+    margin-bottom: 12px;
+    span:nth-child(2){
+        padding-right: 10px;
+        border-right: 1px solid rgba(0, 0, 0, .12);
+        margin-right: 10px;
+        padding-left: 5px ;
+    }
+    span:not(:last-child){
+        color:#26aa99;
+    }
+
+}
+.orderContainer .orderBox .productBox{
+    display: flex;
+    gap: 10px;
+    padding-bottom: 10px;
+    img{
+        width: 80px;
+        height: 80px;
+    }
+    .product{
+        flex : 1;
+        span{
+            font-size: 14px;
+        }
+    }
+    .priceBox{
+        display: flex;
+        align-items: center;
+        color: rgba(212, 26, 26, 1);
+        gap: 10px;
+        .oldPrice{
+            color: rgba(0,0,0,.26);
+            text-decoration-line: line-through
+        }
+    }
+}
+.orderContainer .orderBox .totalPrice{
+    padding: 24px 24px 12px;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.2);
+    text-align: right;
+    span{
+        color: rgba(212, 26, 26, 1);
+        font-size: 16px;
+    }
+}
+.orderContainer .orderBox .buttonBox{
+    padding: 12px 24px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 10px;
+    button{
+        background-color: rgba(212, 26, 26, 1);
+        color: #fff;
+        border: 1px solid #cd3011;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 400;
+        padding: 8px 10px;
+        min-height: 40px;
+        min-width: 150px;
+    }
+}
+.emptyOrder {
+    height: 600px;
+    width: 100%;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    background-color: white;
+    flex-direction:column;
+    gap: 20px;
+    img{
+        width: 100px;
+        height: 100px;
+    }
+    p{
+        font-size:16px ;
+    }
+}
