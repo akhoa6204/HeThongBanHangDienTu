@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login as auth_login, logout
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import Group
@@ -50,13 +51,15 @@ def infoUser(request):
 def changePassword(request):
     if request.method == 'POST':
         currentPassword = request.POST.get('currentPassword')
+        newPassword = request.POST.get('newPassword')
         user = request.user
         if check_password(currentPassword, user.password):
-            user.password = currentPassword
+            user.set_password(newPassword)
             user.save()
-            print(user.password)
+            update_session_auth_hash(request, user)
+            return JsonResponse({'message': 'Đổi mật khẩu thành công'}, status=status.HTTP_200_OK)
         else:
-            print('Sai mật khẩu')
+            return JsonResponse({'error-message-password': 'Sai mật khẩu'}, status=status.HTTP_400_BAD_REQUEST)
     return render(request, 'page/public/changePassword.html')
 
 
