@@ -12,24 +12,25 @@
         <h2>ĐĂNG NHẬP</h2>
         <form method="POST">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Nhập số điện thoại" required>
-            <input type="password" name="password" placeholder="Nhập mật khẩu" required>
-            <div class="box">
-                {% if errors %}
-                <div class="error-message">
-                    <p style="color: red;">{{ errors }}</p>
-                </div>
-                {% endif %}
-                <div class="forgot-password">
-                    <a href="">Quên mật khẩu</a>
-                </div>
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Nhập email">
+                <p class="error-message"></p>
             </div>
-            <button type="submit">Đăng nhập</button>
-
-            <p class="register">Bạn chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay</a></p>
-
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Nhập mật khẩu">
+                <p class="error-message"></p>
+            </div>
+            <div class="form-group">
+                <p class="forgot-password "><a href="#">Quên mật khẩu</a></p>
+            </div>
+            <div class="form-group">
+                <input type="submit" value='Đăng nhập'>
+                <p class="register">Bạn chưa có tài khoản? <a href="{% url 'register' %}">Đăng ký ngay</a></p>
+            </div>
         </form>
-
     </div>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/login/login.js' %}" type="module"></script>
 {% endblock %}

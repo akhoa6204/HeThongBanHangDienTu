@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart, OrderItem, Order
+from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart, OrderItem, Order, MediaFile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -61,6 +61,12 @@ class OptionForProductSerializer(serializers.ModelSerializer):
                   'product']
 
 
+class MediaFileSerialier(serializers.ModelSerializer):
+    class Meta:
+        model = MediaFile
+        fields = '__all__'
+
+
 class ReviewReplySerializer(serializers.ModelSerializer):
     class Meta:
         model = ReviewReply
@@ -68,14 +74,25 @@ class ReviewReplySerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = serializers.SerializerMethodField()
     option = OptionReviewSerializer()
     reviewReply = ReviewReplySerializer(source='reviewreply')
+    media = MediaFileSerialier(many=True, source='media_files')
 
     class Meta:
         model = Review
         fields = ['content', 'star_count', 'user', 'created_at', 'quality', 'summary', 'featureHighlight', 'img',
-                  'option', 'reviewReply']
+                  'option', 'reviewReply', 'media']
+
+    def get_user(self, obj):
+        return {
+            "first_name": obj.user.first_name,
+            "last_name": obj.user.last_name,
+            "phone": obj.user.phone,
+            "email": obj.user.email,
+            "address": obj.user.address,
+            "img": obj.user.img
+        }
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -140,7 +157,25 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     orderItem = OrderItemSerializer(many=True, source='order_items')
+    has_review = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['status', 'total_price', 'updated_at', 'orderItem']
+        fields = ['id', 'status', 'total_price', 'updated_at', 'orderItem', 'has_review', 'address', 'user']
+
+    def get_has_review(self, obj):
+        for item in obj.order_items.all():
+            if Review.objects.filter(option=item.option).exists():
+                return True
+        return False
+
+    def get_user(self, obj):
+        return {
+            "first_name": obj.user.first_name,
+            "last_name": obj.user.last_name,
+            "phone": obj.user.phone,
+            "email": obj.user.email,
+            "address": obj.user.address,
+            "img": obj.user.img
+        }

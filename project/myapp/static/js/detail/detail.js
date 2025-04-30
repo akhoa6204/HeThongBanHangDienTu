@@ -247,7 +247,7 @@ function updateReviewsUI(reviews){
     reviewItemContainer.innerHTML = '';
     if (reviews.length > 0){
         for( const review of reviews){
-            const name = review.user.username;
+            const name = review.user.first_name + " " + review.user.last_name;
             const content = review.content;
             const star_count = review.star_count;
             const version = review.option.color;
@@ -263,11 +263,14 @@ function updateReviewsUI(reviews){
             }catch{
                 dateOnly = null;
             }
-            const imgList = review.img;
+            const imgList = review.media;
             const imagesHTML = imgList && imgList.length > 0
             ? `
                 <div class="imgReviewBox">
-                    ${imgList.map(img => `<img src="${img.trim()}" alt="">`).join('')}
+                    ${imgList.map(img => `
+                        <div class='imgBox'><img src="${img.media.trim()}" alt=""></div>
+                    `
+                    ).join('')}
                 </div>
             `
             : '';
@@ -316,7 +319,8 @@ function updateReviewsUI(reviews){
                                 ''
                             }
                         </div>
-                        <p class="mainContent">${content}</p>
+                        ${content ? `<p class="mainContent">${content}</p>`: ''}
+
                         ${imagesHTML}
 
                         ${reviewReply ?

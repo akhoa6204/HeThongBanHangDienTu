@@ -10,57 +10,49 @@
         {% csrf_token %}
         <div class="input-group">
             <label for="first_name">Tên</label>
-            <input type="text" name='first_name' placeholder="Nhập tên" id='first_name'>
-            {% if error_first_name %}
-            <span class="error-message">{{ error_first_name }}</span>
-            {% endif %}
+            <input type="text" name='first_name' placeholder="Nhập tên" id='first_name'/>
+            <p class="error-message"></p>
         </div>
         <div class="input-group">
             <label for="last_name">Họ</label>
-            <input type="text" name='last_name' placeholder="Nhập họ" id='last_name'>
-            {% if error_last_name %}
-            <span class="error-message">{{ error_last_name }}</span>
-            {% endif %}
+            <input type="text" name='last_name' placeholder="Nhập họ" id='last_name'/>
+            <p class="error-message"></p>
         </div>
         <div class="input-group">
             <label for="phone">Số điện thoại</label>
-            <input type="tel" placeholder="Nhập số điện thoại" name="phone" id='phone'>
-            {% if error_phone %}
-            <span class="error-message">{{ error_phone }}</span>
-            {% endif %}
+            <input type="tel" placeholder="Nhập số điện thoại" name="phone" id='phone'/>
+            <p class="error-message"></p>
         </div>
         <div class="input-group">
-            <label for="email">Email (Không bắt buộc)</label>
-            <input type="email" placeholder="Nhập email" name="email" id='email'>
+            <label for="email">Email</label>
+            <input type="email" placeholder="Nhập email" name="email" id='email'/>
+            <p class="error-message"></p>
         </div>
         <div class="input-group">
             <label for="password">Mật khẩu</label>
-            <input type="password" placeholder="Nhập mật khẩu" name="password" id="password">
+            <input type="password" placeholder="Nhập mật khẩu" name="password" id="password"/>
             <p class="note">(*) Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ in hoa và 1 kí tự đặc biệt. (VD:
                 aA@123)</p>
-            {% if error_password %}
-            <span class="error-message">{{ error_password }}</span>
-            {% endif %}
+            <p class="error-message"></p>
         </div>
-
         <div class="input-group">
-            <label for="comfirmPassword">Nhập lại mật khẩu</label>
-            <input type="password" placeholder="Nhập lại mật khẩu" name="comfirmPassword" id="comfirmPassword">
-            {% if error_confirmPassword %}
-            <span class="error-message">{{ error_confirmPassword }}</span>
-            {% endif %}
+            <label for="confirmPassword">Nhập lại mật khẩu</label>
+            <input type="password" placeholder="Nhập lại mật khẩu" name="confirmPassword" id="confirmPassword"/>
+            <p class="error-message"></p>
         </div>
-
-        <div class="checkbox-wrap">
+        <div class="input-group checkbox-wrap">
             <input type="checkbox" required id='checkbox'>
             <label for="checkbox">Tôi đồng ý với các điều khoản sử dụng và chính sách bảo mật.</label>
         </div>
-
-        <Button type="submit">Đăng ký</Button>
-
-        <p class="login-link">
-            Bạn đã có tài khoản <a href="{% url 'login' %}">Đăng nhập ngay</a>
-        </p>
+        <div class="input-group">
+            <input type="submit" value="Đăng ký"/>
+            <p class="login-link">
+                Bạn đã có tài khoản <a href="{% url 'login' %}">Đăng nhập ngay</a>
+            </p>
+        </div>
     </form>
 </div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/register/register.js' %}" type="module"></script>
 {% endblock %}

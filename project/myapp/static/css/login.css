@@ -25,47 +25,54 @@
     font-weight: bold;
     color: black;
 }
-.login-form input {
-    background-color: rgba(237, 235, 235, 1);
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border: 1px solid rgba(237, 235, 235, 1);
-    border-radius: 5px;
-    font-size: 16px;
+.login-form .form-group{
+    margin-bottom: 10px;
+    .error-message{
+        color: red;
+        font-size: 14px;
+    }
+    input {
+        background-color: rgba(237, 235, 235, 1);
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(237, 235, 235, 1);
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    input[type='submit'] {
+        width: 100%;
+        padding: 12px;
+        background-color: rgb(6, 6, 103);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .register {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 14px;
+        a {
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+          }
+      }
+    .forgot-password {
+        text-align: right;
+        a {
+            text-align: right;
+            color: rgb(112, 111, 111);
+            text-decoration: none;
+            font-size: 14px;
+            font-style: italic;
+        }
+    }
 }
-.forgot-password {
-    text-align: right;
-    margin-bottom: 20px;
-}
-.forgot-password a {
-    text-align: right;
-    color: rgb(112, 111, 111);
-    text-decoration: none;
-    font-size: 14px;
-    font-style: italic;
-}
-button {
-    width: 100%;
-    padding: 12px;
-    background-color: rgb(6, 6, 103);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-}
-.register {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 14px;
-  }
 
-.register a {
-    color: #000;
-    font-weight: bold;
-    text-decoration: none;
-  }
+
 
 .box{
     display: flex;

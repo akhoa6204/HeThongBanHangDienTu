@@ -17,6 +17,10 @@ const resultBox = document.querySelector('.resultBox');
 const productContainer = document.querySelector('.productContainer');
 const pagination = document.querySelector('.paginationBox');
 const productBox = productContainer.querySelector('.productBox');
+const decreasePriceButton = document.querySelector('.decreasePriceButton');
+const increasePriceButton = document.querySelector('.increasePriceButton');
+let dataProduct = [];
+let currentSort = null;
 function loadProducts(options){
     let html = '';
 
@@ -52,7 +56,6 @@ function loadProducts(options){
         `;
     }
     productBox.innerHTML = html;
-//    productContainer.innerHTML = html;
 }
 function setCurrentPage(value){
     currentPage = value;
@@ -69,28 +72,17 @@ function loadResultBox(length){
         resultBox.innerHTML = html;
     }
 }
-function fetchApi(keyword, currentPage){
-    return fetchApiSearch(keyword, currentPage)
+function fetchApi(keyword, currentPage, sortQuery){
+    return fetchApiSearch(keyword, currentPage, sortQuery)
         .then(data => {
             loadProducts(data.products);
             return data;
-            // Uncomment để debug nếu cần
-            // for (const option of data) {
-            //     console.log(option.product);
-            // }
         })
         .catch(error => {
             console.error('Lỗi khi lấy dữ liệu search:', error);
         });
 }
-window.onload = () => {
-    fetchApi(keyword, currentPage)
-        .then(data =>{
-            loadResultBox(data.totalProducts)
-            renderPagination(getCurrentPage(), data.totalPages);
-            console.log(data);
-        })
-}
+
 function createPageButton(page, currentPage) {
     const btn = document.createElement('p');
     btn.innerText = page;
@@ -99,7 +91,7 @@ function createPageButton(page, currentPage) {
     }else{
         btn.onclick = () => {
           setCurrentPage(page);
-          fetchApi(keyword, getCurrentPage())
+          fetchApi(keyword, getCurrentPage(), currentSort)
             .then(data => renderPagination(getCurrentPage(), data.totalPages))
         };
     }
@@ -122,7 +114,7 @@ function renderPagination(currentPage, totalPage){
         chevronLeft.onclick = () => {
           if (currentPage > 1) {
             setCurrentPage(currentPage- 1);
-            fetchApi(keyword, getCurrentPage())
+            fetchApi(keyword, getCurrentPage(), currentSort)
                 .then(data => renderPagination(getCurrentPage(), data.totalPages))
           }
         };
@@ -163,10 +155,60 @@ function renderPagination(currentPage, totalPage){
         chevronRight.onclick = () => {
           if (currentPage < totalPage) {
             setCurrentPage(currentPage + 1);
-            fetchApi(keyword, getCurrentPage())
+            fetchApi(keyword, getCurrentPage(), currentSort)
                 .then(data => renderPagination(getCurrentPage(), data.totalPages))
           }
         };
         pagination.appendChild(chevronRight);
     }
+}
+function updateSortButtonUI() {
+    increasePriceButton.classList.remove('active');
+    decreasePriceButton.classList.remove('active');
+    if (currentSort === 'increase') {
+        increasePriceButton.classList.add('active');
+    } else if (currentSort === 'decrease') {
+        decreasePriceButton.classList.add('active');
+    }
+}
+
+function setUpEventListerner(){
+    decreasePriceButton.addEventListener('click', () =>{
+        console.log('decrease');
+        setCurrentPage(1);
+        if (currentSort != 'decrease'){
+            currentSort = 'decrease';
+            fetchApi(keyword, getCurrentPage(), currentSort)
+            .then(data => renderPagination(getCurrentPage(), data.totalPages))
+            .then(() => updateSortButtonUI())
+        }else{
+            currentSort = null;
+            fetchApi(keyword, getCurrentPage(), currentSort)
+            .then(data => renderPagination(getCurrentPage(), data.totalPages))
+            .then(() => updateSortButtonUI())
+        }
+    })
+    increasePriceButton.addEventListener('click', () =>{
+        console.log('increase');
+        setCurrentPage(1);
+        if (currentSort != 'increase'){
+            currentSort = 'increase';
+            fetchApi(keyword, getCurrentPage(), currentSort)
+            .then(data => renderPagination(getCurrentPage(), data.totalPages))
+            .then(() => updateSortButtonUI())
+        }else{
+            currentSort = null;
+            fetchApi(keyword, getCurrentPage(), currentSort)
+            .then(data => renderPagination(getCurrentPage(), data.totalPages))
+            .then(() => updateSortButtonUI())
+        }
+    })
+}
+window.onload = () => {
+    fetchApi(keyword, currentPage)
+        .then(data =>{
+            loadResultBox(data.totalProducts)
+            renderPagination(getCurrentPage(), data.totalPages);
+            setUpEventListerner();
+        })
 }

@@ -1,10 +1,11 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 
 from . import api_views
 from . import views
 
 urlpatterns = [
-    # API URL patterns
     path('api/home/', api_views.apiHome, name='api_home'),
     path('api/product/<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', api_views.apiProductDetail,
          name="api_product"),
@@ -22,6 +23,9 @@ urlpatterns = [
     path('api/successOrder/', api_views.api_successOrder, name='api_successOrder'),
     path('api/authenticated/', api_views.api_authenticated, name='api_authenticated'),
     path('api/purchase/<str:status>/<int:page>/', api_views.api_purchase, name='api_purchase'),
+    path('api/review/<int:idOrder>/', api_views.api_review, name='api_review'),
+    path('api/add_new_review/<int:idOrder>/', api_views.api_add_new_review, name='api_add_new_review'),
+    path('api/order_status/<int:idOrder>/', api_views.api_orderStatus, name='api_orderStatus'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -37,5 +41,7 @@ urlpatterns = [
     path('order_status/<int:idOrder>/', views.orderStatus, name='order_status'),
     path('info_user/', views.infoUser, name='infoUser'),
     path('change_password/', views.changePassword, name='change_password'),
-    path('review_product/<int:idOrder>/', views.reviewProduct, name="review_product.css"),
+    path('review/<int:idOrder>/', views.reviewProduct, name="review_product.css"),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

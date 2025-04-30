@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure--)yv5kv3&1-%gxftdhw2!%)0so&l0-q$cmottean%-qe0k)-1$'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# django_project/settings.py
 DEBUG = True
 
 ALLOWED_HOSTS = []
@@ -117,7 +117,7 @@ STATIC_URL = '/static/'
 
 # Cấu hình thư mục chứa các tệp tĩnh của dự án
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'myapp', 'static'),  # Chỉ định thư mục 'static' trong thư mục gốc của dự án
+    os.path.join(BASE_DIR, 'myapp', 'static'),
 ]
 
 # Default primary key field type
@@ -143,3 +143,6 @@ EMAIL_HOST_USER = 'smartbuyshop25@gmail.com'
 EMAIL_HOST_PASSWORD = 'gtis urgx gkhk avah'
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'myapp', 'media')
+MEDIA_URL = '/media/'

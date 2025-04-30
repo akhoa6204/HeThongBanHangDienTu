@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login as auth_login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
+from django.contrib.auth.models import Group
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from rest_framework import status
 
 from .models import User
-from .utils import contains_uppercase, contains_letter, contains_special_char
 
 
 def home(request):
@@ -76,61 +78,42 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             auth_login(request, user)
-
-            redirect_url = 'home'
             if is_admin(user):
-                redirect_url = 'admin_dashboard'
+                return JsonResponse({'role': 'admin'}, status=status.HTTP_200_OK)
             elif is_customer(user):
-                redirect_url = 'home'
-
-            return redirect(redirect_url)
+                return JsonResponse({'role': 'customer'}, status=status.HTTP_200_OK)
+            # else:
+            #     return JsonResponse({'role': 'unknown'}, status=status.HTTP_200_OK)
         else:
-            errors = 'Sai tài khoản hoặc mật khẩu'
-            return render(request, 'page/public/login.html', {'errors': errors})
+            return JsonResponse({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
     return render(request, 'page/public/login.html')
 
 
 def register(request):
     if request.method == 'POST':
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
+        first_name = request.POST.get('firstName')
+        last_name = request.POST.get('lastName')
         phone = request.POST.get('phone')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        confirmPassword = request.POST.get('comfirmPassword')
-        if not first_name:
-            error = 'Tên không được để trống'
-            return render(request, 'page/public/register.html', {'error_first_name': error})
-        if not last_name:
-            error = 'Họ không được để trống'
-            return render(request, 'page/public/register.html', {'error_last_name': error})
-        if not phone:
-            error = 'Số điện thoại không được để trống'
-            return render(request, 'page/public/register.html', {'error_phone': error})
-        if User.objects.filter(phone=phone).exists():
-            error = 'Số điện thoại đã được đăng kí'
-            return render(request, 'page/public/register.html', {'error_phone': error})
-        if not (len(password) > 6 and
-                contains_uppercase(password) and
-                contains_letter(password) and
-                contains_special_char(password)):
-            error = '(*) Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ in hoa và 1 kí tự đặc biệt. (VD: aA@123)'
-            return render(request, 'page/public/register.html', {'error_password': error})
-        if password != confirmPassword:
-            error = 'Mật khẩu nhập lại không giống nhau'
-            return render(request, 'page/public/register.html', {'error_confirmPassword': error})
-        User.objects.create_user(
-            username=phone,
+        if User.objects.filter(email=email).exists():
+            return JsonResponse({'error-message-email': 'Email đã tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.create_user(
+            username=email,
             email=email,
             password=password,
             phone=phone,
             first_name=first_name,
             last_name=last_name
         )
-        return redirect('login')
+        group = Group.objects.get(name='Customer')
+        user.groups.add(group)
+        return JsonResponse({'message': 'Đăng ký thành công'}, status=status.HTTP_200_OK)
     return render(request, 'page/public/register.html')
 
 

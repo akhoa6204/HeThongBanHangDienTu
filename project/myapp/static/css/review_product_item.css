@@ -14,6 +14,8 @@
 }
 .productReview .product p {
   font-weight: 500;
+  font-size: 14px;
+  margin-top: 10px;
 }
 .productReview .review {
   display: flex;
@@ -37,28 +39,20 @@
 .productReview .review .starBox span.selected {
   color: rgba(255, 237, 37, 1);
 }
-
 .formReview {
   margin: 0 auto 20px;
   border-radius: 5px;
   background-color: rgba(248, 248, 248, 1);
   padding: 12px;
 }
-.formReview > p {
+.formReview  p {
   padding: 8px;
   margin-bottom: 20px;
-}
-.formReview form {
-  padding: 8px;
-  border-bottom: 1px solid rgba(119, 118, 118, 1);
 }
 .formReview .formGroup {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
-}
-.formReview .formGroup.column {
-  flex-direction: column;
 }
 .formReview .formGroup input {
   border: none;
@@ -66,20 +60,32 @@
   background-color: rgba(248, 248, 248, 1);
   flex-grow: 1;
 }
-.formReview .formGroup #file {
+.formReview .formGroup input[type="file"] {
   display: none;
 }
-.formReview .image label {
+.formReview label{
+    font-size: 14px;
+    span:first-child{
+        font-size: 20px;
+    }
+    span:last-child{
+        font-size: 14px;
+    }
+}
+.formReview label.img {
   display: flex;
   align-items: center;
   gap: 10px;
   background-color: white;
   border: 1px solid rgba(209, 206, 206, 1);
   border-radius: 5px;
-  padding: 6px 12px;
+  padding: 2px 6px;
 }
-.formReview .image {
-  border: none;
+.formReview .contentInput{
+    margin: 0 0 20px;
+    background-color: rgba(248, 248, 248, 1);
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(119, 118, 118, 1);
 }
 .submit {
   display: flex;
@@ -97,14 +103,7 @@
   background-color: rgba(0, 85, 170, 1);
   color: white;
 }
-#mediaPreviewContainer {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 15px;
-}
-/* #mediaPreviewContainer > * {
 
-} */
 .imgBox {
   position: relative;
 }
@@ -113,3 +112,34 @@
   top: -15px;
   right: -10px;
 }
+.mediaPreviewContainer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.preview-image {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position:relative;
+    img, video{
+        width: 80px;
+        height: 80px;
+    }
+    span{
+        position: absolute;
+        top: 0;
+        right: 10px;
+        color: white;
+        background-color: #ccc;
+        border-radius: 100%;
+        font-size: 14px ;
+    }
+}
+
+

@@ -1,6 +1,6 @@
-async function fetchApiSearch(keyword, pageNumber) {
-    const url = `/api/search/${keyword}/${pageNumber}/`;
-
+async function fetchApiSearch(keyword, pageNumber, sortQuery) {
+    let url = `/api/search/${keyword}/${pageNumber}/`;
+    if (sortQuery) url += `?sort=${sortQuery}`;
     try {
         const response = await fetch(url);
 

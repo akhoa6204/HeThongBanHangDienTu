@@ -4,5 +4,8 @@ function fetchApiAuthenticated(){
         .then(response => {
            return response.json()
         })
+        .catch(error => {
+            return null;
+        });
 }
 export {fetchApiAuthenticated}

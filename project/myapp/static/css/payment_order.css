@@ -198,6 +198,7 @@ main{
         }
         > p{
             margin-bottom: 30px;
+            text-align: center;
         }
         .button{
             display:flex;

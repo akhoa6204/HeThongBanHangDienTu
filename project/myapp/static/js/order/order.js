@@ -5,6 +5,7 @@ const pending = document.querySelector('.header .status.pending');
 const processing = document.querySelector('.header .status.processing');
 const shipped = document.querySelector('.header .status.shipped');
 const cancelled = document.querySelector('.header .status.cancelled');
+const shipping = document.querySelector('.header .status.shipping');
 const orderContainer = document.querySelector('.orderContainer');
 let currentPage = 1;
 let load = true;
@@ -61,7 +62,6 @@ function updateHeader(tag) {
 }
 function loadOrderData(data){
     let html ='';
-
     if (data.length > 0){
         html = data.map((item, index) => {
             let status = '';
@@ -69,6 +69,8 @@ function loadOrderData(data){
                 status = 'Chờ xác nhận';
             }else if(item.status === 'processing'){
                 status = 'Đang xử lý';
+            }else if(item.status === 'shipping'){
+                status = 'Đang giao hàng';
             }else if(item.status === 'shipped'){
                 status = 'Đã giao hàng';
             }else if(item.status === 'cancelled'){
@@ -82,33 +84,42 @@ function loadOrderData(data){
                         <span>${status}</span>
                         <span>Cập nhật mới nhất: ${formattedDate}</span>
                     </div>
-                    ${item.orderItem.map((orderItem, index)=>{
-                        const oldPrice = (orderItem.option.price * orderItem.quantity).toLocaleString('vn-VN');
-                        const price = ((orderItem.option.price - (orderItem.option.price * orderItem.option.discount)) * orderItem.quantity).toLocaleString('vn-VN');
-                        return `
-                            <div class="productBox">
-                                <img src="${orderItem.option.img[0]}"
-                                     alt="img product">
-                                <div class="product">
-                                    <span>${orderItem.option.product.name} - ${orderItem.option.version} - ${orderItem.option.color}</span>
-                                    <span>x${orderItem.quantity}</span>
+                    <div class='productContainer'>
+                        ${item.orderItem.map((orderItem, index)=>{
+                            const oldPrice = (orderItem.option.price * orderItem.quantity).toLocaleString('vn-VN');
+                            const price = ((orderItem.option.price - (orderItem.option.price * orderItem.option.discount)) * orderItem.quantity).toLocaleString('vn-VN');
+                            return `
+                                <div class="productBox">
+                                    <img src="${orderItem.option.img[0]}"
+                                         alt="img product">
+                                    <div class="product">
+                                        <span>${orderItem.option.product.name} - ${orderItem.option.version} - ${orderItem.option.color}</span>
+                                        <span>x${orderItem.quantity}</span>
+                                    </div>
+                                    <div class="priceBox">
+                                        ${orderItem.option.discount > 0 ? `<span class="oldPrice">${oldPrice}₫</span>` : ''}
+                                        <span class="price">${price}₫</span>
+                                    </div>
                                 </div>
-                                <div class="priceBox">
-                                    ${orderItem.option.discount > 0 ? `<span class="oldPrice">${oldPrice}₫</span>` : ''}
-                                    <span class="price">${price}₫</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                            `;
+                        }).join('')}
+                    </div>
                     <div class='totalPrice'>
                         <p>
                             Thành tiền: <span>${(Number(item.total_price)).toLocaleString('vn-VN')}₫</span>
                         </p>
                     </div>
-                    <div class="buttonBox">
-                        <button>Đánh giá</button>
-                        <button>Mua lại</button>
-                    </div>
+                    ${item.status === 'shipped' ?
+                        `<div class="buttonBox">
+                            ${!item.has_review ? "<button class='reviewBtn'>Đánh giá</button>" : ''}
+                            <button>Mua lại</button>
+                        </div>` : ''
+                    }
+                    ${item.status === 'cancelled' ?
+                        `<div class="buttonBox">
+                            <button>Mua lại</button>
+                        </div>` : ''
+                    }
                 </div>
             `;
         }).join('');
@@ -126,12 +137,29 @@ function loadOrderData(data){
     }else{
         orderContainer.innerHTML += html;
     }
+    const buttonBoxAll = document.querySelectorAll('.buttonBox');
+    const productContainerAll = document.querySelectorAll('.productContainer');
+    productContainerAll.forEach((productContainer, index) =>{
+        productContainer.addEventListener('click', ()=>{
+            window.location.href =`/order_status/${data[index].id}`;
+        })
+    })
+    buttonBoxAll.forEach((buttonBox, index) => {
+        const reviewButton = buttonBox.querySelector('.reviewBtn');
+        if(reviewButton){
+            reviewButton.addEventListener('click', () =>{
+                window.location.href =`/review/${data[index].id}`;
+            })
+        }
+    })
+//    console.log(reviewButton)
 }
 function fetchApi(status, page) {
     if(!isLoading){
         setIsLoading(true);
         return fetchOrder(status, page)
             .then(data => {
+                console.log(data);
                 if (data.order.length === 0) {
                     noMoreData = true;
                 }
@@ -176,6 +204,10 @@ window.onload = () => {
     });
     processing.addEventListener('click', () => {
         setCurrentTag('processing');
+        clickHeader(getCurrentTag());
+    });
+    shipping.addEventListener('click', () => {
+        setCurrentTag('shipping');
         clickHeader(getCurrentTag());
     });
     shipped.addEventListener('click', () => {

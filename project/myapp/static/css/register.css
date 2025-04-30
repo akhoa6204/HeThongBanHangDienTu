@@ -3,77 +3,67 @@
     padding: 30px 50px;
     margin:0 auto;
 }
-h2 {
+.containerRegister h2 {
     text-align: center;
-    margin-bottom: 30px;
-    font-size: 24px;
+    margin-bottom: 20px;
+    font-size: 20px;
     font-weight: bold;
 }
 
-.register-form {
-    display: flex;
-    flex-direction: column;
-}
-.register-form .input-group label {
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-.register-form input[type="text"],
-.register-form input[type="tel"],
-.register-form input[type="email"],
-.register-form input[type="password"] {
-    padding: 12px;
-    margin-bottom: 10px;
-    border: none;
-    background-color: rgba(237, 235, 235, 1);
-    border-radius: 6px;
-    font-size: 15px;
-    width: 100%;
-    outline: none;
+.register-form{
+    .input-group{
+        margin-bottom: 10px;
+        label{
+            font-size: 14px;
+        }
+        input:not([type="checkbox"]){
+            margin: 5px 0;
+            padding: 12px;
+            border: none;
+            background-color: rgba(237, 235, 235, 1);
+            border-radius: 6px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+        }
+        input[type="submit"] {
+            padding: 14px;
+            background-color: #2d2d63;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 14px;
+            a {
+                font-weight: bold;
+                text-decoration: none;
+                color: #000;
+            }
+        }
+        .note {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+        .error-message{
+            color: red;
+            margin-bottom: 10px;
+        }
+    }
+    .checkbox-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 15px 0 20px;
+        font-size: 13px;
+    }
 }
 
-.note {
-    font-size: 12px;
-    color: #555;
-    margin-top: -5px;
-    margin-bottom: 10px;
-    font-style: italic;
-}
 
-.checkbox-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 15px 0 20px;
-    font-size: 13px;
-}
-
-button {
-    padding: 14px;
-    background-color: #2d2d63;
-    color: white;
-    font-size: 16px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.login-link {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 14px;
-}
-
-.login-link a {
-    font-weight: bold;
-    text-decoration: none;
-    color: #000;
-}
-.error-message{
-    color: red;
-    margin-bottom: 10px;
-}
-.input-group{
-    margin-bottom: 10px;
-}
 

@@ -42,11 +42,18 @@
 .reviewItem .content .summaryBox > div p:first-child{
     color: rgba(119, 118, 118, 1);
 }
-
+.reviewItem .content .imgReviewBox{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+.reviewItem .content .imgReviewBox .imgBox{
+    display: flex;
+    align-items: center;
+    justify-content:center;
+}
 .reviewItem .content .imgReviewBox img{
-    width: 95px;
-    heigth: 95px;
-    margin-right: 10px;
+    width: 80px;
+    height: 80px;
 }
 
 .reviewItem .reviewReply{

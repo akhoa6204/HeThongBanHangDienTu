@@ -1,15 +1,18 @@
 import threading
 
-from django.db.models import Avg, Exists, OuterRef
+from django.db.models import Avg, Exists, OuterRef, Count
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Option, Category, Brand, ReviewReply, Cart, Order, OrderItem
-from .models import Product, Review
+from .models import Option, Category, Brand, ReviewReply, Cart, MediaFile
+from .models import Order, Review
+from .models import OrderItem
+from .models import Product
 from .serializers import ProductSerializer, OptionSerializer, CategorySerializer, BrandSerializer, AllOptionSerializer, \
-    OptionForCategory, OptionForProductSerializer, CartSerializer, OrderSerializer
+    OptionForCategory, OptionForProductSerializer, CartSerializer, OrderSerializer, OrderItemSerializer
 from .serializers import ReviewSerializer
 from .utils import send_order_confirmation_email
 
@@ -74,8 +77,13 @@ def apiReviews(request, slugProduct, star, numberPage):
     elif star == 0:
         reviews = Review.objects.filter(product=product).select_related('user', 'option')
     elif star == 6:
-        reviews = Review.objects.filter(product=product, img__isnull=False).select_related('user', 'option')
-        print(reviews)
+        reviews = Review.objects.filter(
+            product=product
+        ).annotate(
+            media_count=Count('media_files')
+        ).filter(
+            media_count__gt=0
+        ).select_related('user', 'option')
     elif star == 7:
         reviews = Review.objects.annotate(
             has_reply=Exists(
@@ -117,14 +125,20 @@ def apiReviews(request, slugProduct, star, numberPage):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def apiSearch(request, slugSearch, numberPage):
+    sort_query = request.GET.get('sort', None)
+
     products = Product.objects.filter(slug__icontains=slugSearch)
 
     if not products.exists():
         category = Category.objects.filter(slug__icontains=slugSearch).first()
         if category:
             products = Product.objects.filter(category=category)
-
+            
     options = Option.objects.filter(product__in=products).select_related('product')
+    if sort_query == 'increase':
+        options = options.order_by('price')
+    elif sort_query == 'decrease':
+        options = options.order_by('-price')
 
     # Lọc option trùng product + version
     seen = set()
@@ -205,7 +219,7 @@ def apiOrder(request):
             results.append(data)
         except Exception as e:
             results.append({'error': str(e), 'slugProduct': slugProduct})
-    if len(results) == 1 and results[0]['error']:
+    if len(results) == 1 and results[0].get('error'):
         request.session.pop('orderInfo', None)
     return Response({
         "options": results,
@@ -323,7 +337,11 @@ def api_successOrder(request):
     userInfo = request.session.get('userInfo')
     orderItemList = request.session.get('orderInfo')
 
-    order = Order.objects.create(user=user, status='pending')
+    order = Order.objects.create(
+        user=user,
+        status='pending',
+        address=f"{userInfo.get('address_detail')}, {userInfo.get('ward')}, {userInfo.get('district')}, {userInfo.get('city')}"
+    )
 
     order_details = []
 
@@ -392,3 +410,86 @@ def api_purchase(request, status, page=1):
     return Response({
         'order': order_serializer.data,
     })
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_review(request, idOrder):
+    user = request.user
+    order = Order.objects.get(id=idOrder)
+    if order.user != user:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    if order.status != 'shipped':
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    orderItems = OrderItem.objects.filter(order=order)
+    orderItem_serializer = OrderItemSerializer(orderItems, many=True)
+    for item in orderItem_serializer.data:
+        imgList = [img.strip(';').strip() for img in item['option']['img'].split(',')]
+        item['option']['img'] = imgList
+    return Response(orderItem_serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def api_add_new_review(request, idOrder):
+    user = request.user
+    data = request.data
+
+    try:
+        order = Order.objects.get(id=idOrder, user=user)
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=404)
+
+    order_items = list(OrderItem.objects.filter(order=order))
+
+    for i in range(len(order_items)):
+        if f"reviews[{i}][starCount]" not in data:
+            continue
+        order_item = order_items[i]
+        option = order_item.option
+        product = Product.objects.get(id=option.product_id)
+        star_count = int(data.get(f"reviews[{i}][starCount]", 5))
+        quality = data.get(f"reviews[{i}][quality]", "")
+        description = data.get(f"reviews[{i}][description]", "")
+        features = data.get(f"reviews[{i}][features]", "")
+        content = data.get(f"reviews[{i}][content]", "")
+
+        review = Review.objects.create(
+            user=user,
+            option=option,
+            product=product,
+            star_count=star_count,
+            quality=quality,
+            summary=description,
+            featureHighlight=features,
+            content=content,
+        )
+
+        media_files = request.FILES.getlist(f"reviews[{i}][mediaFiles]")
+        for media_file in media_files:
+            if not media_file.content_type.startswith('image'):
+                continue
+            MediaFile.objects.create(
+                review=review,
+                media_type='image',
+                media=media_file
+            )
+
+    return Response({'status': 'success'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_orderStatus(request, idOrder):
+    nowUser = request.user
+    order = Order.objects.get(id=idOrder)
+    if nowUser != order.user:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+    order_serializer = OrderSerializer(order)
+    order_data = order_serializer.data
+    for item in order_data['orderItem']:
+        imgList = [img.strip() for img in item['option']['img'].split(',')]
+        item['option']['img'] = imgList
+    return Response({
+        'order': order_serializer.data
+    }, status=status.HTTP_200_OK)
