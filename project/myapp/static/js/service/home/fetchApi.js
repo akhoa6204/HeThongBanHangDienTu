@@ -1,5 +1,5 @@
 async function fetchApiHome() {
-    const url = '/api/home';
+    const url = '/api/home/get/';
 
     try {
         const response = await fetch(url);

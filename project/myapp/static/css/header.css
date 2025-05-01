@@ -47,13 +47,25 @@
   display: flex;
 }
 #header .container .box > *:not(:last-child) {
-  padding-right: 12px;
+  position: relative;
   margin-right: 12px;
-  border-right: 2px solid #ccc;
+  padding-right: 12px;
+}
+
+#header .container .box > *:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 24px;
+  background-color: #ccc;
 }
 #header .container .box > * {
   display: flex;
   align-items: center;
+  padding-bottom: 8px;
 }
 #header .container .box a{
     color: black;
@@ -68,9 +80,9 @@
     background-color: white;
     padding: 12px;
     border-radius: 10px;
-    top: calc(100% + 16px);
+    top: 100%;
     z-index: 100;
-    width: 210px;
+    width: 170px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 #header .container .box .user .nav .subNav{
@@ -81,6 +93,7 @@
 #header .container .box .user .nav .subNav:not(:last-child){
     margin-bottom: 10px;
 }
-#header .container .box .user .nav.active{
-    display: block;
+
+#header .container .box .user:hover .nav{
+    display: block !important;
 }

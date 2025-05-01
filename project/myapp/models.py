@@ -6,10 +6,16 @@ from django.db import models
 
 
 class User(AbstractUser):
+    SEX_CHOICES = [
+        ('male', 'Nam'),
+        ('female', 'Nữ'),
+        ('other', 'Khác'),
+    ]
     phone = models.CharField(max_length=50)
     email = models.EmailField(unique=True)
     address = models.TextField()
-    img = models.TextField(null=True, blank=True)
+    sex = models.CharField(max_length=50, choices=SEX_CHOICES, default='male')
+    birthday = models.DateField(null=True, blank=True)
 
 
 class Category(models.Model):
@@ -77,7 +83,7 @@ class Option(models.Model):
     promotion_description = models.TextField(null=True, blank=True, help_text="Mô tả khuyến mãi")
 
     description = models.TextField(null=True, blank=True, help_text="Mô tả chi tiết phiên bản")
-    created_at = models.DateTimeField(null=True, blank=True, help_text="Ngày tạo bản ghi")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="Ngày tạo bản ghi")
     updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
 
     def final_price(self):
@@ -100,7 +106,6 @@ class Cart(models.Model):
 
 
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
     option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     content = models.TextField()
@@ -116,11 +121,6 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.img or 'None'}"
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['user', 'option'], name='unique_user_option_review')
-        ]
 
 
 class ReviewReply(models.Model):
@@ -144,6 +144,7 @@ class Order(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     address = models.TextField(null=True, blank=True)
+    has_review = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

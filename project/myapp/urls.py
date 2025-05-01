@@ -4,9 +4,10 @@ from django.urls import path
 
 from . import api_views
 from . import views
+from .api_views import homeApiView, infoUserApiView
 
 urlpatterns = [
-    path('api/home/', api_views.apiHome, name='api_home'),
+    path('api/home/get/', homeApiView.as_view(), name='api_home'),
     path('api/product/<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', api_views.apiProductDetail,
          name="api_product"),
     path('api/reviews/<str:slugProduct>/<int:star>/<int:numberPage>/', api_views.apiReviews, name="api_reviews"),
@@ -26,6 +27,8 @@ urlpatterns = [
     path('api/review/<int:idOrder>/', api_views.api_review, name='api_review'),
     path('api/add_new_review/<int:idOrder>/', api_views.api_add_new_review, name='api_add_new_review'),
     path('api/order_status/<int:idOrder>/', api_views.api_orderStatus, name='api_orderStatus'),
+    path('api/info_user/get/', infoUserApiView.as_view(), name='api_info_user_get'),
+    path('api/infoUser/patch/', infoUserApiView.as_view(), name='api_info_user_patch'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),

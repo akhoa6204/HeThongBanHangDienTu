@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import Option, Category, Brand, ReviewReply, Cart, MediaFile
 from .models import Order, Review
@@ -17,13 +18,13 @@ from .serializers import ReviewSerializer
 from .utils import send_order_confirmation_email
 
 
-@api_view(['GET'])
 @permission_classes([AllowAny])
-def apiHome(request):
-    categories = Category.objects.all()
-    category_serialized = OptionForCategory(categories, many=True)
+class homeApiView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        category_serialized = OptionForCategory(categories, many=True)
 
-    return Response(category_serialized.data)
+        return Response(category_serialized.data)
 
 
 @api_view(['GET'])
@@ -72,13 +73,14 @@ def apiProductDetail(request, slugCategory, slugProduct, slugOption):
 def apiReviews(request, slugProduct, star, numberPage):
     product = Product.objects.get(slug=slugProduct)
     reviews = None
-    if star > 0 and star < 6:
-        reviews = Review.objects.filter(product=product, star_count=star).select_related('user', 'option')
+
+    if 0 < star < 6:
+        reviews = Review.objects.filter(option__product=product, star_count=star).select_related('user', 'option')
     elif star == 0:
-        reviews = Review.objects.filter(product=product).select_related('user', 'option')
+        reviews = Review.objects.filter(option__product=product).select_related('user', 'option')
     elif star == 6:
         reviews = Review.objects.filter(
-            product=product
+            option__product=product
         ).annotate(
             media_count=Count('media_files')
         ).filter(
@@ -89,29 +91,28 @@ def apiReviews(request, slugProduct, star, numberPage):
             has_reply=Exists(
                 ReviewReply.objects.filter(review=OuterRef('pk'))
             )
-        ).filter(product=product, has_reply=True).select_related('user', 'option')
+        ).filter(option__product=product, has_reply=True).select_related('user', 'option')
+
     avg = reviews.aggregate(average=Avg('star_count'))['average'] or 0
     avg = round(avg, 1)
 
     reviews_per_page = 3
-
     page_number = int(numberPage) if numberPage else 1
 
     start_index = (page_number - 1) * reviews_per_page
     end_index = start_index + reviews_per_page
-
     paginated_reviews = reviews[start_index:end_index]
 
     reviews_serialized = ReviewSerializer(paginated_reviews, many=True)
     for review in reviews_serialized.data:
-        if review['img']:
+        if review.get('img'):
             imgList = [img.strip(';').strip() for img in review['img'].split(',')]
         else:
             imgList = None
         review['img'] = imgList
-    total_reviews = reviews.count() if reviews else 0
-    total_pages = (total_reviews // reviews_per_page) + (
-        1 if total_reviews % reviews_per_page != 0 else 0) if total_reviews > 0 else 0
+
+    total_reviews = reviews.count()
+    total_pages = (total_reviews + reviews_per_page - 1) // reviews_per_page  # ceil logic
 
     return Response({
         "reviews": reviews_serialized.data,
@@ -133,7 +134,7 @@ def apiSearch(request, slugSearch, numberPage):
         category = Category.objects.filter(slug__icontains=slugSearch).first()
         if category:
             products = Product.objects.filter(category=category)
-            
+
     options = Option.objects.filter(product__in=products).select_related('product')
     if sort_query == 'increase':
         options = options.order_by('price')
@@ -392,7 +393,6 @@ def api_purchase(request, status, page=1):
         order = Order.objects.filter(user=user)
     else:
         order = Order.objects.filter(user=user, status=status)
-    total_order = order.count()
     order_per_page = 5
 
     start_index = (page - 1) * order_per_page
@@ -457,7 +457,6 @@ def api_add_new_review(request, idOrder):
         review = Review.objects.create(
             user=user,
             option=option,
-            product=product,
             star_count=star_count,
             quality=quality,
             summary=description,
@@ -475,6 +474,8 @@ def api_add_new_review(request, idOrder):
                 media=media_file
             )
 
+    order.has_review = True
+    order.save()
     return Response({'status': 'success'}, status=status.HTTP_200_OK)
 
 
@@ -493,3 +494,35 @@ def api_orderStatus(request, idOrder):
     return Response({
         'order': order_serializer.data
     }, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+class infoUserApiView(APIView):
+    def get(self, request):
+        user = request.user
+        user_final = {
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            'email': user.email,
+            'sex': user.sex,
+            'phone': user.phone,
+            'birthday': user.birthday,
+            'address': user.address
+        }
+        return Response({'user': user_final}, status=status.HTTP_200_OK)
+
+    def patch(self, request):
+        user = request.user
+        data = request.data
+        if 'first_name' in data:
+            user.first_name = data['first_name']
+        if 'last_name' in data:
+            user.last_name = data['last_name']
+        if 'sex' in data:
+            user.sex = data['sex']
+        if 'birthday' in data:
+            user.birthday = data['birthday']
+        if 'address' in data:
+            user.address = data['address']
+        user.save()
+        return Response({"detail": "Cập nhật dữ liệu thành công"}, status=status.HTTP_200_OK)

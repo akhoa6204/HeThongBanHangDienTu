@@ -51,9 +51,6 @@ fetchApiAuthenticated()
              order.addEventListener('click', ()=>{
                 window.location.href ='/purchase/';
             });
-            user.addEventListener('click', () => {
-                nav.classList.toggle('active');
-            })
             nav.addEventListener('click', (e) => {
                 e.stopPropagation();
             })

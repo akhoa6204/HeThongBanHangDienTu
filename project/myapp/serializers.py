@@ -44,12 +44,6 @@ class AllOptionSerializer(serializers.ModelSerializer):
         fields = ['slug', 'version']
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username', 'img']
-
-
 class OptionForProductSerializer(serializers.ModelSerializer):
     product = ProductSerializer()
 
@@ -91,7 +85,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             "phone": obj.user.phone,
             "email": obj.user.email,
             "address": obj.user.address,
-            "img": obj.user.img
         }
 
 
@@ -157,18 +150,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     orderItem = OrderItemSerializer(many=True, source='order_items')
-    has_review = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = ['id', 'status', 'total_price', 'updated_at', 'orderItem', 'has_review', 'address', 'user']
-
-    def get_has_review(self, obj):
-        for item in obj.order_items.all():
-            if Review.objects.filter(option=item.option).exists():
-                return True
-        return False
 
     def get_user(self, obj):
         return {
@@ -177,5 +163,4 @@ class OrderSerializer(serializers.ModelSerializer):
             "phone": obj.user.phone,
             "email": obj.user.email,
             "address": obj.user.address,
-            "img": obj.user.img
         }

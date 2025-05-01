@@ -56,7 +56,7 @@ function loadCities(addressUser) {
     fetchApiCity().then(cities => {
         citySelect.innerHTML = '';
         for (const city of cities) {
-            citySelect.innerHTML += `<option value="${city.code}" ${addressUser && city.name === addressUser.split(' - ')[0] ? 'selected' : ''} code="${city.code}">${city.name}</option>`;
+            citySelect.innerHTML += `<option value="${city.code}" ${addressUser && city.name.includes(addressUser.split(' - ')[0]) ? 'selected' : ''} code="${city.code}">${city.name}</option>`;
         }
 
         const selectedCityCode = citySelect.value;
@@ -77,7 +77,7 @@ function loadDistricts(cityCode) {
 
     fetchApiDistricts(cityCode).then(cityData => {
         for (const district of cityData.districts) {
-            districtSelect.innerHTML += `<option value="${district.code}" ${addressUser && district.name === addressUser.split(' - ')[1] ? 'selected' : ''}>${district.name}</option>`;
+            districtSelect.innerHTML += `<option value="${district.code}" ${addressUser && district.name.includes(addressUser.split(' - ')[1]) ? 'selected' : ''}>${district.name}</option>`;
         }
 
         loadWards(districtSelect.value);
@@ -95,7 +95,7 @@ function loadWards(districtCode) {
 
     fetchApiWards(districtCode).then(districtData => {
         for (const ward of districtData.wards) {
-            wardSelect.innerHTML += `<option value="${ward.code}" ${addressUser && ward.name === addressUser.split(' - ')[2] ? 'selected' : ''}>${ward.name}</option>`;
+            wardSelect.innerHTML += `<option value="${ward.code}" ${addressUser && ward.name.includes(addressUser.split(' - ')[2]) ? 'selected' : ''}>${ward.name}</option>`;
         }
     });
 };

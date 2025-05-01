@@ -2,84 +2,16 @@
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/infoUser.css' %}">
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
 {% endblock %}
-
 {% block content %}
 <main>
-    <form class="form-user">
-        <h2>Thông tin người dùng</h2>
-        <div class="info-row">
-            <span class="label">Họ và tên</span>
-            <span class="value">Nguyen Van A</span>
-            <input type="text" placeholder="Nguyen Van A" id="name">
-            <span class="edit-icon">✎</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Email</span>
-            <span class="value">nguyenvana@gmail.com</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Giới tính</span>
-            <span class="value">Chưa cập nhật</span>
-            <select name="" id="sex">
-                <option value="male">Nam</option>
-                <option value="female">Nữ</option>
-                <option value="different">Khác</option>
-            </select>
-            <span class="edit-icon">✎</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Số điện thoại</span>
-            <span class="value">0123456789</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Sinh nhật</span>
-            <span class="value">Chưa cập nhật</span>
-            <input type="date" value="2000-01-01" id="date">
-            <span class="edit-icon">✎</span>
-        </div>
-        <div class="info-row">
-            <span class="label">Địa chỉ</span>
-            <span class="value">Chưa cập nhật</span>
-            <input type="text" placeholder="Chưa cập nhật" id="address">
-            <span class="edit-icon">✎</span>
-        </div>
-        <input type="submit" value="Cập nhật thông tin" class="update-btn">
-    </form>
 </main>
+<div class="popup-model">
+    {% include 'components/components/popupSuccess.html' with title="Thông tin đã được cập nhật" %}
+</div>
 {% endblock %}
 {% block extra_js %}
-<script>
-    const editIcons = document.querySelectorAll('.edit-icon');
-    const checkList = new Array(editIcons.length).fill(false);
-
-    editIcons.forEach((icon, index) => {
-        icon.addEventListener('click', () => {
-            editIcons.forEach((otherIcon, i) => {
-                const valueSpan = otherIcon.previousElementSibling.previousElementSibling;
-                const input = otherIcon.previousElementSibling;
-
-                if (i === index) {
-                    // Nếu chưa bật, thì bật
-                    if (!checkList[i]) {
-                        checkList[i] = true;
-                        valueSpan.style.display = 'none';
-                        input.style.display = 'inline-block';
-                        input.focus();
-                    } else {
-                        // Nếu đang bật, thì tắt
-                        checkList[i] = false;
-                        input.style.display = 'none';
-                        valueSpan.style.display = 'inline-block';
-                    }
-                } else {
-                    // Tắt những ô khác
-                    checkList[i] = false;
-                    input.style.display = 'none';
-                    valueSpan.style.display = 'inline-block';
-                }
-            });
-        });
-    });
-</script>
+<script src="{% static 'js/infoUser/infoUser.js' %}" type="module"></script>
+<script src="{% static 'js/infoUser/popup.js' %}" type="module"></script>
 {% endblock %}

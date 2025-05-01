@@ -1,4 +1,5 @@
 import {fetchOrder} from '../service/order/fetchApi.js';
+import { fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
 const statusAll = document.querySelectorAll('.header .status');
 const all = document.querySelector('.header .status.all');
 const pending = document.querySelector('.header .status.pending');
@@ -60,6 +61,50 @@ function updateHeader(tag) {
         }
     });
 }
+function attachEventListeners(data)     {
+    const productsPerPage = 5;
+    const startIndex = (currentPage - 1) * productsPerPage;
+    const endIndex = currentPage * productsPerPage - 1;
+    const orderBoxAll = document.querySelectorAll('.orderBox');
+    const orderBoxAllForCurrentPage = Array.from(orderBoxAll).slice(startIndex, endIndex + 1);
+
+    console.log(orderBoxAllForCurrentPage);
+    orderBoxAllForCurrentPage.forEach((orderBox, index) =>{
+        const productContainer = orderBox.querySelector('.productContainer');
+        productContainer.addEventListener('click', () => {
+            window.location.href = `/order_status/${data[index].id}`;
+        });
+        const buttonBox = orderBox.querySelector('.buttonBox');
+        if (buttonBox){
+            const reviewButton = buttonBox.querySelector('.reviewBtn');
+            const buyButton = buttonBox.querySelector('.buyBtn');
+            if (reviewButton) {
+                reviewButton.addEventListener('click', () => {
+                    window.location.href = `/review/${data[index].id}`;
+                });
+            }
+            if (buyButton) {
+                buyButton.addEventListener('click', () =>{
+                    const productList = [];
+                    const orderItem = data[index].orderItem;
+                    orderItem.forEach((item, index) => {
+                        productList.push({
+                            slugProduct: item.option.product.slug,
+                            slugOption: item.option.slug,
+                            color: item.option.color,
+                            quantity: item.quantity,
+                        });
+                    });
+                    fetchApiSetOrderProduct(productList)
+                    .then(data => {
+                        window.location.href = "/info_order/";
+                    })
+                })
+            }
+        }
+    })
+}
+
 function loadOrderData(data){
     let html ='';
     if (data.length > 0){
@@ -112,12 +157,12 @@ function loadOrderData(data){
                     ${item.status === 'shipped' ?
                         `<div class="buttonBox">
                             ${!item.has_review ? "<button class='reviewBtn'>Đánh giá</button>" : ''}
-                            <button>Mua lại</button>
+                            <button class='buyBtn'>Mua lại</button>
                         </div>` : ''
                     }
                     ${item.status === 'cancelled' ?
                         `<div class="buttonBox">
-                            <button>Mua lại</button>
+                            <button class='buyBtn'>Mua lại</button>
                         </div>` : ''
                     }
                 </div>
@@ -135,24 +180,9 @@ function loadOrderData(data){
     if (getLoad()){
         orderContainer.innerHTML = html;
     }else{
-        orderContainer.innerHTML += html;
+        orderContainer.insertAdjacentHTML('beforeend', html);
     }
-    const buttonBoxAll = document.querySelectorAll('.buttonBox');
-    const productContainerAll = document.querySelectorAll('.productContainer');
-    productContainerAll.forEach((productContainer, index) =>{
-        productContainer.addEventListener('click', ()=>{
-            window.location.href =`/order_status/${data[index].id}`;
-        })
-    })
-    buttonBoxAll.forEach((buttonBox, index) => {
-        const reviewButton = buttonBox.querySelector('.reviewBtn');
-        if(reviewButton){
-            reviewButton.addEventListener('click', () =>{
-                window.location.href =`/review/${data[index].id}`;
-            })
-        }
-    })
-//    console.log(reviewButton)
+    attachEventListeners(data);
 }
 function fetchApi(status, page) {
     if(!isLoading){
