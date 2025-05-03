@@ -61,6 +61,9 @@ form.addEventListener('submit', (e) =>{
             if (data['error-message-email']) {
                 addErrorMessage(email, data['error-message-email']);
             }
+            if(data.message) {
+                window.location.href='/login/';
+            }
         } else {
             console.error('Dữ liệu trả về không hợp lệ:', data);
         }

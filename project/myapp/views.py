@@ -14,7 +14,7 @@ def home(request):
     return render(request, 'page/public/home.html')
 
 
-def search(request, nameProduct):
+def search(request):
     return render(request, 'page/public/search.html')
 
 

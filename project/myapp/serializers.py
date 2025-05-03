@@ -104,10 +104,15 @@ class OptionForProduct(serializers.ModelSerializer):
 
 class OptionForCategory(serializers.ModelSerializer):
     options = serializers.SerializerMethodField()
+    brands = serializers.SerializerMethodField()
 
     class Meta:
         model = Category
-        fields = ['name', 'slug', 'options']
+        fields = ['name', 'slug', 'options', 'brands']
+
+    def get_brands(self, obj):
+        brands = Brand.objects.filter(product__category=obj).distinct()
+        return BrandSerializer(brands, many=True).data
 
     def get_options(self, obj):
         products = Product.objects.filter(category=obj).order_by('-purchased_count')[:10]

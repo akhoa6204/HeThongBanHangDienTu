@@ -1,9 +1,11 @@
 .reviewItem{
     display: flex;
-    align-items: top;
     gap: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(136, 135, 135, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+}
+.reviewItem:not(:first-child){
     margin-top  : 20px;
 }
 .reviewItem .imgBox img{
@@ -13,7 +15,7 @@
 .reviewItem .content{
     flex-grow: 1;
 }
-.reviewItem .content > *{
+.reviewItem .content > *:not(:last-child){
     margin-bottom: 10px;
 }
 .reviewItem .content .name {

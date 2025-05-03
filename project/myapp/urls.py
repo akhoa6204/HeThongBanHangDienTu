@@ -4,14 +4,14 @@ from django.urls import path
 
 from . import api_views
 from . import views
-from .api_views import homeApiView, infoUserApiView
+from .api_views import homeApiView, infoUserApiView, searchApiView
 
 urlpatterns = [
     path('api/home/get/', homeApiView.as_view(), name='api_home'),
     path('api/product/<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', api_views.apiProductDetail,
          name="api_product"),
     path('api/reviews/<str:slugProduct>/<int:star>/<int:numberPage>/', api_views.apiReviews, name="api_reviews"),
-    path('api/search/<str:slugSearch>/<int:numberPage>/', api_views.apiSearch, name='api_search'),
+    path('api/search/', searchApiView.as_view(), name='api_search'),
     path('api/order/', api_views.apiOrder, name='api_order'),
     path('api/setOrderProduct/', api_views.api_order_product, name='api_order_product'),
     path('api/setOrderUser/', api_views.api_order_user, name='api_order_user'),
@@ -34,7 +34,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     path('', views.home, name='home'),
-    path('search/<str:nameProduct>/', views.search, name='search'),
+    path('search/', views.search, name='search'),
     path('<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', views.detail, name='detail_option'),
     path('cart/', views.cart, name='cart'),
 

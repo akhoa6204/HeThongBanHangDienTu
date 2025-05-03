@@ -1,23 +1,57 @@
 .sub-menu {
-        background-color: #FAF8F8;
-        color: black;
-        padding: 16px;
-        border-radius: 8px;
+    background-color: #FAF8F8;
+    color: black;
+    padding: 16px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap:10px;
+    position: relative;
+    .child-menu {
         display: flex;
-        flex-direction: column;
-        gap:10px;
-
-        .child-menu {
-            display: flex;
-            gap: 10px;
-            padding: 0 8px;
-            align-items:center;
-            .arrow {
-                margin-left: auto;
+        gap: 10px;
+        padding: 8px;
+        align-items:center;
+        .arrow {
+            margin-left: auto;
+        }
+        span:nth-child(2){
+           flex-grow: 1;
+            font-size: 16px;
+        }
+        .subChildMenu{
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: absolute;
+            z-index: 1000;
+            right: -140%;
+            background-color: rgba(250, 248, 248, 1);
+            width: 400px;
+            height: 60%;
+            top: 0%;
+            padding: 24px;
+            border-radius: 10px;
+            overflow-y: scroll;
+            scrollbar-width: none;
+            display: none;
+            gap: 40px;
+            .brand{
+                text-transform: uppercase;
             }
-            span:nth-child(2){
-               flex-grow: 1;
-                font-size: 16px;
+            div{
+                position:relative;
+            }
+            div::after{
+                position: absolute;
+                content:'';
+                height: 24px;
+                width: 100%;
+            }
+            p:not(:last-child){
+                margin-bottom: 10px;
             }
         }
+    }
+    .child-menu:hover .subChildMenu{
+        display: flex;
+    }
 }

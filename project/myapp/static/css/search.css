@@ -6,12 +6,12 @@ main{
 main > *{
     margin-bottom: 20px;
 }
-.productContainer .productBox{
+.productContainer{
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 20px 16px;
 }
-.productContainer .productBox > * {
+.productContainer > * {
     max-width: 180px;
 }
 .resultBox p{
@@ -31,8 +31,8 @@ main > *{
         color: black;
     }
     button.active{
-        background-color: #009981;
-        border: 1px solid #009981;
+        background: linear-gradient(to right, #2b3467, #5667cd);
         color: white;
+        border: none;
     }
 }

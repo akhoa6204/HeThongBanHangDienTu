@@ -1,6 +1,7 @@
 import threading
 
-from django.db.models import Avg, Exists, OuterRef, Count
+from django.contrib.auth.models import Group
+from django.db.models import Avg, Exists, OuterRef, Count, Q
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -8,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Option, Category, Brand, ReviewReply, Cart, MediaFile
+from .models import Option, Category, Brand, ReviewReply, Cart, MediaFile, User
 from .models import Order, Review
 from .models import OrderItem
 from .models import Product
@@ -96,7 +97,7 @@ def apiReviews(request, slugProduct, star, numberPage):
     avg = reviews.aggregate(average=Avg('star_count'))['average'] or 0
     avg = round(avg, 1)
 
-    reviews_per_page = 3
+    reviews_per_page = 5
     page_number = int(numberPage) if numberPage else 1
 
     start_index = (page_number - 1) * reviews_per_page
@@ -120,57 +121,6 @@ def apiReviews(request, slugProduct, star, numberPage):
         "total_pages": total_pages,
         "avg": avg,
         "total_reviews": total_reviews
-    })
-
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def apiSearch(request, slugSearch, numberPage):
-    sort_query = request.GET.get('sort', None)
-
-    products = Product.objects.filter(slug__icontains=slugSearch)
-
-    if not products.exists():
-        category = Category.objects.filter(slug__icontains=slugSearch).first()
-        if category:
-            products = Product.objects.filter(category=category)
-
-    options = Option.objects.filter(product__in=products).select_related('product')
-    if sort_query == 'increase':
-        options = options.order_by('price')
-    elif sort_query == 'decrease':
-        options = options.order_by('-price')
-
-    # Lọc option trùng product + version
-    seen = set()
-    unique_options = []
-    for option in options:
-        key = (option.product_id, option.version)
-        if key not in seen:
-            seen.add(key)
-            unique_options.append(option)
-
-    # Serialize
-    options_serialized = OptionForProductSerializer(unique_options, many=True).data
-
-    # Xử lý ảnh
-    for option in options_serialized:
-        option['img'] = [img.strip() for img in option.get('img', '').split(',') if img.strip()]
-        if option.get('product') and option['product'].get('img'):
-            option['product']['img'] = [img.strip() for img in option['product']['img'].split(',') if img.strip()]
-
-    # Pagination
-    products_per_page = 15
-    total_products = len(options_serialized)
-    start_index = (numberPage - 1) * products_per_page
-    end_index = start_index + products_per_page
-    paginated_options = options_serialized[start_index:end_index]
-    total_pages = (total_products // products_per_page) + (
-        1 if total_products % products_per_page != 0 else 0) if total_products > 0 else 0
-    return Response({
-        'products': paginated_options,
-        'totalProducts': total_products,
-        'totalPages': total_pages
     })
 
 
@@ -526,3 +476,109 @@ class infoUserApiView(APIView):
             user.address = data['address']
         user.save()
         return Response({"detail": "Cập nhật dữ liệu thành công"}, status=status.HTTP_200_OK)
+
+
+class registerApiView(APIView):
+    def post(self, request):
+        data_user = request.data
+        first_name = data_user.get('firstName')
+        last_name = data_user.get('lastName')
+        phone = data_user.get('phone')
+        email = data_user.get('email')
+        password = data_user.get('password')
+        if User.objects.filter(email=email).exists():
+            return Response({'error-message-email': 'Email đã tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            phone=phone,
+            first_name=first_name,
+            last_name=last_name
+        )
+        group = Group.objects.get(name='Customer')
+        user.groups.add(group)
+        return Response({'message': 'Đăng ký thành công'}, status=status.HTTP_200_OK)
+
+
+def get_filtered_products(category_slug, brand_slug):
+    filters = Q()
+
+    if category_slug:
+        filters &= Q(category__slug__icontains=category_slug)
+
+    if brand_slug:
+        filters &= Q(brand__slug__icontains=brand_slug)
+
+    return Product.objects.filter(filters)
+
+
+@permission_classes([AllowAny])
+class searchApiView(APIView):
+    def get(self, request):
+        keyword = request.GET.get('keyword').strip('/') if request.GET.get('keyword') else None
+        category_slug = request.GET.get('category').strip('/') if request.GET.get('category') else None
+        brand_slug = request.GET.get('brand').strip('/') if request.GET.get('brand') else None
+        sort_query = request.GET.get('sort').strip('/') if request.GET.get('sort') else None
+        number_page = int(request.GET.get('page', 1).strip('/')) if request.GET.get('page', 1) else None
+        min_price = request.GET.get('min_price').strip('/') if request.GET.get('min_price') else None
+        max_price = request.GET.get('max_price').strip('/') if request.GET.get('max_price') else None
+
+        if not keyword:
+            products = get_filtered_products(category_slug, brand_slug)
+        else:
+            products = Product.objects.filter(
+                Q(slug__icontains=keyword) |
+                Q(category__slug__icontains=keyword) |
+                Q(brand__slug__icontains=keyword)
+            ).distinct()
+
+        options = Option.objects.filter(product__in=products).select_related('product')
+
+        if min_price:
+            try:
+                min_price = int(min_price)
+                options = options.filter(price__gte=min_price)
+            except ValueError:
+                return Response({"error": "Invalid min_price value"}, status=400)
+
+        if max_price:
+            try:
+                max_price = int(max_price)
+                options = options.filter(price__lte=max_price)
+            except ValueError:
+                return Response({"error": "Invalid max_price value"}, status=400)
+
+        if sort_query == 'increase':
+            options = options.order_by('price')
+        elif sort_query == 'decrease':
+            options = options.order_by('-price')
+
+        seen = set()
+        unique_options = []
+        for option in options:
+            key = (option.product_id, option.version)
+            if key not in seen:
+                seen.add(key)
+                unique_options.append(option)
+
+        options_serialized = OptionForProductSerializer(unique_options, many=True).data
+        for option in options_serialized:
+            option['img'] = [img.strip() for img in option.get('img', '').split(',') if img.strip()]
+            if option.get('product') and option['product'].get('img'):
+                option['product']['img'] = [img.strip() for img in option['product']['img'].split(',') if img.strip()]
+
+        per_page = 15
+        total = len(options_serialized)
+        start = (number_page - 1) * per_page
+        end = start + per_page
+        paginated = options_serialized[start:end]
+        total_pages = (total // per_page) + (1 if total % per_page else 0)
+
+        return Response({
+            'products': paginated,
+            'totalProducts': total,
+            'totalPages': total_pages
+        })
+
+# fetch('/api/search/?category=dien-thoai&brand=apple&min_price=1000000&max_price=2000000&page=1')
