@@ -28,9 +28,9 @@ const oneStar = document.querySelector('main > .reviewBox .filter .oneStar');
 const haveComment = document.querySelector('main > .reviewBox .filter .haveComment');
 const haveImg = document.querySelector('main > .reviewBox .filter .haveImg');
 const path = window.location.pathname;
-const slugCategory = path.split('/')[1];
-const slugProduct = path.split('/')[2];
-const slugOption = path.split('/')[3];
+const slugCategory = path.split('/')[2];
+const slugProduct = path.split('/')[3];
+const slugOption = path.split('/')[4];
 const slug = {
     'category': slugCategory,
     'product': slugProduct,

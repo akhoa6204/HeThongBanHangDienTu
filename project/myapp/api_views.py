@@ -2,6 +2,7 @@ import threading
 
 from django.contrib.auth.models import Group
 from django.db.models import Avg, Exists, OuterRef, Count, Q
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
@@ -580,5 +581,14 @@ class searchApiView(APIView):
             'totalProducts': total,
             'totalPages': total_pages
         })
+
+
+@permission_classes([IsAuthenticated])
+class orderApiView(APIView):
+    def patch(self, request, orderId):
+        order = get_object_or_404(Order, id=orderId)
+        order.status = 'cancelled'
+        order.save()
+        return Response({"detail": "Cập nhật trạng thái thành công"}, status=status.HTTP_200_OK)
 
 # fetch('/api/search/?category=dien-thoai&brand=apple&min_price=1000000&max_price=2000000&page=1')

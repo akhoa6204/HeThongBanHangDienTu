@@ -4,7 +4,7 @@ from django.urls import path
 
 from . import api_views
 from . import views
-from .api_views import homeApiView, infoUserApiView, searchApiView
+from .api_views import homeApiView, infoUserApiView, searchApiView, orderApiView
 
 urlpatterns = [
     path('api/home/get/', homeApiView.as_view(), name='api_home'),
@@ -29,13 +29,14 @@ urlpatterns = [
     path('api/order_status/<int:idOrder>/', api_views.api_orderStatus, name='api_orderStatus'),
     path('api/info_user/get/', infoUserApiView.as_view(), name='api_info_user_get'),
     path('api/infoUser/patch/', infoUserApiView.as_view(), name='api_info_user_patch'),
+    path('api/order/patch/<int:orderId>/', orderApiView.as_view(), name='api_update_order'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('register/', views.register, name='register'),
     path('', views.home, name='home'),
     path('search/', views.search, name='search'),
-    path('<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', views.detail, name='detail_option'),
+    path('detail/<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', views.detail, name='detail_option'),
     path('cart/', views.cart, name='cart'),
 
     path('info_order/', views.info_order, name='info_order'),

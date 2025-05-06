@@ -70,12 +70,12 @@ function loadProducts(options){
                         ${option.discount > 0 ? `<div class="discount">Giảm ${option.discount}%</div>` : ''}
                     </div>
                     <div class="product-image">
-                        <a href="/${option.product.category.slug}/${option.product.slug}/${option.slug}/">
+                        <a href="/detail/${option.product.category.slug}/${option.product.slug}/${option.slug}/">
                             <img src="${option.img ? option.img[0] : option.product.img[0]}">
                         </a>
                     </div>
                     <div class="name-product">
-                        <a href="/${option.product.category.slug}/${option.product.slug}/${option.slug}/">
+                        <a href="/detail/${option.product.category.slug}/${option.product.slug}/${option.slug}/">
                             <p>${option.product.name} - ${option.version} - ${option.color}</p>
                         </a>
                     </div>

@@ -1,4 +1,4 @@
-import {fetchOrder} from '../service/order/fetchApi.js';
+import {fetchOrder, fetchUpdateStatusOrder} from '../service/order/fetchApi.js';
 import { fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
 const statusAll = document.querySelectorAll('.header .status');
 const all = document.querySelector('.header .status.all');
@@ -78,6 +78,7 @@ function attachEventListeners(data)     {
         if (buttonBox){
             const reviewButton = buttonBox.querySelector('.reviewBtn');
             const buyButton = buttonBox.querySelector('.buyBtn');
+            const cancelBtn = buttonBox.querySelector('.cancelBtn');
             if (reviewButton) {
                 reviewButton.addEventListener('click', () => {
                     window.location.href = `/review/${data[index].id}`;
@@ -98,6 +99,17 @@ function attachEventListeners(data)     {
                     fetchApiSetOrderProduct(productList)
                     .then(data => {
                         window.location.href = "/info_order/";
+                    })
+                })
+            }
+            if (cancelBtn){
+                cancelBtn.addEventListener('click', () => {
+                    console.log(data[index]);
+                    fetchUpdateStatusOrder(data[index].id)
+                    .then(data=> {
+                        if(data.detail == "Cập nhật trạng thái thành công"){
+                            cancelled.click();
+                        }
                     })
                 })
             }
@@ -163,6 +175,11 @@ function loadOrderData(data){
                     ${item.status === 'cancelled' ?
                         `<div class="buttonBox">
                             <button class='buyBtn'>Mua lại</button>
+                        </div>` : ''
+                    }
+                    ${item.status === 'pending' ?
+                        `<div class="buttonBox">
+                            <button class='cancelBtn'>Huỷ đơn hàng</button>
                         </div>` : ''
                     }
                 </div>

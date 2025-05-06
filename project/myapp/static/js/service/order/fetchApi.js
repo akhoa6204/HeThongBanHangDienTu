@@ -16,4 +16,22 @@ function fetchOrder(status, page){
         })
         .then(response => response.json())
 }
-export {fetchOrder};
+function fetchUpdateStatusOrder(orderId){
+    const url = `/api/order/patch/${orderId}/`;
+    return cookieStore.get('csrftoken')
+        .then(cookie =>{
+            if (!cookie){
+                throw new Error('Không tìm thấy CSRF token');
+            }
+            return fetch(url, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': cookie.value,
+                },
+                credentials: 'include',
+            })
+        })
+        .then(response => response.json())
+}
+export {fetchOrder, fetchUpdateStatusOrder};
