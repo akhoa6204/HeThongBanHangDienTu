@@ -13,7 +13,6 @@
             <button class="btn btn-success">📁 Thêm nhà cung cấp</button>
             <button class="btn btn-success">📂 Thêm danh mục</button>
         </div>
-
         <form id="createProductForm" enctype="multipart/form-data">
             <div class="row">
                 <div class="col">
@@ -25,26 +24,21 @@
                     <input type="text" name="name" class="form-control" required>
                 </div>
             </div>
-
-            <div class="row mt-3">
+            <div class="row mt-2">
                 <div class="col">
                     <label>Danh mục</label>
                     <select name="category_id" class="form-select" required>
                         <option value="">Chọn danh mục</option>
-                        {% for category in categories %}
-                        <option value="{{ category.id }}">{{ category.name }}</option>
-                        {% endfor %}
                     </select>
                 </div>
                 <div class="col">
                     <label>Nhà cung cấp</label>
                     <select name="brand_id" class="form-select" required>
                         <option value="">Chọn nhà cung cấp</option>
-                        {% for brand in brands %}
-                        <option value="{{ brand.id }}">{{ brand.name }}</option>
-                        {% endfor %}
                     </select>
                 </div>
+            </div>
+            <div class="row mt-2 img">
                 <div class="col img">
                     <label>Ảnh sản phẩm</label>
                     <div class="btn btn-dark ">
@@ -53,18 +47,96 @@
                     </div>
                     <input type="file" name="img" class="btn btn-dark" id="file" required multiple>
                 </div>
-            </div>
-            <div class="mt-4">
-                <div id="message" style="margin-top: 10px; font-weight: bold;"></div>
-                <button type="submit" class="btn btn-success">Lưu</button>
-                <a href="{% url 'quantri-dashboard-products' %}" class="btn btn-danger">Hủy</a>
+                <div class="imgContainer">
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                </div>
             </div>
         </form>
-
+    </div>
+    <div class="card">
+        <h2>Tạo mới phiên bản</h2>
+        <form action="">
+            <div class="row">
+                <div class="col">
+                    <label for="nameVersion1">Tên phiên bản</label>
+                    <input type="text" id="nameVersion1" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label for="priceVersion1">Giá phiên bản</label>
+                    <input type="text" id="priceVersion1" class="form-control" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <label for="quantity1">Kho</label>
+                    <input type="number" id="quantity1" class="form-control" required min="0">
+                </div>
+                <div class="col">
+                    <label for="color1">Màu sắc</label>
+                    <input type="text" id="color1" class="form-control" required min="0">
+                </div>
+            </div>
+            <div class="row mt-2 img">
+                <div class="col img">
+                    <label>Ảnh sản phẩm</label>
+                    <div class="btn btn-dark ">
+                        <span class="material-symbols-outlined">add_photo_alternate</span>
+                        <span>Chọn ảnh</span>
+                    </div>
+                    <input type="file" name="img" class="btn btn-dark" id="file1" required multiple>
+                </div>
+                <div class="imgContainer">
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                    <div class="imgBox">
+                        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="addDetail">
+            <span class="material-symbols-outlined">add</span>
+            <span>Thêm chi tiết sản phẩm</span>
+        </div>
     </div>
     <div class="addOption" id="add-option-btn">
         <span class="material-symbols-outlined">add</span>
-        <span>Thêm option sản phẩm</span>
+    </div>
+</div>
+<div class="popUp addNewDetail">
+    <div class="containerPopup">
+        <div class="row">
+            <label for="newDetail">Tên chi tiết mới </label>
+            <input type="text" id="newDetail" class="form-control">
+        </div>
+        <div class="row buttonBox">
+            <button>Lưu</button>
+            <button>Hủy</button>
+        </div>
     </div>
 </div>
 

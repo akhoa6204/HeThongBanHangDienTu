@@ -228,7 +228,7 @@ def create_product_page(request):
                 img=option.get('img') or ''
             )
 
-        return redirect('admin_product_list')  # hoặc render lại trang
+        return redirect('admin_product_list')
 
     return render(request, 'page/admin/create_product.html')
 

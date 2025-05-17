@@ -68,7 +68,6 @@
     display: flex;
     flex-direction: column;
 }
-
 label {
     font-weight: 600;
     margin-bottom: 6px;
@@ -102,7 +101,7 @@ label {
     border-radius: 0 6px 6px 0;
 }
 
-.mt-3 {
+.mt-2 {
     margin-top: 20px;
 }
 
@@ -132,11 +131,16 @@ label {
         height: 100%
     }
 }
-#file{
+input[name='img']{
     display:none;
 }
+.row.img{
+    flex-direction: column;
+}
 .col.img {
+    flex: 0;
     > div{
+        width: 200px;
         display:flex;
         align-items:center;
         gap: 10px;
@@ -158,5 +162,78 @@ label {
     }
     span{
         font-size: 16px;
+    }
+}
+.addDetail{
+    margin-top: 20px;
+    display:flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 12px;
+    background-color: rgba(246, 246, 246, 1);
+    border-radius: 10px;
+    width: fit-content;
+    border: 1px solid #ccc;
+}
+.popUp.addNewDetail{
+    display: flex;
+    position: fixed;
+    top:0;
+    bottom: 0;
+    right:0;
+    left: 0;
+    align-items: center;
+    justify-content: center;
+    flex-direction:column;
+    background-color: rgba(0, 0, 0, .3);
+    .containerPopup{
+        background-color: white;
+        width: 480px;
+        padding: 12px 24px;
+        border-radius: 10px;
+    }
+    input{
+        outline:none;
+    }
+    label{
+        margin: 0;
+    }
+   .row{
+        display:flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 0;
+   }
+   .row.buttonBox{
+        margin-top: 20px;
+        flex-direction: row;
+        justify-content: right;
+        button{
+            padding: 6px 12px;
+            border:none;
+            outline:none;
+        }
+        button:first-child{
+            background-color:rgba(111, 240, 129, 0.56);
+            color: rgba(19, 105, 19, 1);
+        }
+        button:last-child{
+            background-color:rgba(204, 0, 0, 0.4);
+            color: rgba(212, 26, 26, 1);
+        }
+   }
+}
+.popUp.addNewDetail.active{
+    display: flex;
+}
+.imgContainer{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    .imgBox{
+        text-align: center;
+        img{
+            width: 80px;
+            height: 80px;
+        }
     }
 }

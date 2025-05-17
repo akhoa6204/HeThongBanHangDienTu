@@ -28,6 +28,8 @@
         padding: 16px;
         border-radius: 5px;
         margin-bottom: 10px;
+        text-decoration: none;
+        color:white;
         p{
             font-size: 16px
         };
@@ -40,4 +42,5 @@
         color:black;
     }
 }
+
 
