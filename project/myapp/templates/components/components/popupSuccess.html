@@ -1,6 +1,6 @@
 {% block content %}
 <div class="popUp-container">
-    <i class="fa-solid fa-check"></i>
+    <i class="fa-solid fa-check {% if status %}error{% endif %}"></i>
     <p>{{ title }}</p>
     <button class="btnClosePopup">Đóng</button>
 </div>

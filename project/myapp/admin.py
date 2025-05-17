@@ -8,7 +8,7 @@ class UserAdmin(BaseUserAdmin):
     # Thêm 'groups' vào fieldsets nếu dùng custom user
     fieldsets = (
         ('Thông tin đăng nhập', {'fields': ('username', 'password')}),
-        ('Thông tin cá nhân', {'fields': ('first_name', 'last_name', 'email', 'phone', 'address', 'img')}),
+        ('Thông tin cá nhân', {'fields': ('first_name', 'last_name', 'email', 'phone', 'address')}),
         ('Phân quyền', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
     )
 

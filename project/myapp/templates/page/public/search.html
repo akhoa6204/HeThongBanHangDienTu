@@ -11,6 +11,9 @@
 </main>
 {% endblock %}
 {% block extra_js %}
+<script>
+    const urlImgEmptySearch = "{% static 'assets/img/searchEmpty.png' %}";
+</script>
 <script src="{% static 'js/search/search.js' %}" type="module"></script>
 {% endblock %}
 

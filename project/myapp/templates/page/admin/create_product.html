@@ -1,0 +1,74 @@
+{% extends 'components/layout/adminLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumb.css' %}">
+<link rel="stylesheet" href="{% static 'css/create_product.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container-admin">
+    {% include 'components/components/breadcrumb.html' with title1="Danh sách sản phẩm" title2="Thêm sản phẩm mới" %}
+    <div class="card">
+        <h2>Tạo mới sản phẩm</h2>
+        <div class="btn-group mb-3">
+            <button class="btn btn-success">📁 Thêm nhà cung cấp</button>
+            <button class="btn btn-success">📂 Thêm danh mục</button>
+        </div>
+
+        <form id="createProductForm" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col">
+                    <label>Slug</label>
+                    <input type="text" name="slug" class="form-control" required>
+                </div>
+                <div class="col">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col">
+                    <label>Danh mục</label>
+                    <select name="category_id" class="form-select" required>
+                        <option value="">Chọn danh mục</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Nhà cung cấp</label>
+                    <select name="brand_id" class="form-select" required>
+                        <option value="">Chọn nhà cung cấp</option>
+                        {% for brand in brands %}
+                        <option value="{{ brand.id }}">{{ brand.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col img">
+                    <label>Ảnh sản phẩm</label>
+                    <div class="btn btn-dark ">
+                        <span class="material-symbols-outlined">add_photo_alternate</span>
+                        <span>Chọn ảnh</span>
+                    </div>
+                    <input type="file" name="img" class="btn btn-dark" id="file" required multiple>
+                </div>
+            </div>
+            <div class="mt-4">
+                <div id="message" style="margin-top: 10px; font-weight: bold;"></div>
+                <button type="submit" class="btn btn-success">Lưu</button>
+                <a href="{% url 'quantri-dashboard-products' %}" class="btn btn-danger">Hủy</a>
+            </div>
+        </form>
+
+    </div>
+    <div class="addOption" id="add-option-btn">
+        <span class="material-symbols-outlined">add</span>
+        <span>Thêm option sản phẩm</span>
+    </div>
+</div>
+
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/admin/create_product.js' %}"></script>
+{% endblock %}

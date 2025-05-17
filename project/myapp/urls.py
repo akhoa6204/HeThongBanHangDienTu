@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 
-from . import api_views
+from . import api_views, admin_api
 from . import views
 from .api_views import homeApiView, infoUserApiView, searchApiView, orderApiView
 
@@ -30,6 +30,10 @@ urlpatterns = [
     path('api/info_user/get/', infoUserApiView.as_view(), name='api_info_user_get'),
     path('api/infoUser/patch/', infoUserApiView.as_view(), name='api_info_user_patch'),
     path('api/order/patch/<int:orderId>/', orderApiView.as_view(), name='api_update_order'),
+    path('api/forgotPassword/', api_views.apiCheckEmail, name='api_forgotPassword'),
+    path('api/checkOTP/', api_views.apiCheckOTP, name='api_checkOTP'),
+    path('api/generateOTP/', api_views.apiGenerateOtp, name='api_generateOTP'),
+    path('api/resetPassword/', api_views.apiResetPassword, name='api_resetPassword'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),
@@ -45,7 +49,43 @@ urlpatterns = [
     path('order_status/<int:idOrder>/', views.orderStatus, name='order_status'),
     path('info_user/', views.infoUser, name='infoUser'),
     path('change_password/', views.changePassword, name='change_password'),
-    path('review/<int:idOrder>/', views.reviewProduct, name="review_product.css"),
+    path('review/<int:idOrder>/', views.reviewProduct, name="review_product"),
+    path('forgot_password/', views.forgotPassword, name="forgot_password"),
+    path('verify-code/', views.verifyCode, name="verifyCode"),
+    path('reset-password/', views.resetPassword, name="resetPassword"),
+
+    # ----------- API Quản trị sản phẩm ----------
+    path('quantri/products/', admin_api.admin_list_products, name='admin-list-products'),
+    path('quantri/products/create/', admin_api.admin_create_product, name='admin-create-product'),
+    path('quantri/products/<int:product_id>/', admin_api.admin_view_product, name='admin-view-product'),
+    path('quantri/products/<int:product_id>/update/', admin_api.admin_update_product, name='admin-update-product'),
+    path('quantri/products/<int:product_id>/delete/', admin_api.admin_delete_product, name='admin-delete-product'),
+    path('quantri/categories-brands/', admin_api.admin_list_categories_brands, name='admin-list-categories-brands'),
+
+    # ----------- API Quản trị đơn hàng ----------
+    path('quantri/orders/', admin_api.admin_list_orders, name='admin-list-orders'),
+    path('quantri/orders/<int:order_id>/', admin_api.admin_view_order, name='admin-view-order'),
+    path('quantri/orders/<int:order_id>/update/', admin_api.admin_update_order_status, name='admin-update-order'),
+    path('quantri/orders/<int:order_id>/delete/', admin_api.admin_delete_order, name='admin-delete-order'),
+    path('quantri/orders/<int:order_id>/info/', admin_api.admin_order_info_basic, name='admin-order-info'),
+
+    # ----------- API Quản trị đơn hàng ----------
+    path('quantri/reviews/', admin_api.admin_list_reviews),
+    path('quantri/reviews/<int:review_id>/', admin_api.admin_view_review),
+    path('quantri/reviews/<int:review_id>/delete/', admin_api.admin_delete_review),
+    path('quantri/reviews/<int:review_id>/reply/', admin_api.admin_reply_review),
+
+    # ----------- Giao diện quản trị (HTML) ----------
+    path('quantri/product/', views.admin_product_list, name='quantri-dashboard-products'),
+    path('quantri/products/edit/<int:product_id>/', views.edit_product, name='quantri-edit-product'),
+    path('quantri/products/delete/<int:product_id>/', views.delete_product, name='quantri-delete-product'),
+    path('quantri/product/create/', views.create_product_page, name='quantri-create-product'),
+    path('quantri/products/detail/<int:product_id>/', views.admin_product_detail_page, name='quantri-product-detail'),
+
+    path('quantri/order/', views.manage_order, name='quantri-dashboard-order'),
+    path('quantri/order/<int:order_id>/', views.order_detail_view, name='admin-order-detail'),
+
+    path('quantri/review/', views.admin_review_list_view, name='quantri_review_list'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

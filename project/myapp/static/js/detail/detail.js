@@ -230,7 +230,7 @@ function updateColorUI(data) {
 function updateVersionUI(all_options){
     for (const version of all_options) {
         const isActive = version.slug === slugOption;
-        const href = isActive ? '#' : `/${slugCategory}/${slugProduct}/${version.slug}/`;
+        const href = isActive ? '#' : `/detail/${slugCategory}/${slugProduct}/${version.slug}/`;
         const activeClass = isActive ? 'active' : '';
 
         const html = `

@@ -128,6 +128,15 @@ function loadFilterBox(length){
     }
 
 }
+function loadEmpty(){
+    const html = `
+        <div class="searchEmpty">
+            <img src="${urlImgEmptySearch}" alt="img" />
+            <p>Vui lòng nhập từ khóa khác</p>
+        </div>
+    `;
+    main.innerHTML += html;
+}
 function fetchApi(currentPage, sortQuery){
     const dynamicUrl = processingUrl(currentPage, sortQuery)
     return fetchApiSearch(dynamicUrl)
@@ -144,8 +153,13 @@ function fetchApi(currentPage, sortQuery){
             if (!filter){
                 loadFilterBox(data.totalProducts);
             }
-            loadProducts(data.products);
-            renderPagination(getCurrentPage(), data.totalPages);
+            console.log(data.products.length);
+            if (data.products.length < 1){
+                loadEmpty();
+            }else{
+                loadProducts(data.products);
+                renderPagination(getCurrentPage(), data.totalPages);
+            }
         })
         .catch(error => {
             console.error('Lỗi khi lấy dữ liệu search:', error);
@@ -229,10 +243,10 @@ function updateSortButtonUI() {
 function attachEventListener(){
     const filterBox = main.querySelector('.filterBox');
     const pagination = document.getElementById('pagination');
-    const decreasePriceButton = filterBox.querySelector('.decreasePriceButton');
-    const increasePriceButton = filterBox.querySelector('.increasePriceButton');
     if (filterBox){
-        if (!decreasePriceButton.dataset.listenerAttached) {
+        const decreasePriceButton = filterBox.querySelector('.decreasePriceButton');
+        const increasePriceButton = filterBox.querySelector('.increasePriceButton');
+        if (decreasePriceButton != null && !decreasePriceButton.dataset.listenerAttached) {
             decreasePriceButton.addEventListener('click', () => {
                 setCurrentPage(1);
                 if (currentSort !== 'decrease') {
@@ -247,7 +261,7 @@ function attachEventListener(){
             });
             decreasePriceButton.dataset.listenerAttached = 'true';
         }
-        if (!increasePriceButton.dataset.listenerAttached) {
+        if (increasePriceButton != null && !increasePriceButton.dataset.listenerAttached) {
             increasePriceButton.addEventListener('click', () => {
                 console.log('increase');
                 setCurrentPage(1);

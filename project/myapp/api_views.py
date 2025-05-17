@@ -1,5 +1,8 @@
+import random
 import threading
+from datetime import datetime, timedelta
 
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.models import Group
 from django.db.models import Avg, Exists, OuterRef, Count, Q
 from django.shortcuts import get_object_or_404
@@ -17,7 +20,7 @@ from .models import Product
 from .serializers import ProductSerializer, OptionSerializer, CategorySerializer, BrandSerializer, AllOptionSerializer, \
     OptionForCategory, OptionForProductSerializer, CartSerializer, OrderSerializer, OrderItemSerializer
 from .serializers import ReviewSerializer
-from .utils import send_order_confirmation_email
+from .utils import send_order_confirmation_email, send_otp
 
 
 @permission_classes([AllowAny])
@@ -332,8 +335,12 @@ def api_successOrder(request):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def api_authenticated(request):
-    return Response({"is_authenticated": request.user.is_authenticated})
+    if request.user.is_authenticated:
+        return Response({"is_authenticated": True}, status=status.HTTP_200_OK)
+    else:
+        return Response({"is_authenticated": True}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
@@ -591,4 +598,117 @@ class orderApiView(APIView):
         order.save()
         return Response({"detail": "Cập nhật trạng thái thành công"}, status=status.HTTP_200_OK)
 
-# fetch('/api/search/?category=dien-thoai&brand=apple&min_price=1000000&max_price=2000000&page=1')
+
+class OtpService:
+    @staticmethod
+    def generate_otp(request):
+        if OtpService.check_otp(request):
+            return
+
+        email = request.data.get('email')
+        otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        expiry_time = (datetime.now() + timedelta(minutes=5)).timestamp()
+
+        request.session['otp'] = otp
+        request.session['otp_expiry'] = expiry_time
+
+        threading.Thread(target=send_otp, args=(email, otp)).start()
+
+    @staticmethod
+    def delete_otp(request):
+        request.session.pop('otp', None)
+        request.session.pop('otp_expiry', None)
+
+    @staticmethod
+    def check_otp(request):
+        otp = request.session.get('otp')
+        otp_expiry = request.session.get('otp_expiry')
+        if not otp or not otp_expiry:
+            return False
+        if datetime.now().timestamp() > otp_expiry:
+            OtpService.delete_otp(request)
+            return False
+        return True
+
+    @staticmethod
+    def setOtpVerify(request, value):
+        request.session['otp_verified'] = value
+
+    @staticmethod
+    def getOtpVerify(request):
+        return request.session.get('otp_verified', False)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def apiCheckEmail(request):
+    email = request.data.get('email')
+    user = User.objects.filter(email=email)
+
+    if not user.exists():
+        return Response({"detail": "Kiểm tra email thành công"}, status=status.HTTP_400_BAD_REQUEST)
+    request.session['email'] = email
+    OtpService.generate_otp(request)
+    return Response({"detail": "Kiểm tra email thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def apiCheckOTP(request):
+    otp_actual = request.data.get('otp')
+    otp_expected = request.session.get('otp')
+    otp_expiry = request.session.get('otp_expiry')
+    if not otp_expected or not otp_expiry:
+        return Response({"detail": "OTP đã hết hạn hoặc không tồn tại"}, status=status.HTTP_400_BAD_REQUEST)
+    current_time = datetime.now().timestamp()
+    if current_time > otp_expiry:
+        OtpService.delete_otp(request)
+        return Response({"detail": "OTP đã hết hạn"}, status=status.HTTP_400_BAD_REQUEST)
+    if otp_actual != otp_expected:
+        return Response({"detail": "Mã OTP không đúng"}, status=status.HTTP_400_BAD_REQUEST)
+    OtpService.delete_otp(request)
+    OtpService.setOtpVerify(request, True)
+    return Response({"detail": "Xác thực OTP thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def apiGenerateOtp(request):
+    email = request.session.get('email')
+    if not email:
+        return Response({"detail": "Không tồn tại email"}, status=status.HTTP_400_BAD_REQUEST)
+    OtpService.generate_otp(request)
+    return Response({"detail": "Sinh mã OTP thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def apiResetPassword(request):
+    def clear_session_keys(request, keys):
+        for key in keys:
+            request.session.pop(key, None)
+
+    keys_to_clear = ['email', 'otp', 'otp_expiry', 'otp_verified']
+
+    if not OtpService.getOtpVerify(request):
+        print("getOtpVerify")
+        clear_session_keys(request, keys_to_clear)
+        return Response({"detail": "Có lỗi xảy ra"}, status=status.HTTP_403_FORBIDDEN)
+
+    email = request.session.get('email')
+    new_password = request.data.get('newPassword')
+
+    if not new_password or not new_password.strip():
+        print("new_password")
+        clear_session_keys(request, keys_to_clear)
+        return Response({"detail": "Có lỗi xảy ra"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.get(email=email)
+    user.set_password(new_password)
+    user.save()
+    update_session_auth_hash(request, user)
+
+    OtpService.setOtpVerify(request, False)
+    clear_session_keys(request, keys_to_clear)
+
+    return Response({"detail": "Cập nhật mật khẩu thành công"}, status=status.HTTP_200_OK)

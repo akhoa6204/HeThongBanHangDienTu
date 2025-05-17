@@ -1,0 +1,86 @@
+{% block content %}
+<div class="overlay">
+  <div class="modal">
+    <div class="modal-icon">
+      <span>?</span>
+    </div>
+    <p class="modal-message">Bạn có chắc chắn muốn xóa “{{ product.name }}” không?</p>
+    <form method="post" class="modal-actions">
+      {% csrf_token %}
+      <a href="{% url 'quantri-dashboard-products' %}" class="btn cancel-btn">Hủy</a>
+      <button type="submit" class="btn delete-btn">Xóa</button>
+    </form>
+  </div>
+</div>
+
+<style>
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(128, 128, 128, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  font-family: Arial, sans-serif;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 30px 40px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  min-width: 320px;
+}
+
+.modal-icon {
+  background-color: #d32f2f;
+  color: white;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.modal-message {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  min-width: 80px;
+  text-decoration: none;
+  text-align: center;
+  display: inline-block;
+}
+
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: black;
+}
+
+.delete-btn {
+  background-color: #d32f2f;
+  color: white;
+}
+</style>
+{% endblock %}

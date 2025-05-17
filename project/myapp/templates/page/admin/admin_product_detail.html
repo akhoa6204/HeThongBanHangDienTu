@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết sản phẩm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h3 {
+            color: #333;
+        }
+        .product-img {
+            max-width: 300px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .product-details {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .product-details p {
+            margin: 5px 0;
+        }
+        .options-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .options-table th, .options-table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .options-table th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .options-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .no-options {
+            padding: 10px;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="product-details">
+        <h1>{{ product.name }}</h1>
+        <p><strong>Slug:</strong> {{ product.slug }}</p>
+        <p><strong>Danh mục:</strong> {{ product.category_name }}</p>
+        <p><strong>Thương hiệu:</strong> {{ product.brand_name }}</p>
+    </div>
+
+    <h3>Ảnh sản phẩm:</h3>
+    <div class="product-images">
+        {% for img_url in product.img %}
+            <img src="{{ img_url }}" class="product-img" alt="Product Image">
+        {% empty %}
+            <p>Chưa có ảnh sản phẩm.</p>
+        {% endfor %}
+    </div>
+
+    <h3>Danh sách Option:</h3>
+    {% if options %}
+    <table class="options-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên option</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>Ảnh</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for option in options %}
+            <tr>
+                <td>{{ option.id }}</td>
+                <td>{{ option.version }} - {{ option.color }}</td>  <!-- Fixed this line -->
+                <td>{{ option.price }}</td>
+                <td>{{ option.quantity }}</td>
+                <td>
+                    {% if option.img %}
+                        <img src="{{ option.img }}" alt="Option Image" style="max-width: 100px; height: auto;">
+                    {% else %}
+                        <p>Chưa có ảnh</p>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p class="no-options">Chưa có option nào.</p>
+    {% endif %}
+</body>
+</html>

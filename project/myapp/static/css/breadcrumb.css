@@ -1,0 +1,20 @@
+.breadcrumb {
+    border: 1px solid #ccc  ;
+    padding: 10px 30px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    position: relative;
+    span{
+        font-size: 16px;
+    }
+}
+.breadcrumb::before{
+    content: "";
+    position:absolute;
+    top:0;
+    left: -5px;
+    width: 15px;
+    height:100%;
+    background-color: rgba(241, 243, 194, 1);
+    border-radius: 10px;
+}

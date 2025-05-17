@@ -1,0 +1,27 @@
+{% load static %}
+{% block content %}
+<div class="sidebarAdminContainer">
+    <div class="logoContainer">
+        <img src="{% static 'assets/img/logo.png' %}" alt="Logo">
+        <p>SMART BUY</p>
+    </div>
+    <div class="nav">
+        <div class="box">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <p>Quản lý sản phẩm</p>
+        </div>
+        <div class="box">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            <p>Quản lý đơn hàng</p>
+        </div>
+        <div class="box">
+            <span class="material-symbols-outlined">groups</span>
+            <p>Quản lý đánh giá</p>
+        </div>
+        <div class="box">
+            <span class="material-symbols-outlined">settings</span>
+            <p>Cài đặt</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

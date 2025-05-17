@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Trang chủ{% endblock %}</title>
+    {% load static %}
+    {% block extra_css %}{% endblock %}
+    <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+            rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'css/sidebarAdmin.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *{
+             margin: 0;
+             padding: 0;
+             box-sizing: border-box;
+        }
+        body {
+            height: 89vh;
+            background-color:#003366;
+        }
+        h3, h2, h1{
+            font-size: 16px ;
+        }
+        p, span, a{
+            font-size: 12px ;
+        }
+        main{
+            display:flex ;
+        }
+    </style>
+</head>
+<body>
+<main>
+    {% include 'components/components/sidebar_admin.html' %}
+    {% block content %}{% endblock %}
+</main>
+</body>
+<script src="{% static 'js/sidebarAdmin/sidebarAdmin.js' %}" type="module"></script>
+{% block extra_js %}{% endblock %}
+</html>

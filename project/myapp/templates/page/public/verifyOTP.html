@@ -1,0 +1,36 @@
+{% extends 'components/layout/onlyHeader.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forgot_password.css' %}">
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="form-container validate">
+        <form>
+            <h2>Vui lòng nhập mã xác thực gửi về email của bạn</h2>
+            <div class="input-group">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+                <input type="text" maxlength="1">
+            </div>
+            <div class="timeContainer">
+                <div class="timeBox">
+                    <span class="time"></span>
+                    <span class="material-symbols-outlined refresh">refresh</span>
+                </div>
+                <span class="error-message"></span>
+            </div>
+            <div class="buttonBox">
+                <button type="submit">Xác thực</button>
+            </div>
+        </form>
+    </div>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/verifyOTP/verifyOTP.js' %}" type="module"></script>
+{% endblock %}

@@ -1,19 +1,5 @@
-import re
-
 from django.conf import settings
 from django.core.mail import send_mail
-
-
-def contains_uppercase(password):
-    return bool(re.search(r'[A-Z]', password))
-
-
-def contains_letter(password):
-    return bool(re.search(r'[a-zA-Z]', password))
-
-
-def contains_special_char(password):
-    return bool(re.search(r'[!@#$%^&*(),.?":{}|<>_\-+=~`[\]\\\/]', password))
 
 
 def send_order_confirmation_email(userInfo, order_details, total_price):
@@ -32,11 +18,23 @@ Chúng tôi sẽ liên hệ sớm với bạn để xác nhận đơn hàng.
 
 Trân trọng,
 SmartBuy"""
-    # Gửi email
     send_mail(
         subject='[SmartBuy] Xác nhận đơn hàng của bạn',
         message=email_body,
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[userInfo['email'].strip()],
+        fail_silently=False,
+    )
+
+
+def send_otp(email, otp):
+    email_body = f'''Mã xác thực OTP của bạn: {otp}
+Vui lòng không gửi mã xác thực này cho ai
+'''
+    send_mail(
+        subject='[SmartBuy] Mã xác thực tài khoản',
+        message=email_body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
         fail_silently=False,
     )

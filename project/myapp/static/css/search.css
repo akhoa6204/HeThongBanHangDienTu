@@ -36,3 +36,13 @@ main > *{
         border: none;
     }
 }
+.searchEmpty{
+    text-align:center;
+    > * {
+        margin-bottom:5px;
+    }
+    img{
+        width: 100px;
+        height: 100px;
+    }
+}

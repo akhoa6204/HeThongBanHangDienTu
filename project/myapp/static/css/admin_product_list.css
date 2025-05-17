@@ -1,0 +1,97 @@
+.adminContainer{
+    flex: 1;
+    margin-top: 30px;
+    background-color: white;
+    padding: 30px;
+}
+.container{
+    padding: 10px 0;
+    border: 1px solid rgba(209, 206, 206, 1);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    > * {
+        padding: 0 30px;
+    }
+}
+.buttonBox{
+    padding: 10px 30px;
+    border-bottom: 1px solid rgba(209, 206, 206, 1);
+    display: flex ;
+    gap: 20px;
+    > div > *{
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: black;
+    }
+    > div{
+        border-radius: 10px;
+        border:none;
+        padding: 6px 12px;
+        min-width: 160px;
+    }
+    .addProduct{
+        background-color:rgba(111, 240, 129, 0.56);
+    }
+    .removeAll{
+        background-color: rgba(217, 217, 217, 0.7);
+    }
+}
+.tableBox{
+    padding: 10px 30px;
+    .searchBox{
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 20px;
+        input{
+            flex: 1;
+            border: none;
+            outline: none;
+            background-color:rgba(229, 229, 229, 1);
+            padding: 12px 24px;
+            border-radius: 10px;
+        }
+    }
+    .table{
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, tr th, tr td{
+            border: 1px solid rgba(209, 206, 206, 1);
+
+        }
+        thead{
+            background-color: rgba(229, 229, 229, 1);
+        }
+        tr th, tr td{
+            padding: 6px 12px;
+            text-align: center;
+        }
+        tr td img{
+            width: 50px;
+            height: 50px;
+        }
+        tr td:last-child{
+            span:first-child{
+                margin-right: 10px;
+            }
+            span{
+                padding: 6px 12px;
+                color: white;
+                border-radius : 5px;
+            }
+            span.edit{
+                background-color: rgba(255, 237, 37, 0.92);
+
+            }
+            span.remove{
+                background-color:rgba(215, 0, 24, 0.8);
+            }
+
+        }
+
+    }
+}

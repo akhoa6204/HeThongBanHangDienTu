@@ -47,7 +47,9 @@ form.addEventListener('submit', (e) => {
     .then(data => {
         if (data) {
             if (data?.message) {
-                window.location.href = '/';
+                const popupModel = document.querySelector('.popup-model');
+                popupModel.classList.add('active');
+//                window.location.href = '/';
             } else if (data?.['error-message-password']) {
                 addErrorMessage(currentPassword, data['error-message-password']);
             } else {

@@ -61,12 +61,13 @@ fetchApiAuthenticated()
                 window.location.href = '/change_password/'
             })
 
-        }else{
-            box.innerHTML += `
-                <a class="loginBox" href="/login/">
-                    <span class="material-symbols-outlined">person</span>
-                    <p>Đăng nhập</p>
-                </a>
-            `;
         }
     })
+    .catch(error => {
+        box.innerHTML += `
+            <a class="loginBox" href="/login/">
+                <span class="material-symbols-outlined">person</span>
+                <p>Đăng nhập</p>
+            </a>
+        `;
+    });

@@ -130,9 +130,7 @@ fetchApiOrder()
                     return;
                 }
                 const note = document.querySelector('#note').value;
-                const checkBoxEmail = document.querySelector('#acceptEmail');
                 const checkBoxBill = document.querySelector('#acceptBill');
-                const acceptEmail = checkBoxEmail.checked;
                 const acceptBill = checkBoxBill.checked;
                 const userInfo = {
                     first_name:  data.user.first_name,
@@ -144,7 +142,6 @@ fetchApiOrder()
                     ward,
                     address_detail,
                     note,
-                    acceptEmail,
                     acceptBill
                 };
 

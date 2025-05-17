@@ -1,11 +1,14 @@
 function fetchApiAuthenticated(){
     const url = '/api/authenticated/'
-    return fetch(url)
-        .then(response => {
-           return response.json()
-        })
-        .catch(error => {
-            return null;
-        });
+    return fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+    })
+    .then(response => {
+       if (!response.ok){
+            throw new Error('Chưa đăng nhập');
+       }
+       return response.json();
+    })
 }
 export {fetchApiAuthenticated}
