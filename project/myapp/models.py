@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
+from .utils import ProcessingUploadPath
+
 
 class User(AbstractUser):
     SEX_CHOICES = [
@@ -44,12 +46,22 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     purchased_count = models.PositiveIntegerField(default=0)
-    img = models.URLField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     slug = models.CharField(max_length=150, null=True, blank=True)
 
     def __str__(self):
         return f"{self.name} - {self.slug or 'None'}"
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    img = models.ImageField(
+        upload_to=ProcessingUploadPath.product_image_upload_path,
+        null=True,
+        blank=True,
+        help_text="Ảnh đại diện sản phẩm"
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 class Option(models.Model):
@@ -60,31 +72,19 @@ class Option(models.Model):
     color = models.CharField(max_length=150, null=True, blank=True, help_text="Màu sắc sản phẩm")
     price = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True,
                                 help_text="Giá gốc của sản phẩm")
-    img = models.TextField(null=True, blank=True, help_text="Danh sách URL hình ảnh")
+    details = models.JSONField(null=True, blank=True, help_text="Thông tin chi tiết dạng JSON")
 
-    # Các trường specs dạng JSON → lưu dưới dạng chuỗi (TextField)
-    memory_and_storage = models.TextField(null=True, blank=True, help_text="Bộ nhớ & Lưu trữ")
-    rear_camera = models.TextField(null=True, blank=True, help_text="Camera sau")
-    front_camera = models.TextField(null=True, blank=True, help_text="Camera trước")
-    os_and_cpu = models.TextField(null=True, blank=True, help_text="Hệ điều hành & CPU")
-    connectivity = models.TextField(null=True, blank=True, help_text="Kết nối")
-    display = models.TextField(null=True, blank=True, help_text="Màn hình")
-    battery_and_charging = models.TextField(null=True, blank=True, help_text="Pin & Sạc")
-    design_and_weight = models.TextField(null=True, blank=True, help_text="Thiết kế & Trọng lượng")
-    general_information = models.TextField(null=True, blank=True, help_text="Thông tin chung")
-    utilities = models.TextField(null=True, blank=True, help_text="Tiện ích")
-    product_overview = models.TextField(null=True, blank=True, help_text="Tổng quan sản phẩm")
-
-    warranty = models.CharField(max_length=150, null=True, blank=True, help_text="Thông tin bảo hành")
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0,
                                    help_text="Phần trăm giảm giá")
-    promotion_start_date = models.DateTimeField(null=True, blank=True, help_text="Ngày bắt đầu khuyến mãi")
-    promotion_end_date = models.DateTimeField(null=True, blank=True, help_text="Ngày kết thúc khuyến mãi")
-    promotion_description = models.TextField(null=True, blank=True, help_text="Mô tả khuyến mãi")
-
     description = models.TextField(null=True, blank=True, help_text="Mô tả chi tiết phiên bản")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="Ngày tạo bản ghi")
     updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
+
+    def get_details(self):
+        return self.details or {}
+
+    def set_details(self, details_dict):
+        self.details = details_dict
 
     def final_price(self):
         if self.price is None:
@@ -95,6 +95,15 @@ class Option(models.Model):
 
     def __str__(self):
         return f"{self.product.name} - {self.version or ''} - {self.color or ''} - {self.slug or 'None'}"
+
+
+class OptionImage(models.Model):
+    option = models.ForeignKey(Option, on_delete=models.CASCADE, related_name='images')
+    img = models.ImageField(upload_to=ProcessingUploadPath.option_image_upload_path, null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.option} - {self.img.url if self.img else 'No image'}"
 
 
 class Cart(models.Model):
@@ -117,10 +126,6 @@ class Review(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    img = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return f"{self.img or 'None'}"
 
 
 class ReviewReply(models.Model):
@@ -166,8 +171,7 @@ class OrderItem(models.Model):
         return self.option.final_price() * self.quantity
 
 
-class MediaFile(models.Model):
+class ReviewImage(models.Model):
     review = models.ForeignKey(Review, related_name='media_files', on_delete=models.CASCADE)
-    media_type = models.CharField(max_length=50, choices=[('image', 'Image'), ('video', 'Video')])
-    media = models.FileField(upload_to='media_reviews/')
-    created_at = models.DateTimeField(auto_now_add=True)
+    img = models.ImageField(upload_to=ProcessingUploadPath.review_upload_path, null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)

@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Option, Category, Brand, ReviewReply, Cart, MediaFile, User
+from .models import Option, Category, Brand, ReviewReply, Cart, User
 from .models import Order, Review
 from .models import OrderItem
 from .models import Product
@@ -521,7 +521,8 @@ class searchApiView(APIView):
         max_price = request.GET.get('max_price').strip('/') if request.GET.get('max_price') else None
 
         if not keyword:
-            products = get_filtered_products(category_slug, brand_slug)
+            filter = get_filtered_products(category_slug, brand_slug)
+            products = Product.objects.filter(filter)
         else:
             products = Product.objects.filter(
                 Q(slug__icontains=keyword) |

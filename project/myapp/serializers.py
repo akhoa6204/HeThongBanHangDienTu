@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart, OrderItem, Order, MediaFile
+from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart, OrderItem, Order, ReviewImage
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -55,9 +55,9 @@ class OptionForProductSerializer(serializers.ModelSerializer):
                   'product']
 
 
-class MediaFileSerialier(serializers.ModelSerializer):
+class ReviewImageSerialier(serializers.ModelSerializer):
     class Meta:
-        model = MediaFile
+        model = ReviewImage
         fields = '__all__'
 
 
@@ -71,7 +71,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     option = OptionReviewSerializer()
     reviewReply = ReviewReplySerializer(source='reviewreply')
-    media = MediaFileSerialier(many=True, source='media_files')
+    media = ReviewImageSerialier(many=True, source='media_files')
 
     class Meta:
         model = Review
