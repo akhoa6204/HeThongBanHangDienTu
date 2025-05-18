@@ -1,5 +1,12 @@
+import random
+import threading
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.core.mail import send_mail
+from django.db.models import Q
+
+from .models import Product
 
 
 def send_order_confirmation_email(userInfo, order_details, total_price):
@@ -38,3 +45,63 @@ Vui lòng không gửi mã xác thực này cho ai
         recipient_list=[email],
         fail_silently=False,
     )
+
+
+def is_admin(user):
+    return user.is_staff
+
+
+def is_customer(user):
+    return user.groups.filter(name='Customer').exists()
+
+
+def get_filtered_products(category_slug, brand_slug):
+    filters = Q()
+
+    if category_slug:
+        filters &= Q(category__slug__icontains=category_slug)
+
+    if brand_slug:
+        filters &= Q(brand__slug__icontains=brand_slug)
+
+    return Product.objects.filter(filters)
+
+
+class OtpService:
+    @staticmethod
+    def generate_otp(request):
+        if OtpService.check_otp(request):
+            return
+
+        email = request.data.get('email')
+        otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        expiry_time = (datetime.now() + timedelta(minutes=5)).timestamp()
+
+        request.session['otp'] = otp
+        request.session['otp_expiry'] = expiry_time
+
+        threading.Thread(target=send_otp, args=(email, otp)).start()
+
+    @staticmethod
+    def delete_otp(request):
+        request.session.pop('otp', None)
+        request.session.pop('otp_expiry', None)
+
+    @staticmethod
+    def check_otp(request):
+        otp = request.session.get('otp')
+        otp_expiry = request.session.get('otp_expiry')
+        if not otp or not otp_expiry:
+            return False
+        if datetime.now().timestamp() > otp_expiry:
+            OtpService.delete_otp(request)
+            return False
+        return True
+
+    @staticmethod
+    def setOtpVerify(request, value):
+        request.session['otp_verified'] = value
+
+    @staticmethod
+    def getOtpVerify(request):
+        return request.session.get('otp_verified', False)

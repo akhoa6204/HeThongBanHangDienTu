@@ -34,6 +34,9 @@ urlpatterns = [
     path('api/checkOTP/', api_views.apiCheckOTP, name='api_checkOTP'),
     path('api/generateOTP/', api_views.apiGenerateOtp, name='api_generateOTP'),
     path('api/resetPassword/', api_views.apiResetPassword, name='api_resetPassword'),
+    path('api/changePassword/', api_views.apiChangePassword, name='api_changePassword'),
+    path('api/login/', api_views.apiLogin, name='api_login'),
+    path('api/register/', api_views.apiRegister, name='api_register'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),

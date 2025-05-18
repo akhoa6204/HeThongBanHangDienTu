@@ -1,15 +1,12 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login as auth_login, logout
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import check_password
-from django.contrib.auth.models import Group
-from django.http import JsonResponse
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 
-from .models import User, Product, Category, Option
+from .models import Product, Category, Option
 from .serializers import ProductSerializer
+from .utils import is_admin
 
 
 def home(request):
@@ -51,17 +48,6 @@ def infoUser(request):
 
 @login_required
 def changePassword(request):
-    if request.method == 'POST':
-        currentPassword = request.POST.get('currentPassword')
-        newPassword = request.POST.get('newPassword')
-        user = request.user
-        if check_password(currentPassword, user.password):
-            user.set_password(newPassword)
-            user.save()
-            update_session_auth_hash(request, user)
-            return JsonResponse({'message': 'Đổi mật khẩu thành công'}, status=status.HTTP_200_OK)
-        else:
-            return JsonResponse({'error-message-password': 'Sai mật khẩu'}, status=status.HTTP_400_BAD_REQUEST)
     return render(request, 'page/public/changePassword.html')
 
 
@@ -70,55 +56,11 @@ def reviewProduct(request, idOrder):
     return render(request, 'page/public/review_product.html')
 
 
-def is_admin(user):
-    return user.groups.filter(name='Admin').exists()
-
-
-def is_customer(user):
-    return user.groups.filter(name='Customer').exists()
-
-
 def login(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            auth_login(request, user)
-            if is_admin(user):
-                return JsonResponse({'role': 'admin'}, status=status.HTTP_200_OK)
-            elif is_customer(user):
-                return JsonResponse({'role': 'customer'}, status=status.HTTP_200_OK)
-            # else:
-            #     return JsonResponse({'role': 'unknown'}, status=status.HTTP_200_OK)
-        else:
-            return JsonResponse({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
     return render(request, 'page/public/login.html')
 
 
 def register(request):
-    if request.method == 'POST':
-        first_name = request.POST.get('firstName')
-        last_name = request.POST.get('lastName')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        if User.objects.filter(email=email).exists():
-            return JsonResponse({'error-message-email': 'Email đã tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password,
-            phone=phone,
-            first_name=first_name,
-            last_name=last_name
-        )
-        group = Group.objects.get(name='Customer')
-        user.groups.add(group)
-        return JsonResponse({'message': 'Đăng ký thành công'}, status=status.HTTP_200_OK)
     return render(request, 'page/public/register.html')
 
 
@@ -149,6 +91,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 @login_required
+@user_passes_test(is_admin, login_url='home')
 def admin_product_list(request):
     return render(request, 'page/admin/admin_product_list.html', )
 

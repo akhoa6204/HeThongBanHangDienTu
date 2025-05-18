@@ -1,8 +1,8 @@
-import random
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth import update_session_auth_hash, authenticate, login as auth_login
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import Group
 from django.db.models import Avg, Exists, OuterRef, Count, Q
 from django.shortcuts import get_object_or_404
@@ -20,7 +20,7 @@ from .models import Product
 from .serializers import ProductSerializer, OptionSerializer, CategorySerializer, BrandSerializer, AllOptionSerializer, \
     OptionForCategory, OptionForProductSerializer, CartSerializer, OrderSerializer, OrderItemSerializer
 from .serializers import ReviewSerializer
-from .utils import send_order_confirmation_email, send_otp
+from .utils import send_order_confirmation_email, is_admin, is_customer, OtpService, get_filtered_products
 
 
 @permission_classes([AllowAny])
@@ -509,18 +509,6 @@ class registerApiView(APIView):
         return Response({'message': 'Đăng ký thành công'}, status=status.HTTP_200_OK)
 
 
-def get_filtered_products(category_slug, brand_slug):
-    filters = Q()
-
-    if category_slug:
-        filters &= Q(category__slug__icontains=category_slug)
-
-    if brand_slug:
-        filters &= Q(brand__slug__icontains=brand_slug)
-
-    return Product.objects.filter(filters)
-
-
 @permission_classes([AllowAny])
 class searchApiView(APIView):
     def get(self, request):
@@ -599,46 +587,6 @@ class orderApiView(APIView):
         return Response({"detail": "Cập nhật trạng thái thành công"}, status=status.HTTP_200_OK)
 
 
-class OtpService:
-    @staticmethod
-    def generate_otp(request):
-        if OtpService.check_otp(request):
-            return
-
-        email = request.data.get('email')
-        otp = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-        expiry_time = (datetime.now() + timedelta(minutes=5)).timestamp()
-
-        request.session['otp'] = otp
-        request.session['otp_expiry'] = expiry_time
-
-        threading.Thread(target=send_otp, args=(email, otp)).start()
-
-    @staticmethod
-    def delete_otp(request):
-        request.session.pop('otp', None)
-        request.session.pop('otp_expiry', None)
-
-    @staticmethod
-    def check_otp(request):
-        otp = request.session.get('otp')
-        otp_expiry = request.session.get('otp_expiry')
-        if not otp or not otp_expiry:
-            return False
-        if datetime.now().timestamp() > otp_expiry:
-            OtpService.delete_otp(request)
-            return False
-        return True
-
-    @staticmethod
-    def setOtpVerify(request, value):
-        request.session['otp_verified'] = value
-
-    @staticmethod
-    def getOtpVerify(request):
-        return request.session.get('otp_verified', False)
-
-
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def apiCheckEmail(request):
@@ -712,3 +660,66 @@ def apiResetPassword(request):
     clear_session_keys(request, keys_to_clear)
 
     return Response({"detail": "Cập nhật mật khẩu thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def apiChangePassword(request):
+    user = request.user
+    current_password = request.data.get("currentPassword")
+    newPassword = request.data.get('newPassword')
+    if not current_password or not newPassword:
+        return Response({"detail": "Thiếu thông tin mật khẩu"}, status=status.HTTP_400_BAD_REQUEST)
+    if not check_password(current_password, user.password):
+        return Response({"detail": "Sai mật khẩu"}, status=status.HTTP_400_BAD_REQUEST)
+    user.set_password(newPassword)
+    user.save()
+    update_session_auth_hash(request, user)
+    return Response({"detail": "Đổi mật khẩu thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def apiLogin(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    user = authenticate(request, username=username, password=password)
+    if not username or not password:
+        return Response({'detail': 'Thiếu tên đăng nhập hoặc mật khẩu'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not user:
+        return Response({'detail': 'Sai tên đăng nhập hoặc mật khẩu'}, status=status.HTTP_400_BAD_REQUEST)
+
+    auth_login(request, user)
+    if is_admin(user):
+        return Response({"detail": "Đăng nhập thành công", 'role': 'admin'}, status=status.HTTP_200_OK)
+    elif is_customer(user):
+        return Response({"detail": "Đăng nhập thành công", 'role': 'customer'}, status=status.HTTP_200_OK)
+    else:
+        return Response({'detail': 'Đăng nhập không thành công', 'role': 'unknow'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def apiRegister(request):
+    first_name = request.data.get('firstName')
+    last_name = request.data.get('lastName')
+    phone = request.data.get('phone')
+    email = request.data.get('email')
+    password = request.data.get('password')
+    if User.objects.filter(email=email).exists():
+        return Response({"detail": 'Email đã tồn tại'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        user = User.objects.create_user(
+            username=email,
+            email=email,
+            password=password,
+            phone=phone,
+            first_name=first_name,
+            last_name=last_name
+        )
+        group = Group.objects.get(name='Customer')
+        user.groups.add(group)
+        return Response({'detail': 'Đăng ký thành công'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'detail': 'Đã có lỗi xảy ra'}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,3 +1,4 @@
+import { fetchApiLogin } from '../service/login/fetchApi.js';
 const form = document.querySelector("form");
 const name = document.querySelector('input[name="username"]');
 const password = document.querySelector('input[name="password"]');
@@ -21,37 +22,19 @@ form.addEventListener('submit', (e) => {
         return;
     }
 
-    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const formData = new FormData();
-    formData.append('username', name.value);
-    formData.append('password', password.value);
-    formData.append('csrfmiddlewaretoken', csrf);
-
-    fetch('', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData,
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Login failed");
-        }
-        return response.json();
-    })
+    const username= name.value;
+    const passwordValue= password.value;
+    fetchApiLogin(username, passwordValue)
     .then(data => {
-        console.log(data.role);
         if (data.role === 'customer') {
             window.location.href = '/';
         } else if (data.role === 'admin') {
-            window.location.href = '/admin_dashboard/';
+            window.location.href = '/quantri/product/';
         }
     })
-    .catch(err => {
-        addMessage(password, 'Tên đăng nhập hoặc mật khẩu không đúng.');
-        console.error('Lỗi:', err);
-    });
+    .catch(error => {
+        addMessage(password, error.message);
+    })
 });
 
 function addMessage(element, message) {

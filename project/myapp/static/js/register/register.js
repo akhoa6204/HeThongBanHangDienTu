@@ -1,3 +1,4 @@
+import { fetchApiRegister } from "../service/register/fetchApi.js";
 const form = document.querySelector('.register-form');
 const firstName = document.getElementById('first_name');
 const lastName = document.getElementById('last_name');
@@ -32,45 +33,21 @@ form.addEventListener('submit', (e) =>{
         return;
     }
 
-    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const formData = new FormData();
-    formData.append('firstName', firstName.value.trim());
-    formData.append('lastName', lastName.value.trim());
-    formData.append('phone', phone.value.trim());
-    formData.append('email', email.value.trim());
-    formData.append('password', password.value.trim());
-    formData.append('csrfmiddlewaretoken', csrf);
-    fetch('', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData,
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        }else if (response.status === 400){
-            return response.json();
-        }else{
-            throw new Error;
-        }
-    })
+    const firstNameValue = firstName.value.trim();
+    const lastNameValue = lastName.value.trim();
+    const phoneValue = phone.value.trim();
+    const emailValue = email.value.trim();
+    const passwordValue = password.value.trim();
+
+    fetchApiRegister(firstNameValue, lastNameValue, phoneValue, emailValue, passwordValue)
     .then(data => {
-        if (data) {
-            if (data['error-message-email']) {
-                addErrorMessage(email, data['error-message-email']);
-            }
-            if(data.message) {
-                window.location.href='/login/';
-            }
-        } else {
-            console.error('Dữ liệu trả về không hợp lệ:', data);
+        if(data){
+            window.location.href='/login/';
         }
     })
-    .catch(err => {
-        console.error('Lỗi:', err);
-    });
+    .catch(error => {
+        addErrorMessage(email, error.message);
+    })
 })
 function addErrorMessage(element, message){
     const p = element.parentElement.querySelector('.error-message');

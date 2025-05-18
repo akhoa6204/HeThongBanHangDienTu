@@ -1,3 +1,4 @@
+import {fetchApiChangePassword} from '../service/changePassword/fetchApi.js';
 const form = document.querySelector('form');
 const currentPassword = document.getElementById('currentPassword');
 const newPassword = document.getElementById('newPassword');
@@ -17,51 +18,30 @@ form.addEventListener('submit', (e) => {
         addErrorMessage(confirmNewPassword, 'Trường này phải trùng với mật khẩu mới');
         return;
     }
+    if (newPassword.value.trim() === currentPassword.value.trim()){
+        addErrorMessage(newPassword, 'Mật khẩu mới phải khác mật khẩu hiện tại');
+        return;
+    }
      const passwordRegex = /^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{6,}$/;
     if (!passwordRegex.test(newPassword.value)) {
         addErrorMessage(newPassword, "Mật khẩu tối thiểu 6 ký tự, có ít nhất 1 chữ in hoa và 1 kí tự đặc biệt.");
         return;
     }
 
-    const csrf = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    const formData = new FormData();
-    formData.append('currentPassword', currentPassword.value.trim());
-    formData.append('newPassword', newPassword.value.trim());
-    formData.append('csrfmiddlewaretoken', csrf);
-    fetch('', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData,
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        }else if (response.status === 400){
-            return response.json();
-        }else{
-            throw new Error;
-        }
-    })
+
+
+    const currentPasswordValue = currentPassword.value.trim();
+    const newPasswordValue = newPassword.value.trim();
+
+    fetchApiChangePassword(currentPasswordValue, newPasswordValue)
     .then(data => {
-        if (data) {
-            if (data?.message) {
-                const popupModel = document.querySelector('.popup-model');
-                popupModel.classList.add('active');
-//                window.location.href = '/';
-            } else if (data?.['error-message-password']) {
-                addErrorMessage(currentPassword, data['error-message-password']);
-            } else {
-                console.error('Lỗi không xác định:', data);
-            }
-        } else {
-            console.error('Dữ liệu trả về không hợp lệ:', data);
-        }
+        const popupModel = document.querySelector('.popup-model');
+        popupModel.classList.add('active');
+        form.reset();
     })
-    .catch(err => {
-        console.error('Lỗi:', err);
-    });
+    .catch(error => {
+        addErrorMessage(currentPassword, error.message);
+    })
 });
 function addErrorMessage(element, message){
     const p = element.parentElement.querySelector('.error-message');
