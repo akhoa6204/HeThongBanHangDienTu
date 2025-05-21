@@ -26,73 +26,78 @@ function prevImg(){
 }
 function loadData(data){
     for (const category of data) {
+        const icon = category.name === "Điện thoại" ? "phone_iphone" : "headphones";
+        console.log(category.name);
+        const brandHTML = category.brands.length > 0 ? `
+            <div class='brand'>
+                <p><strong>Hãng ${category.name}</strong></p>
+                ${category.brands.map(brand => `<p>${brand.name}</p>`).join('')}
+            </div>
+        ` : '';
+
+        const filterHTML = category.name === "Điện thoại" ? `
+            <div class='filterPrice'>
+                <p><strong>Mức giá</strong></p>
+                <p>Dưới 4 triệu</p>
+                <p>Từ 4 - 7 triệu</p>
+                <p>Từ 7 - 13 triệu</p>
+                <p>Từ 13 - 20 triệu</p>
+                <p>Từ 20 - 30 triệu</p>
+                <p>Trên 30 triệu</p>
+            </div>
+        ` : '';
+
         subMenu.innerHTML += `
             <div class="child-menu">
-                <span class="material-symbols-outlined">${category.name ==="Điện thoại" ? "phone_iphone" : "headphones"}</span>
+                <span class="material-symbols-outlined">${icon}</span>
                 <span>${category.name}</span>
                 <span class="material-symbols-outlined">chevron_right</span>
-                ${category.name ==="Điện thoại" ? `
-                    <div class='subChildMenu'>
-                        <div class='brand'>
-                            <p><strong>Hãng ${category.name}</strong></p>
-                            ${category.brands.map(brand => {
-                                return `
-                                    <p>${brand.name}</p>
-                                `;
-                            }).join('')}
-
-                        </div>
-                        <div class='filterPrice'>
-                            <p><strong>Mức giá</strong></p>
-                            <p>Dưới 4 triệu</p>
-                            <p>Từ 4 - 7 triệu</p>
-                            <p>Từ 7 - 13 triệu</p>
-                            <p>Từ 13 - 20 triệu</p>
-                            <p>Từ 20 - 30 triệu</p>
-                            <p>Trên 30 triệu</p>
-                        </div>
-                    </div>
-                ` : ''}
+                <div class='subChildMenu'>
+                    ${brandHTML}
+                    ${filterHTML}
+                </div>
             </div>
         `;
-        const productContainer = `
-            <section class='productContainer'>
-                <div class='section-title'>
-                    <h2>${category.name} nổi bật</h2>
-                    <p>Xem tất cả</p>
-                    <span class="material-symbols-outlined">chevron_right</span>
-                </div>
-                <div class='productBox'>
-                    ${
-                        category.options.map((option) => {
-                            const hasDiscount = option.discount > 0;
-                            return `
-                                <div class='product-item'>
-                                    <div class="header">
-                                        ${hasDiscount ? `<div class="discount">Giảm ${option.discount}%</div>` : ''}
+        if (category.top_options.length > 0){
+            const productContainer = `
+                <section class='productContainer'>
+                    <div class='section-title'>
+                        <h2>${category.name} nổi bật</h2>
+                        <p>Xem tất cả</p>
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </div>
+                    <div class='productBox'>
+                        ${
+                            category.top_options.map((option) => {
+                                const hasDiscount = Number(option.discount) > 0;
+                                return `
+                                    <div class='product-item'>
+                                        <div class="header">
+                                            ${hasDiscount ? `<div class="discount">Giảm ${option.discount * 100}%</div>` : ''}
+                                        </div>
+                                        <div class="product-image">
+                                            <a href="/detail/${category.slug}/${option.product.slug}/${option.slug}/">
+                                                <img src="${option.product.image}" />
+                                            </a>
+                                        </div>
+                                        <div class="name-product">
+                                            <a href="/detail/${category.slug}/${option.product.slug}/${option.slug}/">
+                                                <p>${option.product.name}</p>
+                                            </a>
+                                        </div>
+                                        <div class="price" style ='margin-bottom:10px;'>
+                                            <span style="color: red; font-weight: 600;">${Number(option.top_price * (1 - option.discount)).toLocaleString('vi-VN')}<u>đ</u></span>
+                                            ${hasDiscount ? `<span style="color: rgb(153,153,153); font-weight: 600; text-decoration: line-through;">${(option.top_price).toLocaleString('vi-VN')}<u>đ</u></span>` : ''}
+                                        </div>
                                     </div>
-                                    <div class="product-image">
-                                        <a href="/detail/${category.slug}/${option.product.slug}/${option.slug}/">
-                                            <img src="${option.product.img}" />
-                                        </a>
-                                    </div>
-                                    <div class="name-product">
-                                        <a href="/detail/${category.slug}/${option.product.slug}/${option.slug}/">
-                                            <p>${option.product.name}</p>
-                                        </a>
-                                    </div>
-                                    <div class="price" style ='margin-bottom:10px;'>
-                                        <span style="color: red; font-weight: 600;">${Number(option.price).toLocaleString('vi-VN')} <u>đ</u></span>
-                                        ${hasDiscount ? `<span style="color: rgb(153,153,153); font-weight: 600; text-decoration: line-through;">${option.product.old_price}</span>` : ''}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')
-                    }
-                </div>
-            </section>
-        `;
-        main.innerHTML += productContainer;
+                                `;
+                            }).join('')
+                        }
+                    </div>
+                </section>
+            `;
+            main.innerHTML += productContainer;
+        }
     }
 }
 function attachEventListener(data){

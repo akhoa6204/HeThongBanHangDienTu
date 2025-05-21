@@ -29,7 +29,7 @@ form.addEventListener('submit', (e) => {
         if (data.role === 'customer') {
             window.location.href = '/';
         } else if (data.role === 'admin') {
-            window.location.href = '/quantri/product/';
+            window.location.href = '/products/';
         }
     })
     .catch(error => {

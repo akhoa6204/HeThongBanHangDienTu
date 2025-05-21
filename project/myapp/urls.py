@@ -4,6 +4,7 @@ from django.urls import path
 
 from . import api_views, admin_api
 from . import views
+from .admin_api import CreateProductView
 from .api_views import homeApiView, infoUserApiView, searchApiView, orderApiView
 
 urlpatterns = [
@@ -58,37 +59,47 @@ urlpatterns = [
     path('reset-password/', views.resetPassword, name="resetPassword"),
 
     # ----------- API Quản trị sản phẩm ----------
-    path('quantri/products/', admin_api.admin_list_products, name='admin-list-products'),
-    path('quantri/products/create/', admin_api.admin_create_product, name='admin-create-product'),
-    path('quantri/products/<int:product_id>/', admin_api.admin_view_product, name='admin-view-product'),
-    path('quantri/products/<int:product_id>/update/', admin_api.admin_update_product, name='admin-update-product'),
-    path('quantri/products/<int:product_id>/delete/', admin_api.admin_delete_product, name='admin-delete-product'),
-    path('quantri/categories-brands/', admin_api.admin_list_categories_brands, name='admin-list-categories-brands'),
+    path('api/products/', admin_api.admin_list_products, name='admin-list-products'),
+    path('api/products/create_post/', CreateProductView.as_view(), name='admin-get-product'),
+    path('api/products/create_get/', CreateProductView.as_view(), name='admin-post-product'),
+    path('api/add_category/', admin_api.admin_add_category, name='admin_add_category'),
+    path('api/add_brand/', admin_api.admin_add_brand, name='admin_add_brand'),
+
+    path('api/products/<int:product_id>/', admin_api.admin_product_detail, name='admin-product-detail'),
+    path('api/products/<int:product_id>/update/', admin_api.admin_update_product_and_options,
+         name='admin-update-product'),
+    path('api/products/<int:product_id>/delete/', admin_api.admin_delete_product, name='admin-delete-product'),
+    # path('api/products/<int:product_id>/options/create/', admin_api.admin_create_options, name='admin-create-options'),
+    path('api/products/<int:product_id>/options/', admin_api.admin_view_product_with_options,
+         name='admin-view-product-with-options'),
+    path('api/categories-brands/', admin_api.admin_list_categories_brands, name='admin-list-categories-brands'),
 
     # ----------- API Quản trị đơn hàng ----------
-    path('quantri/orders/', admin_api.admin_list_orders, name='admin-list-orders'),
-    path('quantri/orders/<int:order_id>/', admin_api.admin_view_order, name='admin-view-order'),
-    path('quantri/orders/<int:order_id>/update/', admin_api.admin_update_order_status, name='admin-update-order'),
-    path('quantri/orders/<int:order_id>/delete/', admin_api.admin_delete_order, name='admin-delete-order'),
-    path('quantri/orders/<int:order_id>/info/', admin_api.admin_order_info_basic, name='admin-order-info'),
+    path('api/orders/', admin_api.admin_list_orders, name='admin-list-orders'),
+    path('api/orders/patch/', admin_api.api_admin_update_order_status, name='admin_update_order_status'),
+    path('api/orders/<int:order_id>/', admin_api.admin_view_order, name='admin-view-order'),
+    path('api/orders/<int:order_id>/update/', admin_api.admin_update_order_status, name='admin-update-order'),
+    path('api/orders/<int:order_id>/delete/', admin_api.admin_delete_order, name='admin-delete-order'),
+    path('api/orders/<int:order_id>/info/', admin_api.admin_order_info_basic, name='admin-order-info'),
 
-    # ----------- API Quản trị đơn hàng ----------
-    path('quantri/reviews/', admin_api.admin_list_reviews),
-    path('quantri/reviews/<int:review_id>/', admin_api.admin_view_review),
-    path('quantri/reviews/<int:review_id>/delete/', admin_api.admin_delete_review),
-    path('quantri/reviews/<int:review_id>/reply/', admin_api.admin_reply_review),
+    # ----------- API Quản trị đánh giá ----------
+    path('api/reviews/', admin_api.admin_list_reviews, name='admin-list-reviews'),
+    path('api/reviews/update/', admin_api.api_update_review_reply, name='update_review_reply'),
+    path('api/reviews/<int:review_id>/', admin_api.admin_view_review, name='admin-view-review'),
+    path('api/reviews/<int:review_id>/delete/', admin_api.admin_delete_review, name='admin-delete-review'),
+    path('api/reviews/<int:review_id>/reply/', admin_api.admin_reply_review, name='admin-reply-review'),
 
     # ----------- Giao diện quản trị (HTML) ----------
-    path('quantri/product/', views.admin_product_list, name='quantri-dashboard-products'),
-    path('quantri/products/edit/<int:product_id>/', views.edit_product, name='quantri-edit-product'),
-    path('quantri/products/delete/<int:product_id>/', views.delete_product, name='quantri-delete-product'),
-    path('quantri/product/create/', views.create_product_page, name='quantri-create-product'),
-    path('quantri/products/detail/<int:product_id>/', views.admin_product_detail_page, name='quantri-product-detail'),
+    path('products/', views.admin_product_list, name='admin-dashboard-products'),
+    path('products/create/', views.create_product_page, name='admin-create-product-page'),
+    path('products/<int:product_id>/edit/', views.edit_product, name='admin-edit-product'),
+    path('products/<int:product_id>/delete/', views.confirm_delete_product, name='admin-confirm-delete-product'),
+    path('products/<int:product_id>/', views.admin_product_detail_page, name='admin-product-detail-page'),
 
-    path('quantri/order/', views.manage_order, name='quantri-dashboard-order'),
-    path('quantri/order/<int:order_id>/', views.order_detail_view, name='admin-order-detail'),
+    path('orders/', views.manage_order, name='admin-dashboard-orders'),
+    path('orders/<int:order_id>/', views.order_detail_view, name='admin-order-detail-page'),
 
-    path('quantri/review/', views.admin_review_list_view, name='quantri_review_list'),
+    path('reviews/', views.admin_review_list_view, name='admin-review-list-page')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -68,95 +68,93 @@ function updatePriceItem(index, quantity){
     }
 }
 function attachCartEventHandlers() {
-    const increaseBtns = document.querySelectorAll('.increase-btn');
-    const decreaseBtns = document.querySelectorAll('.decrease-btn');
-    const quantityEls = document.querySelectorAll('.quantity-value');
     const checkboxes = document.querySelectorAll('.cartItem input[type="checkbox"]');
     const deleteSelectedBtn = document.querySelector('.delete-selected');
     const selectAllBtn = document.querySelector('.selectAll');
     const buyBtn = document.querySelector('.buy-btn');
 
-    increaseBtns.forEach((btn, i) => {
-        btn.addEventListener('click', () => {
-            const quantityEl = quantityEls[i];
+    document.querySelectorAll('.increase-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const cartItem = e.target.closest('.cartItem');
+            const index = Number(cartItem.dataset.stockIndex);
+            const quantityEl = cartItem.querySelector('.quantity-value');
             const currentQuantity = parseInt(quantityEl.textContent);
-            const maxStock = getStockData(i).stock;
+            const maxStock = getStockData(index).stock;
+
             if (currentQuantity < maxStock) {
-                setStockDataQuantity(i, currentQuantity + 1)
+                setStockDataQuantity(index, currentQuantity + 1);
                 quantityEl.textContent = currentQuantity + 1;
-                updatePriceItem(i, currentQuantity + 1 )
-                if (checkboxes[i].checked) updateTotalPrice();
+                updatePriceItem(index, currentQuantity + 1);
+                if (cartItem.querySelector('input[type="checkbox"]').checked) updateTotalPrice();
+
                 const product = {
-                    "nameProduct": getStockData(i).nameProduct,
-                    "version": getStockData(i).version,
-                    "color": getStockData(i).color,
-                    "quantity" : currentQuantity + 1
+                    "nameProduct": getStockData(index).nameProduct,
+                    "version": getStockData(index).version,
+                    "color": getStockData(index).color,
+                    "quantity": currentQuantity + 1
                 };
                 fetchApiUpdateQuantityCartItem(product)
-                .then(data => {
-                    console.log(data.detail);
-                })
+                    .then(data => console.log(data.detail));
             }
         });
     });
 
-    decreaseBtns.forEach((btn, i) => {
-        btn.addEventListener('click', () => {
-            const quantityEl = quantityEls[i];
+    document.querySelectorAll('.decrease-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            const cartItem = e.target.closest('.cartItem');
+            const index = Number(cartItem.dataset.stockIndex);
+            const quantityEl = cartItem.querySelector('.quantity-value');
             const currentQuantity = parseInt(quantityEl.textContent);
+
             if (currentQuantity > 1) {
-                setStockDataQuantity(i, currentQuantity - 1)
+                setStockDataQuantity(index, currentQuantity - 1);
                 quantityEl.textContent = currentQuantity - 1;
-                updatePriceItem(i, currentQuantity - 1 )
-                if (checkboxes[i].checked) updateTotalPrice();
+                updatePriceItem(index, currentQuantity - 1);
+                if (cartItem.querySelector('input[type="checkbox"]').checked) updateTotalPrice();
+
                 const product = {
-                    "nameProduct": getStockData(i).nameProduct,
-                    "version": getStockData(i).version,
-                    "color": getStockData(i).color,
-                    "quantity" : currentQuantity - 1
+                    "nameProduct": getStockData(index).nameProduct,
+                    "version": getStockData(index).version,
+                    "color": getStockData(index).color,
+                    "quantity": currentQuantity - 1
                 };
                 fetchApiUpdateQuantityCartItem(product)
-                .then(data => {
-                    console.log(data.detail);
-                })
+                    .then(data => console.log(data.detail));
             }
         });
     });
 
-    checkboxes.forEach((checkbox, i) => {
-        checkbox.addEventListener('change', (e) => {
-            updateTotalPrice();
-        });
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', updateTotalPrice);
     });
 
     selectAllBtn.addEventListener('click', () => {
         const allChecked = [...checkboxes].every(cb => cb.checked);
         checkboxes.forEach(cb => cb.checked = !allChecked);
-        checkboxes.forEach((cb, i) => updateTotalPrice());
+        updateTotalPrice();
     });
 
     deleteSelectedBtn.addEventListener('click', () => {
-        checkboxes.forEach((cb, i) => {
+        checkboxes.forEach((cb) => {
             if (cb.checked) {
-                const deleteBtn = document.querySelectorAll('.delete')[i];
-                deleteBtn.click();
+                const cartItem = cb.closest('.cartItem');
+                const index = Number(cartItem.dataset.stockIndex);
+                deleteItem({ currentTarget: cartItem.querySelector('.delete') }, index);
             }
         });
     });
 
     buyBtn.addEventListener('click', () => {
-        console.log('click mua hàng')
         const orderInfo = getSelectedProduct();
-        if(orderInfo.length > 0){
+        if (orderInfo.length > 0) {
             fetchApiSetOrderProduct(orderInfo)
-                .then(data => {
-                    window.location.href = "/info_order/";
-                })
-        }else{
-            console.log('Không có sản phẩm nào được chọn')
+                .then(() => window.location.href = "/info_order/");
+        } else {
+            console.log('Không có sản phẩm nào được chọn');
         }
-    })
+    });
 }
+
 
 
 function deleteItem(e, index) {
@@ -204,34 +202,49 @@ function loadCartEmpty(){
 function loadCartItem(data) {
     stockData = data.map((item, index) => ({
         index: index,
-        stock: item.option.quantity,
-        price: item.option.price,
-        discount: item.option.discount,
-        nameProduct: item.option.product.name,
-        version: item.option.version,
-        color: item.option.color,
-        slugProduct : item.option.product.slug,
-        slugOption : item.option.slug,
+        stock: item.product.options[0].colors[0].stock,
+        price: item.product.options[0].colors[0].price,
+        discount: item.product.options[0].discount,
+        nameProduct: item.product.name,
+        version: item.product.options[0].version,
+        color: item.product.options[0].colors[0].color,
+        slugProduct : item.product.slug,
+        slugOption : item.product.options[0].slug,
         quantity: item.quantity
     }));
 
-    const cartItemsHTML = data.map((item, index) => {
-        const discount = item.option.discount ?? 0;
-        const finalPrice = (item.option.price - item.option.price * discount) * item.quantity;
+        const cartItemsHTML = data.map((item, index) => {
+        const discount = item.product.options[0].discount ?? 0;
+        const priceBase = item.product.options[0].colors[0].price;
+        const stock = item.product.options[0].colors[0].stock;
+        const quantity = item.quantity;
+        const finalPrice = (priceBase - priceBase * discount) * quantity;
+
         return `
-            <div class="cartItem">
-                <input type="checkbox">
+            <div class="cartItem" data-stock-index="${index}">
+                <input type="checkbox" ${stock === 0 ? 'disabled' : ''}>
                 <div class="product-container">
-                    <img src="${item.option.img[0]}" alt="" />
+                    <img src="${item.product.options[0].colors[0].images[0].img}" alt="" />
                     <div class="product-details">
-                        <p class="product-name">${item.option.product.name} -\n${item.option.version} - ${item.option.color}</p>
+                        <p class="product-name">${item.product.name} - ${item.product.options[0].version} - ${item.product.options[0].colors[0].color}</p>
                         <div class="price-container">
-                            <p class="product-price">${finalPrice.toLocaleString('vi-VN')}đ</p>
-                            ${discount ? `<p class="original-price">${item.option.price.toLocaleString('vi-VN')}đ</p>` : ''}
+                            ${stock === 0 ? '' : discount > 0 ?
+                             `
+                                <p class="product-price">${finalPrice.toLocaleString('vi-VN')}đ</p>
+                                <p class="old-price" style="color:rgba(0, 0, 0, .5)"><strike>${Number(priceBase).toLocaleString('vi-VN')}đ</strike></p>
+                             `
+                             :
+                              `<p class="product-price">${finalPrice.toLocaleString('vi-VN')}đ</p>`}
                             <div class="quantity">
-                                <button class="decrease-btn" data-index="${index}">-</button>
-                                <p class="quantity-value" data-index="${index}">${item.quantity}</p>
-                                <button class="increase-btn" data-index="${index}">+</button>
+                                ${
+                                  stock === 0
+                                  ? `<p class="out-of-stock">Hết hàng</p>`
+                                  : `
+                                    <button class="decrease-btn" data-index="${index}">-</button>
+                                    <p class="quantity-value" data-index="${index}">${quantity}</p>
+                                    <button class="increase-btn" data-index="${index}">+</button>
+                                  `
+                                }
                             </div>
                         </div>
                     </div>
@@ -268,7 +281,7 @@ function loadCartItem(data) {
 }
 fetchApiCart()
     .then(data => {
-        console.log(data);
+        console.log(data.cart);
         if (data.cart.length < 1){
             loadCartEmpty();
         }else{

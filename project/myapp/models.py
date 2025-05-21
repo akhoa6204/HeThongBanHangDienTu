@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-from .utils import ProcessingUploadPath
+from .upload_paths import ProcessingUploadPath
 
 
 class User(AbstractUser):
@@ -66,48 +66,44 @@ class ProductImage(models.Model):
 
 class Option(models.Model):
     slug = models.CharField(max_length=150, null=True, blank=True)
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, help_text="Sản phẩm tương ứng")
-    quantity = models.PositiveIntegerField(default=5);
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, help_text="Sản phẩm tương ứng",
+                                related_name='options')
     version = models.CharField(max_length=150, null=True, blank=True, help_text="Tên phiên bản sản phẩm")
-    color = models.CharField(max_length=150, null=True, blank=True, help_text="Màu sắc sản phẩm")
-    price = models.DecimalField(max_digits=20, decimal_places=2, null=True, blank=True,
-                                help_text="Giá gốc của sản phẩm")
-    details = models.JSONField(null=True, blank=True, help_text="Thông tin chi tiết dạng JSON")
-
     discount = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, default=0,
                                    help_text="Phần trăm giảm giá")
     description = models.TextField(null=True, blank=True, help_text="Mô tả chi tiết phiên bản")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="Ngày tạo bản ghi")
     updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
 
-    def get_details(self):
-        return self.details or {}
 
-    def set_details(self, details_dict):
-        self.details = details_dict
+class OptionDetail(models.Model):
+    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    value = models.CharField(max_length=255)
+
+
+class OptionColor(models.Model):
+    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    color = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    stock = models.IntegerField(default=0)
 
     def final_price(self):
-        if self.price is None:
-            return Decimal('0.00')
-        if self.discount:
-            return self.price * (Decimal('1') - self.discount / Decimal('100'))
-        return self.price
-
-    def __str__(self):
-        return f"{self.product.name} - {self.version or ''} - {self.color or ''} - {self.slug or 'None'}"
+        discount = self.option.discount or 0
+        return self.price * (Decimal('1.0') - discount)
 
 
 class OptionImage(models.Model):
-    option = models.ForeignKey(Option, on_delete=models.CASCADE, related_name='images')
+    option_color = models.ForeignKey(OptionColor, on_delete=models.CASCADE)
     img = models.ImageField(upload_to=ProcessingUploadPath.option_image_upload_path, null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Image for {self.option} - {self.img.url if self.img else 'No image'}"
+        return f"Image for {self.option_color} - {self.img.url if self.img else 'No image'}"
 
 
 class Cart(models.Model):
-    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    option_color = models.ForeignKey(OptionColor, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -115,7 +111,7 @@ class Cart(models.Model):
 
 
 class Review(models.Model):
-    option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
+    option_color = models.ForeignKey(OptionColor, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     content = models.TextField()
     quality = models.TextField(null=True, blank=True)
@@ -146,6 +142,7 @@ class Order(models.Model):
         ('cancelled', 'Đã hủy'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    need_invoice = models.BooleanField(default=False, help_text="Có cần in hóa đơn không")
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     address = models.TextField(null=True, blank=True)
@@ -164,11 +161,11 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
-    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+    option_color = models.ForeignKey(OptionColor, on_delete=models.CASCADE, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=1)
 
     def total_price(self):
-        return self.option.final_price() * self.quantity
+        return self.option_color.final_price() * self.quantity
 
 
 class ReviewImage(models.Model):

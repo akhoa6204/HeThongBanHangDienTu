@@ -9,7 +9,7 @@
 
             .discount {
                 background-color: red;
-                padding: 5px 12px 8px;
+                padding: 2px 4px;
                 border-top-right-radius: 16px;
                 border-top-left-radius: 8px;
                 border-bottom-right-radius: 16px;
@@ -53,7 +53,6 @@
         }
 
         .price {
-            margin-left: 16px;
             display: flex;
             gap: 10px;
             margin-top: 12px;

@@ -18,13 +18,14 @@ function getAddressUser(){
 
 function loadData(data){
     if (data.length < 1) return;
-    for(const option of data){
-        if (option.error) return;
-        const srcImg = option.img ? option.img[0] : option.product.img[0];
-        const name = option.product.name + ' - ' + option.version + " - " + option.color;
-        const quantity = option.quantity;
+    for(const item of data){
+        if (item.error) return;
+        const srcImg = item.product.options[0].colors[0].images[0].img ? item.product.options[0].colors[0].images[0].img : item.product.images[0].img;
+;
+        const name = item.product.name + ' - ' + item.product.options[0].version + " - " + item.product.options[0].colors[0].color;
+        const quantity = item.quantity;
         totalQuantity += Number(quantity);
-        const price = option.discount ? (option.price - option.price * option.discount) * quantity : option.price * quantity;
+            const price = item.product.options[0].discount ? (Number(item.product.options[0].colors[0].price) - Number(item.product.options[0].colors[0].price) * Number(item.product.options[0].discount)) * quantity : item.product.options[0].colors[0].price * quantity;
         const html = `
             <div class="product">
                   <img src = "${srcImg}" alt = ""/>
@@ -32,7 +33,7 @@ function loadData(data){
                     <h3>${name}</h3>
                     <div>
                         <span class="price">${(price).toLocaleString('vi-VN')}đ</span>
-                        ${option.discount ? `<span class="old-price">${(option.price * quantity).toLocaleString('vi-VN')}đ</span>` : ''}
+                        ${item.product.options[0].discount ? `<span class="old-price">${(item.product.options[0].colors[0].price * quantity).toLocaleString('vi-VN')}đ</span>` : ''}
                     </div>
                     <div>Số lượng: ${quantity}</div>
                   </div>
@@ -108,6 +109,7 @@ function loadAddress(addressUser){
 fetchApiOrder()
     .then(data => {
         if(data){
+            console.log(data);
             if (data.options.length > 0 && data.options[0].error){
                 window.location.href= '/';
                 return;

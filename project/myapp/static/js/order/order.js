@@ -61,7 +61,7 @@ function updateHeader(tag) {
         }
     });
 }
-function attachEventListeners(data)     {
+function attachEventListeners(data){
     const productsPerPage = 5;
     const startIndex = (currentPage - 1) * productsPerPage;
     const endIndex = currentPage * productsPerPage - 1;
@@ -89,10 +89,11 @@ function attachEventListeners(data)     {
                     const productList = [];
                     const orderItem = data[index].orderItem;
                     orderItem.forEach((item, index) => {
+                        console.log(item);
                         productList.push({
-                            slugProduct: item.option.product.slug,
-                            slugOption: item.option.slug,
-                            color: item.option.color,
+                            slugProduct: item.product.slug,
+                            slugOption: item.product.options[0].slug,
+                            color: item.product.options[0].colors[0].color,
                             quantity: item.quantity,
                         });
                     });
@@ -121,6 +122,7 @@ function loadOrderData(data){
     let html ='';
     if (data.length > 0){
         html = data.map((item, index) => {
+            console.log(item.status);
             let status = '';
             if (item.status === 'pending'){
                 status = 'Chờ xác nhận';
@@ -143,18 +145,18 @@ function loadOrderData(data){
                     </div>
                     <div class='productContainer'>
                         ${item.orderItem.map((orderItem, index)=>{
-                            const oldPrice = (orderItem.option.price * orderItem.quantity).toLocaleString('vn-VN');
-                            const price = ((orderItem.option.price - (orderItem.option.price * orderItem.option.discount)) * orderItem.quantity).toLocaleString('vn-VN');
+                            const oldPrice = (orderItem.product.options[0].colors[0].price * orderItem.quantity).toLocaleString('vn-VN');
+                            const price = ((orderItem.product.options[0].colors[0].price - (orderItem.product.options[0].colors[0].price * orderItem.product.options[0].discount)) * orderItem.quantity).toLocaleString('vn-VN');
                             return `
                                 <div class="productBox">
-                                    <img src="${orderItem.option.img[0]}"
+                                    <img src="${orderItem.product.options[0].colors[0].images[0].img}"
                                          alt="img product">
                                     <div class="product">
-                                        <span>${orderItem.option.product.name} - ${orderItem.option.version} - ${orderItem.option.color}</span>
+                                        <span>${orderItem.product.name} - ${orderItem.product.options[0].version} - ${orderItem.product.options[0].colors[0].color}</span>
                                         <span>x${orderItem.quantity}</span>
                                     </div>
                                     <div class="priceBox">
-                                        ${orderItem.option.discount > 0 ? `<span class="oldPrice">${oldPrice}₫</span>` : ''}
+                                        ${ orderItem.product.options[0].discount > 0 ? `<span class="oldPrice">${oldPrice}₫</span>` : ''}
                                         <span class="price">${price}₫</span>
                                     </div>
                                 </div>

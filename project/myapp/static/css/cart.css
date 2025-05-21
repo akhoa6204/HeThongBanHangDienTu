@@ -141,7 +141,7 @@ main > *{
     display: flex;
     justify-content: space-between;
     width: 360px;
-    position: fixed;
+    position: sticky;
     left: 50%;
     transform: translateX(-50%);
     bottom: 0;
@@ -190,4 +190,8 @@ main > *{
             color: white;
         }
     }
+}
+.quantity   .out-of-stock{
+    border: none;
+    width: fit-content;
 }

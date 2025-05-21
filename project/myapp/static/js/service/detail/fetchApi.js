@@ -1,25 +1,32 @@
 import {getCookie} from '../utils/utils.js'
-async function fetchApiProduct(slug) {
+function fetchApiProduct(slug) {
     if (!slug || !slug.category || !slug.product || !slug.option) {
         console.log("Invalid slug data");
         return;
     }
-
     const url = `/api/product/${slug.category}/${slug.product}/${slug.option}/`;
 
-    try {
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        return await response.json();
-    } catch (error) {
-        console.log('Lỗi khi lấy dữ liệu:', error);
-        throw error;
-    }
+    return cookieStore.get('csrftoken')
+        .then(cookie => {
+            return fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': cookie.value,
+                },
+                credentials: 'include'
+            });
+        })
+        .then(async response => {
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error("Có lỗi xảy ra");
+            }
+            return data;
+        });
 }
+
+
 async function fetchApiReviews(slug, page, star){
     const url = page ? `/api/reviews/${slug}/${star}/${page}/`:`/api/reviews/${slug}/${star}/1/`
     try{
@@ -48,13 +55,16 @@ function fetchApiAddProductCart(product){
                 'X-CSRFToken': cookie.value,
             },
             credentials: 'include',
-            body: JSON.stringify(product)
+            body: JSON.stringify({product})
         })
     })
-    .then(response => response.json())
-    .catch(error => {
-        console.error("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ:", error);
-    });
+    .then(async response => {
+        const data = await response.json();
+        if(!response.ok){
+            throw new Error(data.detail || 'Có lỗi xảy ra');
+        }
+        return data;
+    })
 }
 function fetchApiSetOrderProduct(orderInfo){
     const url = '/api/setOrderProduct/';
@@ -72,5 +82,5 @@ function fetchApiSetOrderProduct(orderInfo){
     })
     .then(response =>response.json())
 }
-    export { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct };
+export { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct };
 

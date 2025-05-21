@@ -4,6 +4,7 @@ const path = window.location.pathname;
 const orderId = path.split('/')[2];
 const backAll = document.querySelectorAll('.back');
 const submit = document.querySelector('.success');
+const uploadedFiles = new Map();
 function loadProduct(data){
     let html = '';
     data.forEach((review, index) => {
@@ -13,10 +14,10 @@ function loadProduct(data){
                     <div class="product">
                         <div class="info">
                             <img
-                                src ="${review.option.img[0]}"
+                                src ="${review.product.options[0].colors[0].images[0].img}"
                                 alt="img product"
                             />
-                            <p>${review.option.product.name} - ${review.option.version} - ${review.option.color}</p>
+                            <p>${review.product.name} - ${review.product.options[0].version} - ${review.product.options[0].colors[0].color}</p>
                         </div>
                     </div>
                     <div class="review">
@@ -65,7 +66,7 @@ function loadProduct(data){
         `
     })
     reviewBox.innerHTML = html;
-     const reviewAll = document.querySelectorAll('.review');
+    const reviewAll = document.querySelectorAll('.review');
     reviewAll.forEach((review) => {
         const stars = Array.from(review.querySelectorAll('.star'));
         stars.forEach((star, index) => {
@@ -108,14 +109,25 @@ function setUpClick() {
             formData.append(`reviews[${index}][content]`, content);
 
             const fileInput = item.querySelector(`input[type="file"]`);
-            const files = Array.from(fileInput.files)
-                .filter(file => file.type.startsWith('image/'))
-                .slice(0, 5);
+            const inputId = fileInput.id;
+            const files = uploadedFiles.get(inputId) || [];
 
-            files.forEach((file, i) => {
-                formData.append(`reviews[${index}][mediaFiles]`, file);
-            });
+            files
+              .filter(file => file.type.startsWith('image/'))
+              .slice(0, 5)
+              .forEach((file, i) => {
+                  formData.append(`reviews[${index}][mediaFiles]`, file);
+              });
         });
+        // Debug: In toàn bộ FormData ra console
+        for (let pair of formData.entries()) {
+            // Nếu là file thì log thêm tên
+            if (pair[1] instanceof File) {
+                console.log(`${pair[0]}:`, pair[1].name);
+            } else {
+                console.log(`${pair[0]}:`, pair[1]);
+            }
+        }
 
         fetchAddNewReview(orderId, formData)
             .then(data => {
@@ -129,51 +141,55 @@ function setUpClick() {
 }
 function setUpUploadImage() {
     const fileInputs = document.querySelectorAll('input[type="file"]');
+
     fileInputs.forEach((fileInput) => {
+        const inputId = fileInput.id;
+        uploadedFiles.set(inputId, []);
+
         const mediaPreviewContainer = fileInput.closest('.formReview').querySelector('.mediaPreviewContainer');
 
         fileInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files)
-                .filter(file => file.type.startsWith('image/'))
-                .slice(0, 5);
-            if (!files.length) return;
-            files.forEach(file => {
+            const files = Array.from(e.target.files).slice(0, 5);
+            let currentFiles = uploadedFiles.get(inputId) || [];
+
+            for (const file of files) {
+                if (currentFiles.length >= 5) break;
+
                 const reader = new FileReader();
-
                 reader.onload = function(event) {
-                    if (mediaPreviewContainer.children.length >= 5) {
-                        return;
-                    }
-
                     const previewDiv = document.createElement('div');
                     previewDiv.classList.add('preview-image');
-
                     previewDiv.innerHTML = `
                         <img src="${event.target.result}" alt="preview image" />
                         <span class="material-symbols-outlined close-btn">close</span>
                     `;
-
                     mediaPreviewContainer.appendChild(previewDiv);
 
                     const closeBtn = previewDiv.querySelector('.close-btn');
                     closeBtn.addEventListener('click', () => {
                         previewDiv.remove();
+                        currentFiles = currentFiles.filter(f => f !== file);
+                        uploadedFiles.set(inputId, currentFiles);
                     });
                 };
-
                 reader.readAsDataURL(file);
-            });
+                currentFiles.push(file);
+            }
+
+            uploadedFiles.set(inputId, currentFiles);
+            fileInput.value = '';
         });
     });
 }
+
 fetchApiOrderItem(orderId)
 .then(data => {
     if (data){
-        console.log(data);
         loadProduct(data);
         setUpUploadImage();
         setUpClick();
-    }else{
+    }
+    else{
         window.location.href ='/';
     }
 })

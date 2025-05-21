@@ -20,6 +20,9 @@
     > i.error{
         background-color:red;
     }
+    > i.warning{
+        background-color:yellow;
+    }
     > p{
         font-size:25px;
         text-align: center;
@@ -32,5 +35,53 @@
         border: none;
         outline: none;
         font-size: 20px;
+    }
+}
+
+.popUp-container.add-category-brand{
+    text-align: left;
+    max-width: 480px;
+    max-height: 480px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    padding: 0;
+    .header{
+        padding: 12px 24px;
+        border-bottom: 1px solid #ccc;
+        margin: 0;
+    }
+    .content{
+        padding: 16px 32px;
+        .input-group{
+            margin-bottom: 10px;
+            label{
+                font-weight: bold;
+            }
+            input{
+                    background-color:rgba(240, 237, 237, 1);
+                    border: none;
+                    outline: none;
+                    width: 100%;
+                    padding: 6px 12px;
+                    border-radius: 10px;
+                }
+        }
+        ul{
+            line-height: 1.5;
+            padding-left: 24px;
+            margin-bottom: 10px;
+        }
+        button{
+            padding: 6px 12px;
+            border: none;
+            outline: none;
+            border-radius: 5px;
+            background-color: red;
+            color: white;
+        }
+        .submit{
+            background-color: #aef6be;
+            color: black;
+        }
     }
 }

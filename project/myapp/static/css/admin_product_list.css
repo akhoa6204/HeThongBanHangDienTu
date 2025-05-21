@@ -75,20 +75,24 @@
             height: 50px;
         }
         tr td:last-child{
-            span:first-child{
+            a:not(:last-child){
                 margin-right: 10px;
             }
-            span{
+            a{
                 padding: 6px 12px;
                 color: white;
                 border-radius : 5px;
+                text-decoration: none;
+                color: white;
             }
-            span.edit{
+            a.btn-edit{
                 background-color: rgba(255, 237, 37, 0.92);
-
             }
-            span.remove{
+            a.btn-delete{
                 background-color:rgba(215, 0, 24, 0.8);
+            }
+            a.detail{
+                background-color:#003366;
             }
 
         }

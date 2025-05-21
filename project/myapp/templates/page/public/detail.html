@@ -94,9 +94,17 @@
         </div>
     </section>
 </main>
-<div class="popup-model cart">
-    {% include 'components/components/popupSuccess.html' with status="" title="Sản phẩm đã được thêm vào giỏ" %}
+<div class="popup-model success">
+    {% with title="Sản phẩm đã thêm vào giỏ hàng" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
 </div>
+<div class="popup-model warning">
+    {% with title="Sản phẩm đã tồn tại trong giỏ hàng" status='warning' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+
 {% endblock %}
 {% block extra_js %}
 <script src="{% static 'js/detail/detail.js' %}" type="module"></script>

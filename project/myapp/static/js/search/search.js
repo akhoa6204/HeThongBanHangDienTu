@@ -51,8 +51,8 @@ function processingUrl(currentPage, currentSort){
     return url;
 }
 
-console.log(processingUrl(currentPage, currentSort));
 function loadProducts(options){
+    console.log(options);
     let productContainer = document.querySelector('.productContainer');
     if(!productContainer){
         const productContainerHtml = `<section class="productContainer"></section>`;
@@ -61,30 +61,30 @@ function loadProducts(options){
     }
     const html = `
         ${options.map(option => {
-            const discountPrice = option.discount
-                ? option.price - option.price * option.discount / 100
-                : option.price;
+            const discountPrice = option.product.options[0].discount > 0
+                ? option.product.options[0].colors[0].price - option.product.options[0].colors[0].price * option.product.options[0].discount
+                : option.product.options[0].colors[0].price;
             return `
                 <div class="product-item">
                     <div class="header">
-                        ${option.discount > 0 ? `<div class="discount">Giảm ${option.discount}%</div>` : ''}
+                        ${option.product.options[0].discount > 0 ? `<div class="discount">Giảm ${option.product.options[0].discount * 100}%</div>` : ''}
                     </div>
                     <div class="product-image">
-                        <a href="/detail/${option.product.category.slug}/${option.product.slug}/${option.slug}/">
-                            <img src="${option.img ? option.img[0] : option.product.img[0]}">
+                        <a href="/detail/${option.product.category.slug}/${option.product.slug}/${option.product.options[0].slug}/">
+                            <img src="${option.product.options[0].colors[0].images[0].img ? option.product.options[0].colors[0].images[0].img : option.product.images[0].img}">
                         </a>
                     </div>
                     <div class="name-product">
-                        <a href="/detail/${option.product.category.slug}/${option.product.slug}/${option.slug}/">
-                            <p>${option.product.name} - ${option.version} - ${option.color}</p>
+                        <a href="/detail/${option.product.category.slug}/${option.product.slug}/${option.product.options[0].slug}/">
+                            <p>${option.product.name} - ${option.product.options[0].version} - ${option.product.options[0].colors[0].color}</p>
                         </a>
                     </div>
                     <div class="price">
                         <span style="color: red; font-weight: 600;">
                             ${Number(discountPrice).toLocaleString('vi-VN')}đ
                         </span>
-                        ${option.discount ? `<span style="color: gray; text-decoration: line-through;">
-                            ${Number(option.price).toLocaleString('vi-VN')}đ
+                        ${option.product.options[0].discount > 0 ? `<span style="color: gray; text-decoration: line-through;">
+                            ${Number(option.product.options[0].colors[0].price).toLocaleString('vi-VN')}đ
                         </span>` : ''}
                     </div>
                 </div>

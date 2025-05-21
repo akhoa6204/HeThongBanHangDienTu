@@ -4,7 +4,7 @@ from datetime import datetime
 from django.contrib.auth import update_session_auth_hash, authenticate, login as auth_login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.models import Group
-from django.db.models import Avg, Exists, OuterRef, Count, Q
+from django.db.models import Avg, Exists, OuterRef, Count, Q, ExpressionWrapper, F, FloatField
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -13,12 +13,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Option, Category, Brand, ReviewReply, Cart, User
+from .models import Option, Category, ReviewReply, Cart, User, ReviewImage, OptionColor
 from .models import Order, Review
 from .models import OrderItem
 from .models import Product
-from .serializers import ProductSerializer, OptionSerializer, CategorySerializer, BrandSerializer, AllOptionSerializer, \
-    OptionForCategory, OptionForProductSerializer, CartSerializer, OrderSerializer, OrderItemSerializer
+from .serializers import ProductSerializer, CartSerializer, \
+    OrderSerializer, OrderItemSerializer, CategoryWithOptionsSerializer, OptionSearchSerializer
 from .serializers import ReviewSerializer
 from .utils import send_order_confirmation_email, is_admin, is_customer, OtpService, get_filtered_products
 
@@ -27,100 +27,64 @@ from .utils import send_order_confirmation_email, is_admin, is_customer, OtpServ
 class homeApiView(APIView):
     def get(self, request):
         categories = Category.objects.all()
-        category_serialized = OptionForCategory(categories, many=True)
-
+        category_serialized = CategoryWithOptionsSerializer(categories, many=True)
         return Response(category_serialized.data)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def apiProductDetail(request, slugCategory, slugProduct, slugOption):
-    try:
-        product = Product.objects.get(slug=slugProduct)
-        category = Category.objects.get(slug=slugCategory)
-        brand = Brand.objects.get(id=product.brand_id)
-    except (Product.DoesNotExist, Category.DoesNotExist, Brand.DoesNotExist):
-        return Response({"error": "Product, Category, or Brand not found"}, status=404)
-
-    all_options = Option.objects.filter(product_id=product.id)
-    current_options = Option.objects.filter(product_id=product.id, slug=slugOption)
-
-    product_serialized = ProductSerializer(product)
-    all_options_serialized = AllOptionSerializer(all_options, many=True)
-    current_options_serialized = OptionSerializer(current_options, many=True)
-    category_serialized = CategorySerializer(category)
-    brand_serialized = BrandSerializer(brand)
-
-    current_options_data = current_options_serialized.data
-    for option in current_options_data:
-        imgList = [img.strip(';').strip() for img in option['img'].split(',')]
-        option['img'] = imgList
-
-    all_options_data = all_options_serialized.data
-    seen_slugs = set()
-    filtered_options = []
-    for item in all_options_data:
-        if item['slug'] not in seen_slugs:
-            seen_slugs.add(item['slug'])
-            filtered_options.append(item)
+    product = Product.objects.get(slug=slugProduct, category__slug=slugCategory)
+    product_serialized = ProductSerializer(product, context={'request': request})
 
     return Response({
-        "category": category_serialized.data,
-        'brand': brand_serialized.data,
         "product": product_serialized.data,
-        "current_options": current_options_data,
-        "all_options": filtered_options,
     })
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def apiReviews(request, slugProduct, star, numberPage):
-    product = Product.objects.get(slug=slugProduct)
-    reviews = None
+    try:
+        product = Product.objects.get(slug=slugProduct)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found"}, status=404)
 
+    base_qs = Review.objects.filter(option_color__option__product=product)
+
+    # Áp dụng filter theo star
     if 0 < star < 6:
-        reviews = Review.objects.filter(option__product=product, star_count=star).select_related('user', 'option')
-    elif star == 0:
-        reviews = Review.objects.filter(option__product=product).select_related('user', 'option')
+        base_qs = base_qs.filter(star_count=star)
     elif star == 6:
-        reviews = Review.objects.filter(
-            option__product=product
-        ).annotate(
-            media_count=Count('media_files')
-        ).filter(
-            media_count__gt=0
-        ).select_related('user', 'option')
+        base_qs = base_qs.annotate(media_count=Count('media_files')).filter(media_count__gt=0)
     elif star == 7:
-        reviews = Review.objects.annotate(
-            has_reply=Exists(
-                ReviewReply.objects.filter(review=OuterRef('pk'))
-            )
-        ).filter(option__product=product, has_reply=True).select_related('user', 'option')
+        base_qs = base_qs.annotate(has_reply=Exists(
+            ReviewReply.objects.filter(review=OuterRef('pk'))
+        )).filter(has_reply=True)
+
+    reviews = base_qs.select_related('user', 'option_color').prefetch_related('media_files', 'reviewreply')
 
     avg = reviews.aggregate(average=Avg('star_count'))['average'] or 0
     avg = round(avg, 1)
 
+    # Phân trang
     reviews_per_page = 5
     page_number = int(numberPage) if numberPage else 1
-
     start_index = (page_number - 1) * reviews_per_page
     end_index = start_index + reviews_per_page
     paginated_reviews = reviews[start_index:end_index]
-
-    reviews_serialized = ReviewSerializer(paginated_reviews, many=True)
-    for review in reviews_serialized.data:
-        if review.get('img'):
-            imgList = [img.strip(';').strip() for img in review['img'].split(',')]
-        else:
-            imgList = None
-        review['img'] = imgList
+    for review in paginated_reviews:
+        print(f"Review {review.id} has media_files:", list(review.media_files.all()))
+        for media in review.media_files.all():
+            print(media.img.url)
+    # Serialize
+    serializer = ReviewSerializer(paginated_reviews, many=True, context={'request': request})
 
     total_reviews = reviews.count()
-    total_pages = (total_reviews + reviews_per_page - 1) // reviews_per_page  # ceil logic
+    total_pages = (total_reviews + reviews_per_page - 1) // reviews_per_page
 
     return Response({
-        "reviews": reviews_serialized.data,
+        "reviews": serializer.data,
         "page": page_number,
         "total_pages": total_pages,
         "avg": avg,
@@ -148,32 +112,29 @@ def apiOrder(request):
         slugOption = item.get('slugOption')
         color = item.get('color')
         quantity = item.get('quantity')
+
+        product = Product.objects.get(slug=slugProduct)
+        options = Option.objects.filter(
+            product=product,
+            slug=slugOption,
+            # color=color,
+            # quantity__gt=0
+        )
+
+        if not options.exists():
+            results.append({'error': f"No available option for product {slugProduct} with color {color}"})
+            continue
+        option = options.first()
+
+        option_color = OptionColor.objects.get(option=option, color=color)
         try:
-            product = Product.objects.get(slug=slugProduct)
-            options = Option.objects.filter(
-                product=product,
-                slug=slugOption,
-                color=color,
-                quantity__gt=0
-            )
-            if not options.exists():
-                results.append({'error': f"No available option for product {slugProduct} with color {color}"})
-                continue
-            option = options.first()
-            option_serializer = OptionSerializer(option)
-            data = option_serializer.data
+            cart_item = Cart.objects.get(user=user, option_color=option_color)
+        except Cart.DoesNotExist:
+            cart_item = Cart(user=user, option_color=option_color, quantity=quantity)
 
-            if data.get('img'):
-                data['img'] = [img.strip(';').strip() for img in data['img'].split(',')]
+        cart_item_serializer = CartSerializer(cart_item, context={'request': request})
+        results.append(cart_item_serializer.data)
 
-            if data.get('product') and data['product'].get('img'):
-                data['product']['img'] = [img.strip(';').strip() for img in data['product']['img'].split(',')]
-
-            data['quantity'] = quantity
-
-            results.append(data)
-        except Exception as e:
-            results.append({'error': str(e), 'slugProduct': slugProduct})
     if len(results) == 1 and results[0].get('error'):
         request.session.pop('orderInfo', None)
     return Response({
@@ -185,17 +146,17 @@ def apiOrder(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def api_add_product_cart(request):
-    product_data = request.data
+    product_data = request.data.get('product')
     user = request.user
     product = Product.objects.get(slug=product_data.get('slugProduct'))
-    option = Option.objects.get(product_id=product.id, slug=product_data.get('slugOption'),
-                                color=product_data.get('color'))
+    option = Option.objects.get(product_id=product.id, slug=product_data.get('slugOption'))
+    option_color = OptionColor.objects.get(option=option, color=product_data.get('color'))
 
-    if Cart.objects.filter(option=option, user=user).exists():
+    if Cart.objects.filter(option_color=option_color, user=user).exists():
         return Response({"detail": "Sản phẩm đã tồn tại trong giỏ hàng."}, status=status.HTTP_400_BAD_REQUEST)
 
     quantity = product_data.get('quantity', 1)
-    cart = Cart.objects.create(option=option, user=user, quantity=quantity)
+    cart = Cart.objects.create(option_color=option_color, user=user, quantity=quantity)
     return Response({"detail": "Sản phẩm đã được thêm vào giỏ hàng."}, status=status.HTTP_201_CREATED)
 
 
@@ -203,22 +164,16 @@ def api_add_product_cart(request):
 @permission_classes([IsAuthenticated])
 def api_cart(request):
     user = request.user
-    cart = Cart.objects.filter(user=user)
-    cart_serializer = CartSerializer(cart, many=True)
-    for item in cart_serializer.data:
-        if item['quantity'] > item['option']['quantity']:
-            if item['option']['quantity'] == 0:
-                Cart.objects.filter(user=user, id=item['id']).delete()
-                cart = Cart.objects.filter(user=user)
-                cart_serializer = CartSerializer(cart, many=True)
-            else:
-                item['quantity'] = item['option']['quantity']
-                cart_item = Cart.objects.get(user=user, id=item['id'])
-                cart_item.quantity = item['quantity']
+    cart_items = Cart.objects.filter(user=user).select_related('option_color__option')
+
+    for cart_item in cart_items:
+        stock = cart_item.option_color.stock
+        if cart_item.quantity > stock:
+            if stock != 0:
+                cart_item.quantity = stock
                 cart_item.save()
 
-    for item in cart_serializer.data:
-        item['option']['img'] = [img.strip(';') for img in item['option']['img'].split(',')]
+    cart_serializer = CartSerializer(cart_items, many=True, context={'request': request})
 
     return Response({
         'cart': cart_serializer.data,
@@ -231,8 +186,9 @@ def api_cart_remove_item(request):
     user = request.user
     for item in request.data:
         product = Product.objects.get(name=item['nameProduct'])
-        option = Option.objects.get(product=product, version=item['version'], color=item['color'])
-        cart = Cart.objects.get(user=user, option=option)
+        option = Option.objects.get(product=product, version=item['version'])
+        option_color = OptionColor.objects.get(option=option, color=item['color'])
+        cart = Cart.objects.get(user=user, option_color=option_color)
         cart.delete()
     return Response({"detail": 'Xóa sản phẩm thành công'}, status=status.HTTP_200_OK)
 
@@ -243,8 +199,9 @@ def api_cart_update_quantity_item(request):
     user = request.user
     item = request.data
     product = Product.objects.get(name=item['nameProduct'])
-    option = Option.objects.get(product=product, version=item['version'], color=item['color'])
-    cart = Cart.objects.get(user=user, option=option)
+    option = Option.objects.get(product=product, version=item['version'])
+    option_color = OptionColor.objects.get(option=option, color=item['color'])
+    cart = Cart.objects.get(user=user, option_color=option_color)
     cart.quantity = item['quantity']
     cart.save()
     return Response({"detail": 'Cập nhật sản phẩm thành công'}, status=status.HTTP_200_OK)
@@ -295,30 +252,34 @@ def api_successOrder(request):
     order = Order.objects.create(
         user=user,
         status='pending',
-        address=f"{userInfo.get('address_detail')}, {userInfo.get('ward')}, {userInfo.get('district')}, {userInfo.get('city')}"
+        address=f"{userInfo.get('address_detail')}, {userInfo.get('ward')}, {userInfo.get('district')}, {userInfo.get('city')}",
+        need_invoice=userInfo.get('acceptBill')
     )
 
     order_details = []
 
     for item in orderItemList:
         product = Product.objects.get(slug=item['slugProduct'])
-        option = Option.objects.get(product=product, slug=item['slugOption'], color=item['color'])
+        option = Option.objects.get(product=product, slug=item['slugOption'])
+        option_color = OptionColor.objects.get(option=option, color=item['color'])
 
-        if option.quantity < int(item['quantity']):
-            print(f"Sản phẩm {product.name} ({option.version} - {option.color} - {option.quantity}) không đủ hàng.")
-            return Response({"detail": f"Sản phẩm {product.name} ({option.version} - {option.color}) không đủ hàng."},
-                            status=400)
+        if option_color.stock < int(item['quantity']):
+            print(
+                f"Sản phẩm {product.name} ({option.version} - {option_color.color} - {option_color.stock}) không đủ hàng.")
+            return Response(
+                {"detail": f"Sản phẩm {product.name} ({option.version} - {option_color.color}) không đủ hàng."},
+                status=400)
 
-        OrderItem.objects.create(order=order, option=option, quantity=item['quantity'])
-        option.quantity -= int(item['quantity'])
+        OrderItem.objects.create(order=order, option_color=option_color, quantity=item['quantity'])
+        option_color.stock -= int(item['quantity'])
         product.purchased_count += int(item['quantity'])
         product.save()
         option.save()
-        order_details.append(f"{product.name} ({option.version}, {option.color}) x {item['quantity']}")
+        order_details.append(f"{product.name} ({option.version}, {option_color.color}) x {item['quantity']}")
 
     for item in order.order_items.all():
-        print(item.option.price, item.option.discount, item.total_price())
-    # Tính tổng tiền
+        print(item.option_color.price, item.option_color.option.discount, item.total_price())
+
     order.calculate_total_price()
     total_price = order.total_price
 
@@ -358,12 +319,7 @@ def api_purchase(request, status, page=1):
 
     paginated_orders = order[start_index:end_index]
 
-    order_serializer = OrderSerializer(paginated_orders, many=True)
-
-    for item in order_serializer.data:
-        for orderItem in item['orderItem']:
-            imgList = [img.strip() for img in orderItem['option']['img'].split(',')]
-            orderItem['option']['img'] = imgList
+    order_serializer = OrderSerializer(paginated_orders, many=True, context={'request': request})
 
     return Response({
         'order': order_serializer.data,
@@ -380,10 +336,8 @@ def api_review(request, idOrder):
     if order.status != 'shipped':
         return Response(status=status.HTTP_400_BAD_REQUEST)
     orderItems = OrderItem.objects.filter(order=order)
-    orderItem_serializer = OrderItemSerializer(orderItems, many=True)
-    for item in orderItem_serializer.data:
-        imgList = [img.strip(';').strip() for img in item['option']['img'].split(',')]
-        item['option']['img'] = imgList
+    orderItem_serializer = OrderItemSerializer(orderItems, many=True, context={"request": request})
+
     return Response(orderItem_serializer.data, status=status.HTTP_200_OK)
 
 
@@ -404,8 +358,7 @@ def api_add_new_review(request, idOrder):
         if f"reviews[{i}][starCount]" not in data:
             continue
         order_item = order_items[i]
-        option = order_item.option
-        product = Product.objects.get(id=option.product_id)
+        option_color = order_item.option_color
         star_count = int(data.get(f"reviews[{i}][starCount]", 5))
         quality = data.get(f"reviews[{i}][quality]", "")
         description = data.get(f"reviews[{i}][description]", "")
@@ -414,7 +367,7 @@ def api_add_new_review(request, idOrder):
 
         review = Review.objects.create(
             user=user,
-            option=option,
+            option_color=option_color,
             star_count=star_count,
             quality=quality,
             summary=description,
@@ -424,12 +377,9 @@ def api_add_new_review(request, idOrder):
 
         media_files = request.FILES.getlist(f"reviews[{i}][mediaFiles]")
         for media_file in media_files:
-            if not media_file.content_type.startswith('image'):
-                continue
-            MediaFile.objects.create(
+            ReviewImage.objects.create(
                 review=review,
-                media_type='image',
-                media=media_file
+                img=media_file
             )
 
     order.has_review = True
@@ -444,11 +394,7 @@ def api_orderStatus(request, idOrder):
     order = Order.objects.get(id=idOrder)
     if nowUser != order.user:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-    order_serializer = OrderSerializer(order)
-    order_data = order_serializer.data
-    for item in order_data['orderItem']:
-        imgList = [img.strip() for img in item['option']['img'].split(',')]
-        item['option']['img'] = imgList
+    order_serializer = OrderSerializer(order, context={'request': request})
     return Response({
         'order': order_serializer.data
     }, status=status.HTTP_200_OK)
@@ -532,24 +478,28 @@ class searchApiView(APIView):
 
         options = Option.objects.filter(product__in=products).select_related('product')
 
+        options = options.annotate(
+            price_after_discount=ExpressionWrapper(
+                F('optioncolor__price') * (1 - F('discount')),
+                output_field=FloatField()
+            )
+        )
         if min_price:
             try:
-                min_price = int(min_price)
-                options = options.filter(price__gte=min_price)
+                min_price = float(min_price)
+                options = options.filter(price_after_discount__gte=min_price)
             except ValueError:
                 return Response({"error": "Invalid min_price value"}, status=400)
-
         if max_price:
             try:
-                max_price = int(max_price)
-                options = options.filter(price__lte=max_price)
+                max_price = float(max_price)
+                options = options.filter(price_after_discount__lte=max_price)
             except ValueError:
                 return Response({"error": "Invalid max_price value"}, status=400)
-
         if sort_query == 'increase':
-            options = options.order_by('price')
+            options = options.order_by('price_after_discount')
         elif sort_query == 'decrease':
-            options = options.order_by('-price')
+            options = options.order_by('-price_after_discount')
 
         seen = set()
         unique_options = []
@@ -559,11 +509,7 @@ class searchApiView(APIView):
                 seen.add(key)
                 unique_options.append(option)
 
-        options_serialized = OptionForProductSerializer(unique_options, many=True).data
-        for option in options_serialized:
-            option['img'] = [img.strip() for img in option.get('img', '').split(',') if img.strip()]
-            if option.get('product') and option['product'].get('img'):
-                option['product']['img'] = [img.strip() for img in option['product']['img'].split(',') if img.strip()]
+        options_serialized = OptionSearchSerializer(unique_options, many=True, context={"request": request}).data
 
         per_page = 15
         total = len(options_serialized)

@@ -1,7 +1,7 @@
 import { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
 import { fetchApiAuthenticated } from  '../service/header/header.js';
 const listImg = document.querySelector('.viewport .listImg');
-let selected_color, selected_version, activeNow = 0, currentQuantity = 1, total = 0, current_version, brand_name,
+let selected_color, activeNow = 0, currentQuantity = 1, total = 0, current_version, brand_name,
     category_name, avgReview = 0, totalPage =1 , currentPage= 1, dataCurrentVersions, product;
 const h3 = document.querySelector(".productBox .detail .name");
 const prevButton = document.querySelector(".buttonBox .prev");
@@ -16,9 +16,9 @@ const descriptionBox = document.querySelector('.descriptionBox p');
 const categoryBox = document.querySelector('.productBox .categoryBox');
 const cartButton = document.querySelector('.detail .buttonBox button:first-child');
 const buyButton = document.querySelector('.detail .buttonBox button:last-child');
-const popupModel = document.querySelector('.popup-model');
-const popupContainer = popupModel.querySelector('.popUp-container');
-const closePopUpBtn = popupContainer.querySelector('.btnClosePopup');
+const popupModelSuccess = document.querySelector('.popup-model.success');
+const popupModelWarning = document.querySelector('.popup-model.warning');
+
 const all = document.querySelector('main > .reviewBox .filter .all');
 const fiveStar = document.querySelector('main > .reviewBox .filter .fiveStar');
 const fourStar = document.querySelector('main > .reviewBox .filter .fourStar');
@@ -56,7 +56,7 @@ function setTotal(val){
     total = val;
 }
 function updateButtonUi(){
-    if (!current_version){
+    if (!selected_color){
         buyButton.disabled = true;
         cartButton.disabled = true;
     }else{
@@ -68,18 +68,22 @@ function updatePrice() {
     let html = '';
     let discount ='';
     let discountedPrice ='';
-    if (current_version){
-        discount = current_version.discount || 0;
-        discountedPrice = current_version.price * (1 - discount);
+    let price = '';
+    console.log(current_version);
+    if (selected_color){
+        price = current_version.colors.find(color => color.color === selected_color).price;
+        discount = Number(current_version.discount) || 0;
+        discountedPrice = price * (1 - discount);
     }else{
-        discount = dataCurrentVersions[0].discount || 0;
-        discountedPrice = dataCurrentVersions[0].price * (1 - discount)
+        price = product.options[0].colors[0].price;
+        discount = product.options[0].discount || 0;
+        discountedPrice = price * (1 - discount);
     }
     html += `
         <p class="afterDiscount">${Number(discountedPrice).toLocaleString('vi-VN')} <u>đ</u></p>
         ${discount > 0 ? `
         <p class="beforeDiscount">
-            <small><s>${Number(result.price).toLocaleString('vi-VN')} ₫</s></small>
+            <small><s>${Number(price).toLocaleString('vi-VN')} ₫</s></small>
         </p>` : ''}
     `;
     if (priceBox) {
@@ -87,53 +91,35 @@ function updatePrice() {
     }
 }
 function updateDetail() {
-    let memoryData, osCpu, rearCamera, display, quantity;
-    if (!current_version){
-        memoryData = JSON.parse(dataCurrentVersions[0].memory_and_storage);
-        osCpu = JSON.parse(dataCurrentVersions[0].os_and_cpu);
-        rearCamera = JSON.parse(dataCurrentVersions[0].rear_camera);
-        display = JSON.parse(dataCurrentVersions[0].display);
-        quantity = dataCurrentVersions[0].quantity > 0 ? dataCurrentVersions[0].quantity: 'Hết hàng';
+    let html = '';
+    let quantity;
+    if (!selected_color){
+        quantity = product.options[0].colors[0].stock > 0 ? product.options[0].colors[0].stock : 'Hết hàng';
+        html += `
+            <div class="detail"><p>Danh mục</p><p>${category_name}</p></div>
+            <div class="detail"><p>Kho</p><p>${quantity}</p></div>
+            <div class="detail"><p>Thương hiệu</p><p>${brand_name}</p></div>
+        `;
+        product.options[0].details.forEach(detail => {
+            html += `<div class="detail"><p>${detail.name}</p><p>${detail.value}</p></div>`
+        })
+        detailsBox.innerHTML = html;
     }
     else{
-        memoryData = JSON.parse(current_version.memory_and_storage);
-        osCpu = JSON.parse(current_version.os_and_cpu);
-        rearCamera = JSON.parse(current_version.rear_camera);
-        display = JSON.parse(current_version.display);
-        quantity = current_version.quantity > 0 ? current_version.quantity : 'Hết hàng';
-    }
-
-    detailsBox.innerHTML = `
-        <div class="detail"><p>Danh mục</p><p>${category_name}</p></div>
-        <div class="detail"><p>Kho</p><p>${quantity}</p></div>
-        <div class="detail"><p>Thương hiệu</p><p>${brand_name}</p></div>
-        <div class="detail"><p>Dung lượng lưu trữ</p><p>${memoryData["Bộ nhớ trong"]}</p></div>
-        <div class="detail"><p>Loại bảo hành</p><p>Bảo hành nhà sản xuất</p></div>
-        <div class="detail"><p>Hạn bảo hành</p><p>12 tháng</p></div>
-        <div class="detail"><p>Bộ xử lý</p><p>${osCpu["Vi xử lý"]}</p></div>
-        <div class="detail"><p>Độ phân giải camera chính</p><p>${rearCamera["Độ phân giải camera"]}</p></div>
-        <div class="detail"><p>Kích thước màn hình</p><p>${display["Kích thước màn hình"].replace(/^"|"$/g, "")} inches</p></div>
-    `;
-}
-function updateDescription() {
-    let formattedDescription = (current_version ? current_version : dataCurrentVersions[0]).description
-        .replace('Hoàng Hà Mobile', '<strong>SmartBuy</strong>')
-        .split('\n')
-        .map(line => {
-            line = line.trim();
-            if (!line) return '';
-
-            const startsWith = ['Bảng thông số', 'Đánh giá chi tiết', 'Thông số', 'Tổng quan'];
-            const keywords = ['?', 'So sánh', 'Mua', 'SmartBuy'];
-
-            const shouldNotDash = startsWith.some(start => line.startsWith(start)) ||
-                                  keywords.some(kw => line.includes(kw));
-
-            return shouldNotDash ? line : `- ${line}`;
+        console.log(current_version);
+        quantity = current_version.colors.find(color => color.color === selected_color).stock > 0 ? current_version.colors.find(color => color.color === selected_color).stock : 'Hết hàng';
+        html += `
+            <div class="detail"><p>Danh mục</p><p>${category_name}</p></div>
+            <div class="detail"><p>Kho</p><p>${quantity}</p></div>
+            <div class="detail"><p>Thương hiệu</p><p>${brand_name}</p></div>
+        `;
+        current_version.details.forEach(detail => {
+            html += `<div class="detail"><p>${detail.name}</p><p>${detail.value}</p></div>`
         })
-        .join('<br>');
+        detailsBox.innerHTML = html;
+    }
+    detailsBox.innerHTML = html;
 
-    descriptionBox.innerHTML = formattedDescription;
 }
 function updateReviewsForStar() {
     reviewBox.innerHTML = `
@@ -155,17 +141,20 @@ function updateReviewsForStar() {
 }
 function updateImg() {
     let html = "";
-    if (current_version){
-        current_version.img.forEach(img => {
-            html += `<div class="item"><img src="${img}" alt=""></div>`;
+
+    if (selected_color){
+        const images = current_version.colors.find(color => color.color === selected_color).images;
+        console.log(images)
+        images.forEach(img => {
+            html += `<div class="item"><img src="${img.img}" alt=""></div>`;
         });
     }else{
-        html += `<div class="item"><img src="${product.img}" alt=""></div>`;
+        html += `<div class="item"><img src="${product.images[0].img}" alt=""></div>`;
     }
     if (listImg) listImg.innerHTML = html;
 }
 function updateUiQuantity(){
-    if(current_version){
+    if(selected_color){
         quantityBox.disabled = false;
         if(quantityBox.classList.contains('disabled')){
             quantityBox.classList.remove('disabled');
@@ -191,8 +180,8 @@ function updateCurrentColor(e){
             color.classList.remove('active')
         }
     });
-    setCurrentVersion(dataCurrentVersions.find(version => version.color === selected_color));
-    setTotal(current_version?.quantity || 1);
+    const stock = current_version.colors.find(color => color.color === selected_color).stock;
+    setTotal(stock || 1);
     setActiveNow(0);
     listImg.style.transform = `translateX(0%)`;
     updatePrice();
@@ -201,16 +190,19 @@ function updateCurrentColor(e){
     updateButtonUi();
     updateUiQuantity();
 }
-function updateColorUI(data) {
+function updateColorUI(options) {
     const colorBox = document.querySelector('.productBox .colorBox');
-    for (const option of data) {
-        const html = `
-            <div class="color ${option.color === selected_color ? 'active' : ''} ${option.quantity === 0 ? 'disabled' : ''}"
-                 data-color="${option.color}">
-                <p>${option.color}</p>
-            </div>
-        `;
-        colorBox.innerHTML += html;
+    for (const option of options) {
+        if(option.slug !== current_version.slug) return;
+        for (const color of option.colors){
+            const html = `
+                <div class="color ${color.color === selected_color ? 'active' : ''} ${color.stock === 0 ? 'disabled' : ''}"
+                     data-color="${color.color}">
+                    <p>${color.color}</p>
+                </div>
+            `;
+            colorBox.innerHTML += html;
+        }
     }
     colorBox.innerHTML += `<p class='error-message'></p>`;
     const colors = colorBox.querySelectorAll('.color');
@@ -227,8 +219,8 @@ function updateColorUI(data) {
         }
     }
 }
-function updateVersionUI(all_options){
-    for (const version of all_options) {
+function updateVersionUI(options){
+    for (const version of options) {
         const isActive = version.slug === slugOption;
         const href = isActive ? '#' : `/detail/${slugCategory}/${slugProduct}/${version.slug}/`;
         const activeClass = isActive ? 'active' : '';
@@ -250,8 +242,8 @@ function updateReviewsUI(reviews){
             const name = review.user.first_name + " " + review.user.last_name;
             const content = review.content;
             const star_count = review.star_count;
-            const version = review.option.color;
-            const avatar = review.user.img || "https://static.vecteezy.com/system/resources/previews/000/439/863/non_2x/vector-users-icon.jpg"
+            const version = review.product.options[0].colors[0].color;
+            const avatar = "https://static.vecteezy.com/system/resources/previews/000/439/863/non_2x/vector-users-icon.jpg"
             const created_at = review.created_at;
             const quality = review.quality;
             const summary = review.summary;
@@ -268,7 +260,7 @@ function updateReviewsUI(reviews){
             ? `
                 <div class="imgReviewBox">
                     ${imgList.map(img => `
-                        <div class='imgBox'><img src="${img.media.trim()}" alt=""></div>
+                        <div class='imgBox'><img src="${img.img}" alt=""></div>
                     `
                     ).join('')}
                 </div>
@@ -477,7 +469,7 @@ function fetchApiReview(slugProduct, pageNumber, star){
         });
 }
 function buyProduct(slugProduct, slugOption) {
-    if (!current_version) {
+    if (!selected_color) {
         const colorBox = document.querySelector('.productBox .colorBox');
         const errorMessage = colorBox.querySelector('.error-message');
         errorMessage.textContent ='Vui lòng chọn phiên bản';
@@ -496,19 +488,20 @@ function buyProduct(slugProduct, slugOption) {
         quantity
     });
     fetchApiAuthenticated()
-        .then(data => {
-            if(data.is_authenticated){
-                fetchApiSetOrderProduct(orderList)
-                    .then(data => {
-                        window.location.href = "/info_order/";
-                    })
-            }else{
-                window.location.href = "/login/";
-            }
-        });
+    .then(data => {
+        fetchApiSetOrderProduct(orderList)
+            .then(data => {
+                window.location.href = "/info_order/";
+            })
+            .catch(err => {
+                alert("Lỗi ở setorder");
+            })
+
+    })
+    .catch(err => window.location.href = "/login/")
 }
 function addProductCart(slugProduct, slugOption){
-    if (!current_version) {
+    if (!selected_color) {
         const colorBox = document.querySelector('.productBox .colorBox');
         const errorMessage = colorBox.querySelector('.error-message');
         errorMessage.textContent ='Vui lòng chọn phiên bản';
@@ -527,41 +520,38 @@ function addProductCart(slugProduct, slugOption){
         quantity
     };
     fetchApiAuthenticated()
+    .then(data => {
+       fetchApiAddProductCart(product)
         .then(data => {
-            if (data.is_authenticated){
-                fetchApiAddProductCart(product)
-                    .then(data => {
-                        if (data){
-                            if (data.detail === 'Sản phẩm đã tồn tại trong giỏ hàng.'){
-                                alert(data.detail);
-                                return;
-                            }
-                            popupModel.classList.add('active')
-                        }
-                    })
-                }
-            else{
-                window.location.href ='/login/';
-            }
+            popupModelSuccess.classList.add('active')
         })
+        .catch(error => {
+            popupModelWarning.classList.add('active')
+        })
+
+    })
+   .catch(error => window.location.href ='/login/')
 }
 window.onload = () => {
     fetchApiProduct(slug)
         .then(data => {
             if (data) {
+                console.log(data.product);
                 product = data.product;
-                dataCurrentVersions = data.current_options;
-                console.log(dataCurrentVersions);
-                brand_name = data.brand.name;
-                category_name = data.category.name;
-                h3.textContent = data.product.name;
+
+                setCurrentVersion(product.options.find(option => option.slug=slugOption));
+
+                brand_name = product.brand.name;
+                category_name = product.category.name;
+                h3.textContent = product.name;
+                descriptionBox.innerHTML = current_version.description;
+
                 updateImg();
-                updateColorUI(data.current_options);
-                updateVersionUI(data.all_options);
+                updateColorUI(product.options);
+                updateVersionUI(product.options);
                 updatePrice();
                 updateUiQuantity();
                 updateDetail();
-                updateDescription();
 
                 nextButton.addEventListener("click", () =>{
                     activeNow + 1 < listImg.children.length ? setActiveNow(activeNow + 1): setActiveNow(0);
@@ -596,7 +586,6 @@ window.onload = () => {
         });
     fetchApiReview(slugProduct, 1, 0)
         .then(data => {
-            // add Review Average
             updateAvgReviewUI(data.avg, data.total_reviews);
 
             currentPage = data.page;
