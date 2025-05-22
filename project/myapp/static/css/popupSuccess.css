@@ -27,7 +27,16 @@
         font-size:25px;
         text-align: center;
     }
-    > button{
+    .button-box-popup{
+        display: flex;
+        gap: 20px;
+        justify-content:center;
+        button.accept{
+            background-color: red;
+            color: white;
+        }
+    }
+     button{
         background-color: rgba(217, 217, 217, 1);
         color: black;
         padding: 8px 32px;

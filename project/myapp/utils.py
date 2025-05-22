@@ -1,3 +1,4 @@
+import os
 import random
 import threading
 from datetime import datetime, timedelta
@@ -120,3 +121,13 @@ def serialize_product_with_option(option, selected_color=None, context=None):
     product_data['options'] = [option_data]
 
     return product_data
+
+
+def delete_option_image(img_obj):
+    img_path = img_obj.img.path
+    img_obj.delete()
+    if os.path.isfile(img_path):
+        try:
+            os.remove(img_path)
+        except Exception as e:
+            print(f"Lỗi khi xóa file ảnh: {e}")

@@ -26,7 +26,7 @@ class BrandSerializer(serializers.ModelSerializer):
 class OptionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = OptionDetail
-        fields = ['name', 'value']
+        fields = ['id', 'name', 'value']
 
 
 class OptionImageSerializer(serializers.ModelSerializer):
@@ -34,7 +34,7 @@ class OptionImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OptionImage
-        fields = ['img']
+        fields = ['id', 'img']
 
     def get_img(self, obj):
         request = self.context.get('request')
@@ -48,7 +48,7 @@ class OptionColorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OptionColor
-        fields = ['color', 'price', 'stock', 'images']
+        fields = ['id', 'color', 'price', 'stock', 'images']
 
 
 class OptionSerializer(serializers.ModelSerializer):
@@ -57,7 +57,7 @@ class OptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Option
-        fields = ['slug', 'version', 'discount', 'description', 'colors', 'details']
+        fields = ['id', 'slug', 'version', 'discount', 'description', 'colors', 'details']
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -65,7 +65,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductImage
-        fields = ['img']
+        fields = ['id', 'img']
 
     def get_img(self, obj):
         request = self.context.get('request')
@@ -82,7 +82,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug', 'category', 'brand', 'purchased_count', 'options', 'images']
+        fields = ['id', 'name', 'slug', 'category', 'brand', 'purchased_count', 'options', 'images', 'status']
 
 
 class OptionReviewSerializer(serializers.ModelSerializer):
@@ -186,7 +186,7 @@ class CategoryWithOptionsSerializer(serializers.ModelSerializer):
         return BrandSerializer(brands, many=True).data
 
     def get_top_options(self, obj):
-        products = Product.objects.filter(category=obj).order_by('-purchased_count')[:10]
+        products = Product.objects.filter(category=obj, status=True).order_by('-purchased_count')[:10]
         selected_options = []
 
         for product in products:

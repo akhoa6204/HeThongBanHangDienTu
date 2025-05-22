@@ -64,12 +64,21 @@ urlpatterns = [
     path('api/products/create_get/', CreateProductView.as_view(), name='admin-post-product'),
     path('api/add_category/', admin_api.admin_add_category, name='admin_add_category'),
     path('api/add_brand/', admin_api.admin_add_brand, name='admin_add_brand'),
-
     path('api/products/<int:product_id>/', admin_api.admin_product_detail, name='admin-product-detail'),
+    path('api/products/update_product/<int:productId>/', admin_api.admin_api_update_product_detail,
+         name='admin-update-product-detail'),
+    path('api/products/update_option/<int:product_id>/', admin_api.admin_api_update_option,
+         name='admin-create-option'),
+    path('api/products/update_option/<int:product_id>/<int:option_id>/', admin_api.admin_api_update_option,
+         name='admin-update-option'),
+    path('api/products/delete/<int:product_id>/', admin_api.admin_api_delete_product, name='admin-product-delete'),
+    path('api/products/delete_option/<int:option_id>/', admin_api.admin_api_delete_option, name='admin-option-delete'),
+    path('api/products/restore_product/<int:product_id>/', admin_api.admin_api_restore_product,
+         name='admin-restore-product'),
+
     path('api/products/<int:product_id>/update/', admin_api.admin_update_product_and_options,
          name='admin-update-product'),
     path('api/products/<int:product_id>/delete/', admin_api.admin_delete_product, name='admin-delete-product'),
-    # path('api/products/<int:product_id>/options/create/', admin_api.admin_create_options, name='admin-create-options'),
     path('api/products/<int:product_id>/options/', admin_api.admin_view_product_with_options,
          name='admin-view-product-with-options'),
     path('api/categories-brands/', admin_api.admin_list_categories_brands, name='admin-list-categories-brands'),
@@ -78,22 +87,16 @@ urlpatterns = [
     path('api/orders/', admin_api.admin_list_orders, name='admin-list-orders'),
     path('api/orders/patch/', admin_api.api_admin_update_order_status, name='admin_update_order_status'),
     path('api/orders/<int:order_id>/', admin_api.admin_view_order, name='admin-view-order'),
-    path('api/orders/<int:order_id>/update/', admin_api.admin_update_order_status, name='admin-update-order'),
-    path('api/orders/<int:order_id>/delete/', admin_api.admin_delete_order, name='admin-delete-order'),
-    path('api/orders/<int:order_id>/info/', admin_api.admin_order_info_basic, name='admin-order-info'),
 
     # ----------- API Quản trị đánh giá ----------
     path('api/reviews/', admin_api.admin_list_reviews, name='admin-list-reviews'),
     path('api/reviews/update/', admin_api.api_update_review_reply, name='update_review_reply'),
-    path('api/reviews/<int:review_id>/', admin_api.admin_view_review, name='admin-view-review'),
-    path('api/reviews/<int:review_id>/delete/', admin_api.admin_delete_review, name='admin-delete-review'),
-    path('api/reviews/<int:review_id>/reply/', admin_api.admin_reply_review, name='admin-reply-review'),
 
     # ----------- Giao diện quản trị (HTML) ----------
     path('products/', views.admin_product_list, name='admin-dashboard-products'),
     path('products/create/', views.create_product_page, name='admin-create-product-page'),
-    path('products/<int:product_id>/edit/', views.edit_product, name='admin-edit-product'),
-    path('products/<int:product_id>/delete/', views.confirm_delete_product, name='admin-confirm-delete-product'),
+    path('products/detail/<int:product_id>/', views.edit_product, name='admin-edit-product'),
+    path('products/delete/<int:product_id>/', views.confirm_delete_product, name='admin-confirm-delete-product'),
     path('products/<int:product_id>/', views.admin_product_detail_page, name='admin-product-detail-page'),
 
     path('orders/', views.manage_order, name='admin-dashboard-orders'),

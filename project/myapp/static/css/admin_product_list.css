@@ -88,8 +88,25 @@
             a.btn-edit{
                 background-color: rgba(255, 237, 37, 0.92);
             }
-            a.btn-delete{
+            button.btn-delete{
                 background-color:rgba(215, 0, 24, 0.8);
+                padding: 6px 12px;
+                border-radius : 5px;
+                text-decoration: none;
+                color: white;
+                border:none;
+                outline:none;
+                font-size: 12px;
+            }
+            button.btn-restore{
+                background-color:rgba(111, 240, 129, 0.56);
+                padding: 6px 12px;
+                color: black;
+                border-radius : 5px;
+                text-decoration: none;
+                border:none;
+                outline:none;
+                font-size: 12px;
             }
             a.detail{
                 background-color:#003366;
@@ -98,4 +115,22 @@
         }
 
     }
+}
+body{
+    position: relative;
+}
+.popup-model{
+    position: fixed;
+    top:0;
+    bottom:0;
+    right:0;
+    left: 0;
+    background-color:rgba(217, 217, 217, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+}
+.popup-model.active{
+    display: flex;
 }

@@ -47,7 +47,8 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     purchased_count = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    slug = models.CharField(max_length=150, null=True, blank=True)
+    slug = models.CharField(max_length=150, null=True, blank=True, unique=True)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.name} - {self.slug or 'None'}"
@@ -74,6 +75,11 @@ class Option(models.Model):
     description = models.TextField(null=True, blank=True, help_text="Mô tả chi tiết phiên bản")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="Ngày tạo bản ghi")
     updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['product', 'slug'], name='unique_option_slug_per_product')
+        ]
 
 
 class OptionDetail(models.Model):

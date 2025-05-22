@@ -1,5 +1,4 @@
 const popupModelAll = document.querySelectorAll('.popup-model');
-console.log(popupModelAll);
 popupModelAll.forEach(popupModel => {
     const popup = popupModel.querySelector('.popUp-container');
     const btnClose = popup.querySelector('.btnClosePopup');

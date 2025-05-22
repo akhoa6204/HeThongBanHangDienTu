@@ -1,4 +1,6 @@
 import json
+import re
+from collections import defaultdict
 from decimal import Decimal
 from math import ceil
 
@@ -22,6 +24,7 @@ from .models import Order, Review, ReviewReply, OptionImage
 from .models import Product, ProductImage, Category, Brand
 from .serializers import ProductSerializer, CategorySerializer, BrandSerializer, ReviewSerializer, \
     OptionSerializer, OptionReviewSerializer, OrderWithAdminSerializer, OrderWithItemsForAdminSerializer
+from .utils import delete_option_image
 
 
 # -------------------------------
@@ -326,38 +329,11 @@ def admin_delete_product(request, product_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_product_detail(request, product_id):
-    try:
-        product = Product.objects.prefetch_related('options').get(id=product_id)
-    except Product.DoesNotExist:
-        return Response({"error": "Sản phẩm không tồn tại."}, status=404)
-
-    # Xử lý ảnh
-    img_raw = product.img or ""
-    img_list = [img.strip(';').strip() for img in img_raw.split(',') if img.strip()]
-    img_urls = [
-        img if img.startswith("http") else request.build_absolute_uri(settings.MEDIA_URL + img)
-        for img in img_list
-    ]
-
-    # Chuẩn bị option
-    options = []
-    for opt in product.options.all():
-        options.append({
-            "version": opt.version,
-            "color": opt.color,
-            "price": opt.price,
-            "quantity": opt.quantity,
-            "img": opt.img
-        })
+    product = get_object_or_404(Product, id=product_id)
+    product_seriliazer = ProductSerializer(product, context={"request": request})
 
     return Response({
-        "id": product.id,
-        "name": product.name,
-        "slug": product.slug,
-        "category": product.category.name,
-        "brand": product.brand.name,
-        "img": img_urls,
-        "options": options
+        "product": product_seriliazer.data
     })
 
 
@@ -766,3 +742,245 @@ def api_update_review_reply(request):
     )
     message = "Tạo câu trả lời thành công" if created else "Cập nhật câu trả lời thành công"
     return Response({"detail": message}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def admin_api_update_product_detail(request, productId):
+    product = get_object_or_404(Product, id=productId)
+
+    new_name = request.data.get('name', None)
+    new_slug = request.data.get('slug', None)
+    new_category_id = request.data.get('category', None)
+    new_brand_id = request.data.get('brand', None)
+
+    if not new_name or not new_slug or not new_category_id or not new_brand_id:
+        return Response({"detail": "Cập nhật thất bại"}, status=status.HTTP_400_BAD_REQUEST)
+
+    product.name = new_name
+    product.slug = new_slug
+    product.category_id = new_category_id
+    product.brand_id = new_brand_id
+    product.save()
+
+    deleted_ids_str = request.data.get('deleted_ids', '[]')
+    print(f"deleted_ids_str: {deleted_ids_str}")
+    try:
+        deleted_ids = json.loads(deleted_ids_str)
+    except Exception:
+        deleted_ids = []
+
+    if deleted_ids:
+        images_to_delete = ProductImage.objects.filter(id__in=deleted_ids, product=product)
+        for img_obj in images_to_delete:
+            delete_option_image(img_obj)
+
+    images = request.FILES.getlist('images')
+    for image_file in images:
+        ProductImage.objects.create(product=product, img=image_file)
+
+    serializer = ProductSerializer(product, context={"request": request})
+    return Response({'success': True, 'product': serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated, IsAdminUser])
+def admin_api_update_option(request, product_id, option_id=None):
+    """
+    Tạo hoặc cập nhật Option, cùng các OptionColor + OptionImage + OptionDetail liên quan.
+
+    Frontend gửi data kiểu FormData với key như:
+    colors[0][id], colors[0][color], colors[0][price], colors[0][stock],
+    colors[0][keep_image_ids][0], colors[0][new_images][0] (file),
+    details[0][id], details[0][name], details[0][value], ...
+    """
+
+    product = get_object_or_404(Product, id=product_id)
+
+    version = request.POST.get('version', '').strip()
+    slug = request.POST.get('slug', '').strip()
+    description = request.POST.get('description', '').strip()
+
+    if not version or not slug or not description:
+        return Response({"detail": "Thiếu version hoặc slug hoặc description của option"},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if option_id:
+        option = get_object_or_404(Option, id=option_id, product=product)
+    else:
+        option = Option(product=product)
+
+    option.version = version
+    option.slug = slug
+    option.description = description
+    option.save()
+
+    # --- Xử lý colors ---
+    colors_data = defaultdict(dict)
+
+    for key in request.POST:
+        # Thu thập các trường đơn giản dạng colors[0][color], colors[0][price], ...
+        m_simple = re.match(r'colors\[(\d+)\]\[(\w+)\]$', key)
+        if m_simple:
+            idx = int(m_simple.group(1))
+            field = m_simple.group(2)
+            # Nếu field là 'keep_image_ids' thì bỏ qua ở đây, xử lý riêng bên dưới
+            if field != 'keep_image_ids':
+                colors_data[idx][field] = request.POST.get(key)
+
+    # Thu thập keep_image_ids riêng vì dạng keys có cấp 3: colors[0][keep_image_ids][0]
+    for key in request.POST:
+        if 'keep_image_ids' in key:
+            m = re.match(r'colors\[(\d+)\]\[keep_image_ids\]\[(\d+)\]', key)
+            if m:
+                idx = int(m.group(1))
+                if 'keep_image_ids' not in colors_data[idx] or not isinstance(colors_data[idx]['keep_image_ids'], list):
+                    colors_data[idx]['keep_image_ids'] = []
+                try:
+                    val = request.POST.get(key)
+                    if val is not None:
+                        colors_data[idx]['keep_image_ids'].append(int(val))
+                except (ValueError, TypeError):
+                    pass
+
+    # Lưu lại các id đã xử lý
+    processed_color_ids = []
+
+    for color_index in sorted(colors_data.keys()):
+        color_info = colors_data[color_index]
+
+        color_id = color_info.get('id')
+        color_id = int(color_id) if color_id and color_id.isdigit() else None
+
+        color_name = color_info.get('color', '').strip()
+        try:
+            price = float(color_info.get('price', 0))
+        except ValueError:
+            price = 0
+        try:
+            stock = int(color_info.get('stock', 0))
+        except ValueError:
+            stock = 0
+
+        keep_image_ids = color_info.get('keep_image_ids', [])
+
+        if not color_name or price <= 0:
+            continue
+
+        if color_id:
+            option_color = get_object_or_404(OptionColor, id=color_id, option=option)
+            processed_color_ids.append(option_color.id)
+        else:
+            option_color = OptionColor(option=option)
+            option_color.save()
+            processed_color_ids.append(option_color.id)
+
+        option_color.color = color_name
+        option_color.price = price
+        option_color.stock = stock
+        option_color.save()
+
+        # Xử lý ảnh giữ/lưu ảnh mới như cũ
+        existing_images = OptionImage.objects.filter(option_color=option_color)
+        for img_obj in existing_images:
+            if img_obj.id not in keep_image_ids:
+                delete_option_image(img_obj)
+
+        # Upload ảnh mới
+        new_images = []
+        prefix = f'colors[{color_index}][new_images]'
+        for key_file in request.FILES:
+            if key_file.startswith(prefix):
+                new_images.append(request.FILES[key_file])
+        for file in new_images:
+            OptionImage.objects.create(option_color=option_color, img=file)
+
+    # Xóa OptionColor không còn trong dữ liệu gửi lên và ảnh liên quan
+    obsolete_colors = OptionColor.objects.filter(option=option).exclude(id__in=processed_color_ids)
+    for color in obsolete_colors:
+        # Xóa ảnh liên quan trong OptionImage
+        related_images = OptionImage.objects.filter(option_color=color)
+        for img in related_images:
+            delete_option_image(img)
+        # Xóa color
+        color.delete()
+
+    # --- Xử lý details ---
+    details_data = defaultdict(dict)
+
+    # Thu thập details từ POST
+    for key in request.POST:
+        if key.startswith('details['):
+            m = re.match(r'details\[(\d+)\]\[(\w+)\]', key)
+            if m:
+                idx = int(m.group(1))
+                field = m.group(2)
+                details_data[idx][field] = request.POST.get(key)
+
+    processed_detail_ids = []
+
+    for detail_index in sorted(details_data.keys()):
+        detail_info = details_data[detail_index]
+        detail_id = detail_info.get('id')
+        detail_id = int(detail_id) if detail_id and detail_id.isdigit() else None
+        name = detail_info.get('name', '').strip()
+        value = detail_info.get('value', '').strip()
+
+        if not name or not value:
+            continue
+
+        if detail_id:
+            detail_obj = OptionDetail.objects.filter(id=detail_id, option=option).first()
+            if detail_obj:
+                detail_obj.name = name
+                detail_obj.value = value
+                detail_obj.save()
+                processed_detail_ids.append(detail_obj.id)
+            else:
+                new_detail = OptionDetail.objects.create(option=option, name=name, value=value)
+                processed_detail_ids.append(new_detail.id)
+        else:
+            new_detail = OptionDetail.objects.create(option=option, name=name, value=value)
+            processed_detail_ids.append(new_detail.id)
+
+    # ❌ Xóa những OptionDetail không còn trong dữ liệu gửi lên
+    OptionDetail.objects.filter(option=option).exclude(id__in=processed_detail_ids).delete()
+
+    option_serializer = OptionSerializer(option, context={"request": request})
+    return Response({
+        "success": True,
+        "option": option_serializer.data,
+    })
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAdminUser])
+def admin_api_delete_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if not product.status:
+        return Response({"detail": "Sản phẩm đã bị xoá trước đó"}, status=status.HTTP_400_BAD_REQUEST)
+    product.status = False
+    product.save()
+    return Response({"detail": "Xoá sản phẩm thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(["DELETE"])
+@permission_classes([IsAdminUser])
+def admin_api_delete_option(request, option_id):
+    option = get_object_or_404(Option, id=option_id)
+    for color in OptionColor.objects.filter(option=option):
+        for image in OptionImage.objects.filter(option_color=color):
+            delete_option_image(image)
+    OptionDetail.objects.filter(option=option).delete()
+    OptionColor.objects.filter(option=option).delete()
+    option.delete()
+    return Response({"detail": "Xoá phiên bản thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAdminUser])
+def admin_api_restore_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.status = True
+    product.save()
+    return Response({"detail": "Khôi phục sản phẩm thành công"}, status=status.HTTP_200_OK)

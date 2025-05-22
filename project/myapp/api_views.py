@@ -35,6 +35,8 @@ class homeApiView(APIView):
 @permission_classes([AllowAny])
 def apiProductDetail(request, slugCategory, slugProduct, slugOption):
     product = Product.objects.get(slug=slugProduct, category__slug=slugCategory)
+    if not product.status:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     product_serialized = ProductSerializer(product, context={'request': request})
 
     return Response({
@@ -164,7 +166,8 @@ def api_add_product_cart(request):
 @permission_classes([IsAuthenticated])
 def api_cart(request):
     user = request.user
-    cart_items = Cart.objects.filter(user=user).select_related('option_color__option')
+    cart_items = Cart.objects.filter(user=user, option_color__option__product__status=True).select_related(
+        'option_color__option')
 
     for cart_item in cart_items:
         stock = cart_item.option_color.stock

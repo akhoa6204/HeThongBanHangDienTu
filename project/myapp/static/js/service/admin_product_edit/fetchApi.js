@@ -1,5 +1,5 @@
-function fetchApiGetProducts(page, search) {
-    const url = `/api/products/?page=${page}${search ? `&search=${search}` : ''}`;
+function fetchApiGetData(productId) {
+    const url = `/api/products/${productId}/`;
     return cookieStore.get('csrftoken')
         .then(cookie => {
             return fetch(url, {
@@ -19,38 +19,17 @@ function fetchApiGetProducts(page, search) {
             return data;
         })
 }
-function fetchApiDeleteProduct(product_id) {
-    const url = `/api/products/delete/${product_id}/`;
-    return cookieStore.get('csrftoken')
-        .then(cookie => {
-            return fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRFToken': cookie ? cookie.value : '',
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include'
-            });
-        })
-        .then(async res => {
-            const data = await res.json();
-            if(!res.ok){
-                throw new Error(data.detail || "Có lỗi xảy ra");
-            }
-            return data;
-        })
-}
-function fetchApiRestoreProduct(product_id) {
-    const url = `/api/products/restore_product/${product_id}/`;
+function fetchApiUpdateProduct(productId, formData) {
+    const url = `/api/products/update_product/${productId}/`;
     return cookieStore.get('csrftoken')
         .then(cookie => {
             return fetch(url, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': cookie ? cookie.value : '',
-                    'Content-Type': 'application/json',
                 },
-                credentials: 'include'
+                credentials: 'include',
+                body: formData
             });
         })
         .then(async res => {
@@ -61,4 +40,49 @@ function fetchApiRestoreProduct(product_id) {
             return data;
         })
 }
-export { fetchApiGetProducts, fetchApiDeleteProduct, fetchApiRestoreProduct };
+function fetchApiUpdateOption(productId, optionId, formData) {
+    let url = `/api/products/update_option/${productId}/`;
+    if(optionId){
+        url += `${optionId}/`;
+    }
+    return cookieStore.get('csrftoken')
+        .then(cookie => {
+            return fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': cookie ? cookie.value : '',
+                },
+                credentials: 'include',
+                body: formData
+            });
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || "Có lỗi xảy ra");
+            }
+            return data;
+        });
+}
+function fetchApiDeleteOption(option_id){
+    const url = `/api/products/delete_option/${option_id}/`;
+
+    return cookieStore.get('csrftoken')
+        .then(cookie => {
+            return fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': cookie ? cookie.value : '',
+                },
+                credentials: 'include',
+            });
+        })
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || "Có lỗi xảy ra");
+            }
+            return data;
+        });
+}
+export { fetchApiGetData, fetchApiUpdateProduct, fetchApiUpdateOption, fetchApiDeleteOption };

@@ -1,0 +1,17 @@
+{% block content %}
+<div class="popUp-container">
+    {% if status == 'error' %}
+    <i class="fa-solid fa-xmark error"></i>
+    {% elif status == 'warning' %}
+    <i class="fa-solid fa-exclamation warning"></i>
+    {% else %}
+    <i class="fa-solid fa-check success"></i>
+    {% endif %}
+    <p>{{ title }}</p>
+    <div class="button-box-popup">
+        <button class="btnClosePopup">Đóng</button>
+        <button class="accept">Xác nhận</button>
+    </div>
+</div>
+{% endblock %}
+

@@ -220,8 +220,13 @@ function updateColorUI(options) {
     }
 }
 function updateVersionUI(options){
+    let i =0;
     for (const version of options) {
-        const isActive = version.slug === slugOption;
+        console.log(i, '----------------------------------')
+        console.log(version.slug, version.version);
+        console.log(current_version.slug, current_version.version);
+        i++;
+        const isActive = version.slug === current_version.slug;
         const href = isActive ? '#' : `/detail/${slugCategory}/${slugProduct}/${version.slug}/`;
         const activeClass = isActive ? 'active' : '';
 
@@ -536,11 +541,10 @@ window.onload = () => {
     fetchApiProduct(slug)
         .then(data => {
             if (data) {
-                console.log(data.product);
                 product = data.product;
-
+                console.log(product);
                 setCurrentVersion(product.options.find(option => option.slug=slugOption));
-
+                console.log(current_version);
                 brand_name = product.brand.name;
                 category_name = product.category.name;
                 h3.textContent = product.name;
@@ -582,7 +586,7 @@ window.onload = () => {
             }
         })
         .catch(error => {
-                console.error('Lỗi khi lấy dữ liệu product:', error);
+                window.location.href= '/';
         });
     fetchApiReview(slugProduct, 1, 0)
         .then(data => {
