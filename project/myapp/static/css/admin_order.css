@@ -1,0 +1,271 @@
+.adminContainer {
+    flex: 1;
+    margin-top: 30px;
+    background-color: white;
+    padding: 30px;
+}
+
+.container {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid rgba(209, 206, 206, 1);
+    border-radius: 10px;
+    background-color: white;
+    margin-bottom: 20px;
+}
+
+.container > * {
+    padding: 0 10px;
+}
+
+.buttonBox {
+    padding: 10px;
+    border-bottom: 1px solid rgba(209, 206, 206, 1);
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.buttonBox > div > * {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: black;
+}
+
+.buttonBox > div {
+    border-radius: 10px;
+    border: none;
+    padding: 6px 12px;
+    min-width: 160px;
+}
+
+.buttonBox .addProduct {
+    background-color: rgba(111, 240, 129, 0.56);
+}
+
+.buttonBox .removeAll {
+    background-color: rgba(217, 217, 217, 0.7);
+}
+
+.tableBox {
+    width: 100%;
+}
+
+.tableBox .searchBox {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tableBox .searchBox input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background-color: rgba(229, 229, 229, 1);
+    padding: 12px 24px;
+    border-radius: 10px;
+}
+
+.tableBox .table table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tableBox .table table,
+.tableBox .table tr th,
+.tableBox .table tr td {
+    border: 1px solid rgba(209, 206, 206, 1);
+}
+
+.tableBox .table thead {
+    background-color: rgba(229, 229, 229, 1);
+}
+
+.tableBox .table tr th,
+.tableBox .table tr td {
+    padding: 6px 12px;
+    text-align: center;
+}
+
+.tableBox .table tr td:last-child span:first-child {
+    margin-right: 10px;
+}
+
+.tableBox .table tr td:last-child span {
+    padding: 6px 12px;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.tableBox .table tr td:last-child span.edit {
+    background-color: rgba(255, 237, 37, 0.92);
+}
+
+.tableBox .table tr td:last-child span.remove {
+    background-color: rgba(215, 0, 24, 0.8);
+}
+
+.status-select {
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.status-select.bg-yellow-300 {
+    background-color: rgba(255, 204, 0, 0.8);
+}
+
+.status-select.bg-blue-300 {
+    background-color: rgba(59, 130, 246, 0.8);
+}
+
+.status-select.bg-indigo-300 {
+    background-color: rgba(99, 102, 241, 0.8);
+}
+
+.status-select.bg-green-400 {
+    background-color: rgba(74, 222, 128, 0.8);
+}
+
+.status-select.bg-red-300 {
+    background-color: rgba(248, 113, 113, 0.8);
+}
+
+.pagination {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    border: 1px solid rgba(209, 206, 206, 1);
+    border-radius: 5px;
+    text-decoration: none;
+    color: black;
+}
+
+.pagination a.active {
+    background-color: rgba(111, 240, 129, 0.56);
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 100%;
+    position: relative;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.modal-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+.modal-actions .confirm-btn {
+    background-color: rgba(255, 237, 37, 0.92);
+}
+
+.modal-actions .cancel-btn {
+    background-color: rgba(215, 0, 24, 0.8);
+}
+
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: rgba(111, 240, 129, 0.56);
+    padding: 10px 20px;
+    border-radius: 5px;
+    color: black;
+    z-index: 100;
+}
+
+.toast.hidden {
+    display: none;
+}
+select[name='status']{
+    padding: 6px 12px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    text-align: center;
+    width: 140px;
+    .pending{
+        background-color:rgba(246, 159, 28, .7);
+        color: rgba(124, 79, 11, 1);
+    }
+    .processing {
+        background-color:rgba(255, 237, 37, 0.65);
+        color: rgba(165, 154, 40, 1);
+    }
+    .shipping {
+        background-color:rgba(0, 142, 204, 0.37);
+        color: rgba(43, 52, 103, 1);
+    }
+    .cancelled {
+        background-color:rgba(204, 0, 0, 0.4);
+        color: rgba(215, 0, 24, 1);
+    }
+    .shipped {
+        background-color:rgba(111, 240, 129, 0.56);
+        color: rgba(19, 105, 19, 1) ;
+    }
+}
+select[name='status'].pending {
+    background-color:rgba(246, 159, 28, .7);
+    color: rgba(124, 79, 11, 1);
+}
+
+select[name='status'].processing {
+    background-color: rgba(255, 237, 37, 0.65);
+    color: rgba(165, 154, 40, 1);
+}
+
+select[name='status'].shipping {
+    background-color: rgba(0, 142, 204, 0.37);
+    color: rgba(43, 52, 103, 1);
+}
+
+select[name='status'].cancelled {
+    background-color: rgba(204, 0, 0, 0.4);
+    color: rgba(215, 0, 24, 1);
+}
+
+select[name='status'].shipped {
+    background-color: rgba(111, 240, 129, 0.56);
+    color: rgba(19, 105, 19, 1);
+}

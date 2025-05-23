@@ -1,0 +1,56 @@
+{% extends 'components/layout/adminLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumb.css' %}">
+<link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'css/review_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="adminContainer" data-is-admin="{{ user.is_staff|yesno:'true,false' }}">
+    {% include 'components/components/breadcrumb.html' with title1="Danh sách đánh giá" %}
+    <div class="container">
+        <div class="filter-status-row">
+            <p>Trạng thái</p>
+            <p class="all">Tất cả</p>
+            <p class="has-reply">Đã trả lời</p>
+        </div>
+        <div class="filter-star-row">
+            <p>Số sao đánh giá</p>
+            <div class="input-group">
+                <button id="allStar">Tất cả</button>
+            </div>
+            <div class="input-group">
+                <button id="fiveStar">5 sao</button>
+            </div>
+            <div class="input-group">
+                <button id="fourStar">4 sao</button>
+            </div>
+            <div class="input-group">
+                <button id="threeStar">3 sao</button>
+            </div>
+            <div class="input-group">
+                <button id="twoStar">2 sao</button>
+            </div>
+            <div class="input-group">
+                <button id="oneStar">1 sao</button>
+            </div>
+        </div>
+        <div class="header-row">
+            <div><strong>Thông tin sản phẩm</strong></div>
+            <div><strong>Đánh giá người mua</strong></div>
+            <div><strong>Hành động</strong></div>
+        </div>
+        <div class="reviewContainer">
+        </div>
+    </div>
+
+    <div id="pagination"></div>
+
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/admin/review_list.js' %}"></script>
+{% endblock %}

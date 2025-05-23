@@ -1,0 +1,90 @@
+{% extends 'components/layout/adminLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumb.css' %}">
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
+<link rel="stylesheet" href="{% static 'css/create_product.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container-admin">
+    {% include 'components/components/breadcrumb.html' with title1="Danh sách sản phẩm" title2="Thêm sản phẩm mới" %}
+    <div class="form-container product-form">
+        <h2>Tạo mới sản phẩm</h2>
+        <div class="btn-group">
+            <button class="btn-add brand">📁 Thêm nhà cung cấp</button>
+            <button class="btn-add category">📂 Thêm danh mục</button>
+        </div>
+        <div class="form">
+            <div class="input-group">
+                <label>Slug</label>
+                <input type="text" name="slug-product" class="form-input">
+            </div>
+            <div class="input-group">
+                <label>Tên sản phẩm</label>
+                <input type="text" name="name-product" class="form-input">
+            </div>
+            <div class="input-group">
+                <label>Danh mục</label>
+                <select id="category" name="category" class="form-select">
+                    <option value="default">Chọn danh mục</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Nhà cung cấp</label>
+                <select name="brand" class="form-select">
+                    <option value="default">Chọn nhà cung cấp</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="file">
+                    <p>Ảnh sản phẩm</p>
+                    <p>
+                        <span class="material-symbols-outlined">add_photo_alternate</span>
+                        <span>Chọn ảnh</span>
+                    </p>
+                    <input type="file" id="file" name="img" multiple accept="image/*">
+                </label>
+            </div>
+            <div class="image-preview"></div>
+        </div>
+    </div>
+    <div class="option-container-form"></div>
+    <div class="submitContainer">
+        <button class="submit">Lưu sản phẩm</button>
+        <button class="back">Hủy</button>
+    </div>
+    <div class="addOption" id="add-option-btn">
+        <span class="material-symbols-outlined">add</span>
+    </div>
+</div>
+<div class="popup-model success product">
+    {% with title="Sản phẩm đã được tạo mới thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model success category">
+    {% with title="Thêm danh mục thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model success brand">
+    {% with title="Thêm nhà cung cấp thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model add_category">
+    {% with type="category" %}
+    {% include 'components/components/add_brand_category.html' with type=type %}
+    {% endwith %}
+</div>
+<div class="popup-model add_brand">
+    {% with type="" %}
+    {% include 'components/components/add_brand_category.html' with type=type %}
+    {% endwith %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/admin/create_product.js' %}"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
+{% endblock %}

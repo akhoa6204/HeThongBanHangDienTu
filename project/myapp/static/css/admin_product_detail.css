@@ -1,0 +1,49 @@
+.form-container{
+    position: relative;
+    .btn-edit-product, .btn-edit-option{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+}
+.form-container{
+    border-radius: 0;
+    padding: 0;
+    box-shadow:0 0 0 0;
+    margin-bottom: 30px;
+}
+.form-container .main-form{
+    background: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+.form-container .submitContainer{
+    display:none;
+    margin-top: -20px;
+}
+.form-container .submitContainer.active{
+    display:block;
+}
+.form-container h2{
+    margin-bottom: 20px;
+}
+body{
+    position: relative;
+}
+.popup-model{
+    position: fixed;
+    top:0;
+    bottom:0;
+    right:0;
+    left: 0;
+    background-color:rgba(217, 217, 217, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+}
+.popup-model.active{
+    display: flex;
+}

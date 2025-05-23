@@ -1,0 +1,77 @@
+{% extends 'components/layout/adminLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumb.css' %}">
+<link rel="stylesheet" href="{% static 'css/pagination.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin_product_list.css' %}">
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="adminContainer" data-is-admin="{{ user.is_staff|yesno:'true,false' }}">
+    {% include 'components/components/breadcrumb.html' with title1="Danh sách sản phẩm" %}
+    <div class="container">
+        <div class="buttonBox">
+            <div class="addProduct">
+                <a href="{% url 'admin-create-product-page' %}">
+                    <span class="material-symbols-outlined">add</span>
+                    <span>Tạo mới sản phẩm</span>
+                </a>
+            </div>
+        </div>
+        <div class="tableBox">
+            <div class="searchBox">
+                <label for="searchInput">Tìm kiếm</label>
+                <input type="text" id="searchInput" placeholder="Tìm theo tên hoặc mã sản phẩm...">
+            </div>
+            <div class="table">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Ảnh</th>
+                        <th>Số lượng</th>
+                        <th>Tình trạng</th>
+                        <th>Danh mục</th>
+                        <th>Chức năng</th>
+                    </tr>
+                    </thead>
+                    <tbody id="product-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="pagination" class="pagination"></div>
+    <div class="popup-model error product">
+        {% with title="Bạn có chắc muốn xóa sản phẩm này không" status='error' %}
+        {% include 'components/components/popupRemove.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+    <div class="popup-model success delete_product">
+        {% with title="Xóa sản phẩm thành công" status='' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+    <div class="popup-model error delete_product">
+        {% with title="Xóa sản phẩm thất bại" status='error' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+    <div class="popup-model success restore_product">
+        {% with title="Khôi phục sản phẩm thành công" status='' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+    <div class="popup-model error restore_product">
+        {% with title="Khôi phục sản phẩm thất bại" status='error' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/admin/product_admin.js' %}"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
+{% endblock %}

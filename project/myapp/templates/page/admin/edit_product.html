@@ -1,0 +1,112 @@
+{% extends 'components/layout/adminLayout.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumb.css' %}">
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
+<link rel="stylesheet" href="{% static 'css/create_product.css' %}">
+<link rel="stylesheet" href="{% static 'css/admin_product_detail.css' %}">
+{% endblock %}
+{% block content %}
+<div class="container-admin">
+    {% include 'components/components/breadcrumb.html' with title1="Danh sách sản phẩm" title2="Chi tiết sản phẩm" %}
+    <div class="form-container product-form">
+        <div class="main-form">
+            <h2>Chi tiết sản phẩm</h2>
+            <div class="form">
+                <div class="input-group">
+                    <label>Slug</label>
+                    <input type="text" name="slug-product" class="form-input">
+                </div>
+                <div class="input-group">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" name="name-product" class="form-input">
+                </div>
+                <div class="input-group">
+                    <label>Danh mục</label>
+                    <select id="category" name="category" class="form-select">
+                        <option value="default">Chọn danh mục</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Nhà cung cấp</label>
+                    <select name="brand" class="form-select">
+                        <option value="default">Chọn nhà cung cấp</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="file">
+                        <p>Ảnh sản phẩm</p>
+                        <p>
+                            <span class="material-symbols-outlined">add_photo_alternate</span>
+                            <span>Chọn ảnh</span>
+                        </p>
+                        <input type="file" id="file" name="img" multiple accept="image/*">
+                    </label>
+                </div>
+                <div class="image-preview"></div>
+            </div>
+            <div class="btn-edit-product">
+                <span class="material-symbols-outlined">edit</span>
+            </div>
+        </div>
+        <div class="submitContainer">
+            <button class="submit">Lưu thay đổi</button>
+            <button class="back">Hủy</button>
+        </div>
+    </div>
+    <div class="option-container-form"></div>
+    <div class="addOption" id="add-option-btn">
+        <span class="material-symbols-outlined">add</span>
+    </div>
+</div>
+<div class="popup-model success product">
+    {% with title="Cập nhật sản phẩm thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model error product">
+    {% with title="Cập nhật sản phẩm thất bại" status='error' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model success option">
+    {% with title="Sửa phiên bản thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model error option">
+    {% with title="Cập nhật phiên bản thất bạị thất bại" status='error' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model success create-option">
+    {% with title="Tạo mới phiên bản thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model error create-option">
+    {% with title="Tạo mới phiên bản thất bại" status='error' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model error accept_option">
+    {% with title="Bạn có chắc muốn xóa phiên bản này không" status='error' %}
+    {% include 'components/components/popupRemove.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model success delete_option">
+    {% with title="Xóa phiên bản thành công" status='' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+<div class="popup-model error delete_option">
+    {% with title="Xóa phiên bản thất bại" status='error' %}
+    {% include 'components/components/popupSuccess.html' with status=status title=title %}
+    {% endwith %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module" src="{% static 'js/admin/admin_product_edit.js' %}"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
+{% endblock %}
