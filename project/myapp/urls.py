@@ -9,7 +9,7 @@ from .api_views import homeApiView, infoUserApiView, searchApiView, orderApiView
 
 urlpatterns = [
     path('api/home/get/', homeApiView.as_view(), name='api_home'),
-    path('api/product/<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', api_views.apiProductDetail,
+    path('api/product/<str:slugCategory>/<str:slugProduct>/', api_views.apiProductDetail,
          name="api_product"),
     path('api/reviews/<str:slugProduct>/<int:star>/<int:numberPage>/', api_views.apiReviews, name="api_reviews"),
     path('api/search/', searchApiView.as_view(), name='api_search'),
@@ -44,7 +44,7 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('', views.home, name='home'),
     path('search/', views.search, name='search'),
-    path('detail/<str:slugCategory>/<str:slugProduct>/<str:slugOption>/', views.detail, name='detail_option'),
+    path('detail/<str:slugCategory>/<str:slugProduct>/', views.detail, name='detail_option'),
     path('cart/', views.cart, name='cart'),
 
     path('info_order/', views.info_order, name='info_order'),
@@ -59,29 +59,28 @@ urlpatterns = [
     path('reset-password/', views.resetPassword, name="resetPassword"),
 
     # ----------- API Quản trị sản phẩm ----------
+    # create_new_product page
     path('api/products/', admin_api.admin_list_products, name='admin-list-products'),
     path('api/products/create_post/', CreateProductView.as_view(), name='admin-get-product'),
     path('api/products/create_get/', CreateProductView.as_view(), name='admin-post-product'),
     path('api/add_category/', admin_api.admin_add_category, name='admin_add_category'),
     path('api/add_brand/', admin_api.admin_add_brand, name='admin_add_brand'),
+    # product_detail page
     path('api/products/<int:product_id>/', admin_api.admin_product_detail, name='admin-product-detail'),
     path('api/products/update_product/<int:productId>/', admin_api.admin_api_update_product_detail,
          name='admin-update-product-detail'),
+    # create_new_option
     path('api/products/update_option/<int:product_id>/', admin_api.admin_api_update_option,
          name='admin-create-option'),
+    # update_old_option
     path('api/products/update_option/<int:product_id>/<int:option_id>/', admin_api.admin_api_update_option,
          name='admin-update-option'),
-    path('api/products/delete/<int:product_id>/', admin_api.admin_api_delete_product, name='admin-product-delete'),
+    # soft delete option at product_detail page
     path('api/products/delete_option/<int:option_id>/', admin_api.admin_api_delete_option, name='admin-option-delete'),
+    # soft delete product at admin_product page
+    path('api/products/delete/<int:product_id>/', admin_api.admin_api_delete_product, name='admin-product-delete'),
     path('api/products/restore_product/<int:product_id>/', admin_api.admin_api_restore_product,
          name='admin-restore-product'),
-
-    path('api/products/<int:product_id>/update/', admin_api.admin_update_product_and_options,
-         name='admin-update-product'),
-    path('api/products/<int:product_id>/delete/', admin_api.admin_delete_product, name='admin-delete-product'),
-    path('api/products/<int:product_id>/options/', admin_api.admin_view_product_with_options,
-         name='admin-view-product-with-options'),
-    path('api/categories-brands/', admin_api.admin_list_categories_brands, name='admin-list-categories-brands'),
 
     # ----------- API Quản trị đơn hàng ----------
     path('api/orders/', admin_api.admin_list_orders, name='admin-list-orders'),
@@ -93,16 +92,14 @@ urlpatterns = [
     path('api/reviews/update/', admin_api.api_update_review_reply, name='update_review_reply'),
 
     # ----------- Giao diện quản trị (HTML) ----------
-    path('products/', views.admin_product_list, name='admin-dashboard-products'),
-    path('products/create/', views.create_product_page, name='admin-create-product-page'),
-    path('products/detail/<int:product_id>/', views.edit_product, name='admin-edit-product'),
-    path('products/delete/<int:product_id>/', views.confirm_delete_product, name='admin-confirm-delete-product'),
-    path('products/<int:product_id>/', views.admin_product_detail_page, name='admin-product-detail-page'),
+    path('quantri/products/', views.admin_product_list, name='admin-dashboard-products'),
+    path('quantri/products/create/', views.create_product_page, name='admin-create-product-page'),
+    path('quantri/products/detail/<int:product_id>/', views.edit_product, name='admin-edit-product'),
 
-    path('orders/', views.manage_order, name='admin-dashboard-orders'),
-    path('orders/<int:order_id>/', views.order_detail_view, name='admin-order-detail-page'),
+    path('quantri/orders/', views.manage_order, name='admin-dashboard-orders'),
+    path('quantri/orders/<int:order_id>/', views.order_detail_view, name='admin-order-detail-page'),
 
-    path('reviews/', views.admin_review_list_view, name='admin-review-list-page')
+    path('quantri/reviews/', views.admin_review_list_view, name='admin-review-list-page')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

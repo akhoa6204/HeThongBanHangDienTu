@@ -1,11 +1,10 @@
 import {getCookie} from '../utils/utils.js'
 function fetchApiProduct(slug) {
-    if (!slug || !slug.category || !slug.product || !slug.option) {
+    if (!slug || !slug.category || !slug.product) {
         console.log("Invalid slug data");
         return;
     }
-    const url = `/api/product/${slug.category}/${slug.product}/${slug.option}/`;
-
+    const url = `/api/product/${slug.category}/${slug.product}/`;
     return cookieStore.get('csrftoken')
         .then(cookie => {
             return fetch(url, {

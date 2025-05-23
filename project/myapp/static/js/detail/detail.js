@@ -30,11 +30,9 @@ const haveImg = document.querySelector('main > .reviewBox .filter .haveImg');
 const path = window.location.pathname;
 const slugCategory = path.split('/')[2];
 const slugProduct = path.split('/')[3];
-const slugOption = path.split('/')[4];
 const slug = {
     'category': slugCategory,
     'product': slugProduct,
-    'option': slugOption
 }
 
 function setSelectedColor(color) {
@@ -69,7 +67,6 @@ function updatePrice() {
     let discount ='';
     let discountedPrice ='';
     let price = '';
-    console.log(current_version);
     if (selected_color){
         price = current_version.colors.find(color => color.color === selected_color).price;
         discount = Number(current_version.discount) || 0;
@@ -192,8 +189,11 @@ function updateCurrentColor(e){
 }
 function updateColorUI(options) {
     const colorBox = document.querySelector('.productBox .colorBox');
+    colorBox.innerHTML = '';
+    let isLoad = false;
     for (const option of options) {
-        if(option.slug !== current_version.slug) return;
+        if(current_version && option.slug !== current_version.slug) continue;
+        if (isLoad) break;
         for (const color of option.colors){
             const html = `
                 <div class="color ${color.color === selected_color ? 'active' : ''} ${color.stock === 0 ? 'disabled' : ''}"
@@ -202,6 +202,7 @@ function updateColorUI(options) {
                 </div>
             `;
             colorBox.innerHTML += html;
+            isLoad = true;
         }
     }
     colorBox.innerHTML += `<p class='error-message'></p>`;
@@ -211,6 +212,12 @@ function updateColorUI(options) {
             color.disabled=true;
         }else{
             color.addEventListener('click', (e) => {
+                if (!current_version){
+                    const errorMessage = colorBox.querySelector('.error-message');
+                    errorMessage.textContent ='Vui lòng chọn phiên bản';
+                    colorBox.classList.add('notSelected')
+                    return;
+                }
                 if(colorBox.classList.contains('notSelected')) colorBox.classList.remove('notSelected');
                 const errorMessage = colorBox.querySelector('.error-message');
                 errorMessage.textContent ='';
@@ -219,25 +226,35 @@ function updateColorUI(options) {
         }
     }
 }
-function updateVersionUI(options){
-    let i =0;
+function updateVersionUI(options) {
+    categoryBox.innerHTML = '';
+
     for (const version of options) {
-        console.log(i, '----------------------------------')
-        console.log(version.slug, version.version);
-        console.log(current_version.slug, current_version.version);
-        i++;
-        const isActive = version.slug === current_version.slug;
-        const href = isActive ? '#' : `/detail/${slugCategory}/${slugProduct}/${version.slug}/`;
+        const isActive = current_version && version.slug === current_version.slug;
         const activeClass = isActive ? 'active' : '';
 
-        const html = `
-            <a href="${href}" class="category ${activeClass}">
-                ${version.version}
-            </a>
-        `;
-        categoryBox.innerHTML += html;
+        const button = document.createElement('button');
+        button.className = `category ${activeClass}`;
+        button.innerHTML += `<p>${version.version}</p>`;
+        button.style.background = 'none';
+
+        button.addEventListener('click', () => {
+            const colorBox = document.querySelector('.productBox .colorBox');
+            if (colorBox.classList.contains('notSelected')) colorBox.classList.remove('notSelected');
+            const errorMessage = colorBox.querySelector('.error-message');
+            errorMessage.textContent = '';
+
+            setCurrentVersion(version);
+            selected_color = null;
+
+            updateVersionUI(options);
+            updateColorUI(options);
+        });
+
+        categoryBox.appendChild(button);
     }
 }
+
 function updateReviewsUI(reviews){
     const reviewBox = document.querySelector('main > .reviewBox');
     const reviewItemContainer = reviewBox.querySelector('.reviewItemContainer');
@@ -464,7 +481,6 @@ function createDots() {
 function fetchApiReview(slugProduct, pageNumber, star){
     return fetchApiReviews(slugProduct, pageNumber, star)
         .then(data => {
-            console.log(data);
             // reviews
             updateReviewsUI(data.reviews);
             return data;
@@ -473,7 +489,7 @@ function fetchApiReview(slugProduct, pageNumber, star){
             console.error('Lỗi khi lấy dữ liệu reviews:', error);
         });
 }
-function buyProduct(slugProduct, slugOption) {
+function buyProduct(slugProduct) {
     if (!selected_color) {
         const colorBox = document.querySelector('.productBox .colorBox');
         const errorMessage = colorBox.querySelector('.error-message');
@@ -486,6 +502,7 @@ function buyProduct(slugProduct, slugOption) {
     const color = document.querySelector('.productBox .colorBox .color.active').textContent.trim();
     const quantity = document.querySelector('.productBox .quantityBox .quantity p:nth-child(2)').textContent;
     let orderList = [];
+    const slugOption = current_version.slug;
     orderList.push({
         slugProduct,
         slugOption,
@@ -505,7 +522,7 @@ function buyProduct(slugProduct, slugOption) {
     })
     .catch(err => window.location.href = "/login/")
 }
-function addProductCart(slugProduct, slugOption){
+function addProductCart(slugProduct){
     if (!selected_color) {
         const colorBox = document.querySelector('.productBox .colorBox');
         const errorMessage = colorBox.querySelector('.error-message');
@@ -516,8 +533,8 @@ function addProductCart(slugProduct, slugOption){
         return;
     };
     const color = document.querySelector('.productBox .colorBox .color.active').textContent.trim();
-    console.log(color);
     const quantity = document.querySelector('.productBox .quantityBox .quantity p:nth-child(2)').textContent;
+    const slugOption = current_version.slug;
     const product = {
         slugProduct,
         slugOption,
@@ -542,13 +559,12 @@ window.onload = () => {
         .then(data => {
             if (data) {
                 product = data.product;
+                console.log("product: ");
                 console.log(product);
-                setCurrentVersion(product.options.find(option => option.slug=slugOption));
-                console.log(current_version);
                 brand_name = product.brand.name;
                 category_name = product.category.name;
                 h3.textContent = product.name;
-                descriptionBox.innerHTML = current_version.description;
+                descriptionBox.innerHTML = product.options[0].description;
 
                 updateImg();
                 updateColorUI(product.options);
@@ -574,10 +590,10 @@ window.onload = () => {
                     numberQuantity.textContent = currentQuantity;
                 });
                 cartButton.addEventListener('click', ()=>{
-                    addProductCart(slugProduct, slugOption);
+                    addProductCart(slugProduct);
                 })
                 buyButton.addEventListener('click', ()=>{
-                    buyProduct(slugProduct, slugOption);
+                    buyProduct(slugProduct);
                 })
                 setInterval(()=>{
                     activeNow + 1 < listImg.children.length ? setActiveNow(activeNow + 1): setActiveNow(0);
@@ -586,7 +602,7 @@ window.onload = () => {
             }
         })
         .catch(error => {
-                window.location.href= '/';
+            window.location.href= '/';
         });
     fetchApiReview(slugProduct, 1, 0)
         .then(data => {

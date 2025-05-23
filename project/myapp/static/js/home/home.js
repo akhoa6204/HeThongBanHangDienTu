@@ -76,12 +76,12 @@ function loadData(data){
                                             ${hasDiscount ? `<div class="discount">Giảm ${option.discount * 100}%</div>` : ''}
                                         </div>
                                         <div class="product-image">
-                                            <a href="/detail/${category.slug}/${option.product.slug}/${option.slug}/">
+                                            <a href="/detail/${category.slug}/${option.product.slug}/">
                                                 <img src="${option.product.image}" />
                                             </a>
                                         </div>
                                         <div class="name-product">
-                                            <a href="/detail/${category.slug}/${option.product.slug}/${option.slug}/">
+                                            <a href="/detail/${category.slug}/${option.product.slug}/">
                                                 <p>${option.product.name}</p>
                                             </a>
                                         </div>

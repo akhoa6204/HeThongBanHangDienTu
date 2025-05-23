@@ -65,7 +65,7 @@ main > * {
 }
 .productBox .detail .categoryBox .category{
     border-radius: 5px;
-    border: 1px solid rgba(209, 206, 206, 1);
+    border: 3px solid rgba(209, 206, 206, 1);
     padding: 6px 12px;
     text-align: center;
 }
@@ -92,7 +92,7 @@ main > * {
   text-align: right;
   padding: 6px 12px;
   border-radius: 5px;
-  border: 1px solid rgba(209, 206, 206, 1);
+  border: 3px solid rgba(209, 206, 206, 1);
   background-color: white;
 }
 .productBox .detail .colorBox .error-message{

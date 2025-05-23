@@ -1,7 +1,7 @@
 import { fetchApiGet } from '../service/admin_order_detail/fetchApi.js';
 
 const pathParts = window.location.pathname.split('/');
-const orderId = pathParts[2];
+const orderId = pathParts[3];
 console.log("Order ID:", orderId);
 
 function formatPrice(value) {
@@ -47,6 +47,7 @@ function renderOrderItems(order_items) {
   `;
 
   order_items.forEach(item => {
+    console.log(item);
     const product = item.product || {};
     const images = product.options[0].colors[0].images[0] || [];
     const imageUrl = images ? images.img : '';
@@ -66,7 +67,7 @@ function renderOrderItems(order_items) {
       <tr>
         <td>${item.id}</td>
         <td><img src="${imageUrl}" alt="${productName}" style="max-width: 50px;"></td>
-        <td>${productName}</td>
+        <td>${productName} - ${product.options[0].version} - ${product.options[0].colors[0].color}</td>
         <td>
             ${discount > 0 ?
                 `

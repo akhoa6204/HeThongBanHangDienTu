@@ -75,6 +75,7 @@ class Option(models.Model):
     description = models.TextField(null=True, blank=True, help_text="Mô tả chi tiết phiên bản")
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="Ngày tạo bản ghi")
     updated_at = models.DateTimeField(auto_now=True, help_text="Ngày cập nhật gần nhất")
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         constraints = [
@@ -86,6 +87,7 @@ class OptionDetail(models.Model):
     option = models.ForeignKey(Option, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     value = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
 
 
 class OptionColor(models.Model):
@@ -93,6 +95,7 @@ class OptionColor(models.Model):
     color = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     stock = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
 
     def final_price(self):
         discount = self.option.discount or 0
@@ -103,6 +106,7 @@ class OptionImage(models.Model):
     option_color = models.ForeignKey(OptionColor, on_delete=models.CASCADE)
     img = models.ImageField(upload_to=ProcessingUploadPath.option_image_upload_path, null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Image for {self.option_color} - {self.img.url if self.img else 'No image'}"

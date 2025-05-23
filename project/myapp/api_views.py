@@ -33,12 +33,11 @@ class homeApiView(APIView):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def apiProductDetail(request, slugCategory, slugProduct, slugOption):
-    product = Product.objects.get(slug=slugProduct, category__slug=slugCategory)
-    if not product.status:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    product_serialized = ProductSerializer(product, context={'request': request})
+def apiProductDetail(request, slugCategory, slugProduct):
+    product = get_object_or_404(Product, slug=slugProduct, category__slug=slugCategory, status=True)
 
+    product_serialized = ProductSerializer(product, context={'request': request})
+    print(product_serialized.data)
     return Response({
         "product": product_serialized.data,
     })

@@ -52,12 +52,20 @@ class OptionColorSerializer(serializers.ModelSerializer):
 
 
 class OptionSerializer(serializers.ModelSerializer):
-    colors = OptionColorSerializer(many=True, source='optioncolor_set')
-    details = OptionDetailSerializer(many=True, source='optiondetail_set')
+    colors = serializers.SerializerMethodField()
+    details = serializers.SerializerMethodField()
 
     class Meta:
         model = Option
         fields = ['id', 'slug', 'version', 'discount', 'description', 'colors', 'details']
+
+    def get_colors(self, obj):
+        colors = OptionColor.objects.filter(option=obj, is_active=True)
+        return OptionColorSerializer(colors, many=True, context=self.context).data
+
+    def get_details(self, obj):
+        details = OptionDetail.objects.filter(option=obj, is_active=True)  # Thêm is_active=True nếu cần
+        return OptionDetailSerializer(details, many=True).data
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -77,12 +85,16 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     brand = BrandSerializer()
-    options = OptionSerializer(many=True)
+    options = serializers.SerializerMethodField()
     images = ProductImageSerializer(many=True, source='productimage_set')
 
     class Meta:
         model = Product
         fields = ['id', 'name', 'slug', 'category', 'brand', 'purchased_count', 'options', 'images', 'status']
+
+    def get_options(self, obj):
+        options = Option.objects.filter(product=obj, is_active=True)
+        return OptionSerializer(options, many=True, context=self.context).data
 
 
 class OptionReviewSerializer(serializers.ModelSerializer):

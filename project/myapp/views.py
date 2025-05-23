@@ -1,8 +1,7 @@
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import redirect, get_object_or_404, render
+from django.shortcuts import redirect, render
 
-from .models import Product, Category, Brand, ProductImage
 from .utils import is_admin
 
 
@@ -14,7 +13,7 @@ def search(request):
     return render(request, 'page/public/search.html')
 
 
-def detail(request, slugCategory, slugProduct, slugOption):
+def detail(request, slugCategory, slugProduct):
     return render(request, 'page/public/detail.html', )
 
 
@@ -91,31 +90,7 @@ def admin_product_list(request):
 @user_passes_test(is_admin, login_url='home')
 @login_required
 def edit_product(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    options = product.options.all()
-    categories = Category.objects.all()
-    brands = Brand.objects.all()
-
-    return render(request, 'page/admin/edit_product.html', {
-        'product': product,
-        'options': options,
-        'categories': categories,
-        'brands': brands,
-    })
-
-
-from django.http import HttpResponseNotFound
-
-
-@user_passes_test(is_admin, login_url='home')
-@login_required
-def confirm_delete_product(request, product_id):
-    try:
-        product = Product.objects.get(id=product_id)
-    except Product.DoesNotExist:
-        return HttpResponseNotFound('Sản phẩm này không tồn tại.')
-
-    return render(request, 'page/admin/confirm_delete.html', {'product': product})
+    return render(request, 'page/admin/edit_product.html')
 
 
 @login_required
@@ -140,21 +115,3 @@ def manage_order(request):
 @user_passes_test(is_admin, login_url='home')
 def order_detail_view(request, order_id):
     return render(request, 'page/admin/order_detail.html')
-
-
-@login_required
-@user_passes_test(is_admin, login_url='home')
-def manage_bill(request):
-    return render(request, 'page/admin/admin_manage_bill.html')
-
-
-@login_required
-def admin_product_detail_page(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    images = ProductImage.objects.filter(product=product)
-    options = product.options.prefetch_related('images').all()
-    return render(request, 'page/admin/admin_product_detail.html', {
-        'product': product,
-        'images': images,
-        'options': options
-    })

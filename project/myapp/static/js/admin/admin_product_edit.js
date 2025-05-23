@@ -3,7 +3,7 @@ import {fetchApiGet} from '../service/admin_create_product/fetchApi.js';
 const selectCategory = document.querySelector("select[name='category']");
 const selectBrand = document.querySelector("select[name='brand']");
 const pathParts = window.location.pathname.split('/');
-const productId = pathParts[3];
+const productId = pathParts[4];
 const productEditBtn = document.querySelector('.btn-edit-product');
 const productSubmitContainer = document.querySelector('.product-form .submitContainer');
 const productCancelBtn = productSubmitContainer.querySelector('.back');
@@ -515,11 +515,12 @@ const updateOption = (optionDiv) => {
         formData.append(`details[${detailIndex}][name]`, detail.name);
         formData.append(`details[${detailIndex}][value]`, detail.value);
     });
-
+    
     fetchApiUpdateOption(productId, optionData.id || "", formData)
         .then(data => {
             const newForm = createOptionForm(data.option);
             optionDiv.replaceWith(newForm);
+            updateDeleteOptionButtons()
             if(optionData.id){
                 const popupSuccessOption = document.querySelector('.popup-model.success.option')
                 popupSuccessOption.classList.add('active');

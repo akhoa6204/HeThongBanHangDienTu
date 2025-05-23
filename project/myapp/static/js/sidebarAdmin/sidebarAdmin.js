@@ -1,5 +1,5 @@
 const path = window.location.pathname;
-const current = path.split('/')[1];
+const current = path.split('/')[2];
 const boxAll = document.querySelectorAll('.box');
 if (current == 'products'){
     boxAll[0].classList.add('active');
