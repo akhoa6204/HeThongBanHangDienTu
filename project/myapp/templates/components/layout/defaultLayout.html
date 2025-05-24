@@ -5,6 +5,7 @@
     <title>{% block title %}Trang chủ{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/footer.css' %}">
     {% block extra_css %}{% endblock %}
     <link
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
@@ -32,7 +33,7 @@
 <body>
 {% include 'components/components/header.html' %}
 {% block content %}{% endblock %}
-
+{% include 'components/components/footer.html' %}
 </body>
 <script src="{% static 'js/header/header.js' %}" type="module"></script>
 {% block extra_js %}{% endblock %}
