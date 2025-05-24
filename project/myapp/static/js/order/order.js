@@ -36,18 +36,20 @@ function getLoad(){
     return load;
 }
 function formatDate(dateString) {
-    const date = new Date(dateString);
+    // Loại bỏ phần microseconds nếu có (".247929")
+    const cleanDateString = dateString.split('.')[0] + 'Z';
 
-    // Lấy giờ và phút
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const date = new Date(cleanDateString);
 
-    // Lấy ngày, tháng, năm
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Lưu ý là tháng bắt đầu từ 0
-    const year = date.getFullYear();
+    if (isNaN(date)) return 'Không hợp lệ';
 
-    // Định dạng theo kiểu "hh:mm dd-mm-yyyy"
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+
     return `${hours}:${minutes} ${day}-${month}-${year}`;
 }
 function updateHeader(tag) {
@@ -135,7 +137,7 @@ function loadOrderData(data){
             }else if(item.status === 'cancelled'){
                 status = 'Đã hủy';
             }
-            const formattedDate = formatDate(item.updated_at);
+            const formattedDate = item.update_at && formatDate(item.update_at);
             return `
                 <div class="orderBox">
                     <div class="status">

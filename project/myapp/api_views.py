@@ -672,3 +672,11 @@ def apiRegister(request):
         return Response({'detail': 'Đăng ký thành công'}, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'detail': 'Đã có lỗi xảy ra'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_total_product(request):
+    user = request.user
+    product_count = Cart.objects.filter(user=user).count()
+    return Response({'total_product': product_count}, status=status.HTTP_200_OK)

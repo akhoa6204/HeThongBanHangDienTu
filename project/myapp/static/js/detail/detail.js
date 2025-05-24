@@ -1,5 +1,6 @@
 import { fetchApiProduct, fetchApiReviews, fetchApiAddProductCart, fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
-import { fetchApiAuthenticated } from  '../service/header/header.js';
+import { fetchApiAuthenticated, fetchApiTotalProduct } from  '../service/header/header.js'
+
 const listImg = document.querySelector('.viewport .listImg');
 let selected_color, activeNow = 0, currentQuantity = 1, total = 0, current_version, brand_name,
     category_name, avgReview = 0, totalPage =1 , currentPage= 1, dataCurrentVersions, product;
@@ -103,7 +104,6 @@ function updateDetail() {
         detailsBox.innerHTML = html;
     }
     else{
-        console.log(current_version);
         quantity = current_version.colors.find(color => color.color === selected_color).stock > 0 ? current_version.colors.find(color => color.color === selected_color).stock : 'Hết hàng';
         html += `
             <div class="detail"><p>Danh mục</p><p>${category_name}</p></div>
@@ -189,7 +189,7 @@ function updateCurrentColor(e){
 }
 function updateColorUI(options) {
     const colorBox = document.querySelector('.productBox .colorBox');
-    colorBox.innerHTML = '';
+    colorBox.innerHTML = '<p>Màu sắc</p>';
     let isLoad = false;
     for (const option of options) {
         if(current_version && option.slug !== current_version.slug) continue;
@@ -227,8 +227,7 @@ function updateColorUI(options) {
     }
 }
 function updateVersionUI(options) {
-    categoryBox.innerHTML = '';
-
+    categoryBox.innerHTML = '<p>Phiên bản</p>';
     for (const version of options) {
         const isActive = current_version && version.slug === current_version.slug;
         const activeClass = isActive ? 'active' : '';
@@ -239,6 +238,7 @@ function updateVersionUI(options) {
         button.style.background = 'none';
 
         button.addEventListener('click', () => {
+            if (current_version === version) return;
             const colorBox = document.querySelector('.productBox .colorBox');
             if (colorBox.classList.contains('notSelected')) colorBox.classList.remove('notSelected');
             const errorMessage = colorBox.querySelector('.error-message');
@@ -247,6 +247,8 @@ function updateVersionUI(options) {
             setCurrentVersion(version);
             selected_color = null;
 
+            updateDetail();
+            updateDescription('');
             updateVersionUI(options);
             updateColorUI(options);
         });
@@ -254,7 +256,6 @@ function updateVersionUI(options) {
         categoryBox.appendChild(button);
     }
 }
-
 function updateReviewsUI(reviews){
     const reviewBox = document.querySelector('main > .reviewBox');
     const reviewItemContainer = reviewBox.querySelector('.reviewItemContainer');
@@ -545,6 +546,13 @@ function addProductCart(slugProduct){
     .then(data => {
        fetchApiAddProductCart(product)
         .then(data => {
+            fetchApiTotalProduct()
+            .then(data => {
+                const total = data.total_product || 0;
+                const totalProduct= document.querySelector('.total-product');
+                totalProduct && totalProduct.classList.add('active');
+                totalProduct.innerHTML = total;
+            })
             popupModelSuccess.classList.add('active')
         })
         .catch(error => {
@@ -553,6 +561,13 @@ function addProductCart(slugProduct){
 
     })
    .catch(error => window.location.href ='/login/')
+}
+function updateDescription(product=''){
+    if(!current_version){
+        descriptionBox.innerHTML = product.options[0].description;
+    }else{
+        descriptionBox.innerHTML = current_version.description || '';
+    }
 }
 window.onload = () => {
     fetchApiProduct(slug)
@@ -564,7 +579,7 @@ window.onload = () => {
                 brand_name = product.brand.name;
                 category_name = product.category.name;
                 h3.textContent = product.name;
-                descriptionBox.innerHTML = product.options[0].description;
+                updateDescription(product)
 
                 updateImg();
                 updateColorUI(product.options);
@@ -602,6 +617,7 @@ window.onload = () => {
             }
         })
         .catch(error => {
+            alert(error.message);
             window.location.href= '/';
         });
     fetchApiReview(slugProduct, 1, 0)

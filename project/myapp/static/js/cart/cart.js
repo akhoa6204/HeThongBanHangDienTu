@@ -1,5 +1,7 @@
 import { fetchApiCart, fetchApiRemoveCartItem, fetchApiUpdateQuantityCartItem } from '../service/cart/fetchApi.js';
 import { fetchApiSetOrderProduct } from '../service/detail/fetchApi.js';
+import { fetchApiTotalProduct } from  '../service/header/header.js'
+
 const main = document.querySelector('main');
 let stockData = [];
 function getStockData(indexProduct){
@@ -169,7 +171,13 @@ function deleteItem(e, index) {
    fetchApiRemoveCartItem(productList)
     .then(data => {
         if (data.detail === 'Xóa sản phẩm thành công'){
-            console.log(data.detail);
+            fetchApiTotalProduct()
+            .then(data => {
+                const total = data.total_product || 0;
+                const totalProduct= document.querySelector('.total-product');
+                totalProduct && totalProduct.classList.add('active');
+                totalProduct.innerHTML = total;
+            })
             parentElement.remove();
             const cartItem = document.querySelectorAll('.cartItem');
             if (cartItem.length < 1){

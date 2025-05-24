@@ -97,3 +97,19 @@
 #header .container .box .user:hover .nav{
     display: block !important;
 }
+.cart{
+    position: relative;
+    .total-product{
+        position: absolute;
+        padding: 2px 6px;
+        border-radius: 50%;
+        background-color: #2b3467;
+        color: white;
+        top: -10px;
+        left: -5px;
+        display: none;
+    }
+    .total-product.active{
+        display: block;
+    }
+}

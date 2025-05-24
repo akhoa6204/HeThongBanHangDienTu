@@ -250,8 +250,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'need_invoice', 'status', 'total_price', 'updated_at', 'orderItem', 'has_review', 'address',
-                  'user']
+        fields = ['id', 'need_invoice', 'status', 'total_price', 'update_at', 'orderItem', 'has_review', 'address',
+                  'user', 'pending_at', 'processing_at', 'shipping_at', 'shipped_at', 'cancelled_at']
 
     def get_user(self, obj):
         return {

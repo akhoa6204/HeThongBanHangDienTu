@@ -38,6 +38,7 @@ urlpatterns = [
     path('api/changePassword/', api_views.apiChangePassword, name='api_changePassword'),
     path('api/login/', api_views.apiLogin, name='api_login'),
     path('api/register/', api_views.apiRegister, name='api_register'),
+    path('api/get_total_product/', api_views.api_total_product, name='api_total_product'),
 
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),

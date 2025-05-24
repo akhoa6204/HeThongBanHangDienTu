@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils import timezone
 
 from .upload_paths import ProcessingUploadPath
 
@@ -152,13 +153,36 @@ class Order(models.Model):
         ('cancelled', 'Đã hủy'),
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    need_invoice = models.BooleanField(default=False, help_text="Có cần in hóa đơn không")
+    need_invoice = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     address = models.TextField(null=True, blank=True)
     has_review = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True, help_text="Ngày tạo bản ghi")
+    update_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    pending_at = models.DateTimeField(null=True, blank=True)
+    processing_at = models.DateTimeField(null=True, blank=True)
+    shipping_at = models.DateTimeField(null=True, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        # Nếu đơn hàng mới => set pending_at
+        if not self.pk and self.status == 'pending':
+            self.pending_at = timezone.now()
+        else:
+            # Đơn hàng đã tồn tại => kiểm tra thay đổi trạng thái
+            old = Order.objects.get(pk=self.pk)
+            if old.status != self.status:
+                if self.status == 'processing':
+                    self.processing_at = timezone.now()
+                elif self.status == 'shipping':
+                    self.shipping_at = timezone.now()
+                elif self.status == 'shipped':
+                    self.shipped_at = timezone.now()
+                elif self.status == 'cancelled':
+                    self.cancelled_at = timezone.now()
+        super().save(*args, **kwargs)
 
     def calculate_total_price(self):
         total = Decimal('0.00')
@@ -182,3 +206,12 @@ class ReviewImage(models.Model):
     review = models.ForeignKey(Review, related_name='media_files', on_delete=models.CASCADE)
     img = models.ImageField(upload_to=ProcessingUploadPath.review_upload_path, null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+
+class OrderCancellation(models.Model):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='cancellation')
+    reason = models.TextField(null=True, blank=True, help_text="Lý do hủy đơn hàng")
+    note = models.TextField(null=True, blank=True, help_text="Ghi chú nội bộ thêm khi hủy đơn hàng")
+    cancelled_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True,
+                                     help_text="Người thực hiện hủy đơn")
+    cancelled_at = models.DateTimeField(auto_now_add=True)

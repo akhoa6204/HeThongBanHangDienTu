@@ -1,4 +1,4 @@
-import {fetchApiAuthenticated} from  '../service/header/header.js'
+import { fetchApiAuthenticated, fetchApiTotalProduct } from  '../service/header/header.js'
 const input = document.querySelector('#header .search input');
 const searchBtn = document.querySelector('#header .search label');
 searchBtn.addEventListener('click', () =>{
@@ -14,56 +14,64 @@ input.addEventListener('keydown', (event)=>{
 const box = document.querySelector('#header .box');
 fetchApiAuthenticated()
     .then(data=>{
-        if(data.is_authenticated){
-            box.innerHTML += `
-                <div class="user">
-                    <span class="material-symbols-outlined">person</span>
-                    <p>Tôi</p>
-                    <div class='nav'>
-                        <div class="subNav info">
-                            <span class="material-symbols-outlined">manage_accounts</span>
-                            <p>Thông tin người dùng</p>
-                        </div>
-                        <div class="subNav pass">
-                            <span class="material-symbols-outlined">lock</span>
-                            <p>Đổi mật khẩu</p>
-                        </div>
-                        <div class="subNav order">
-                            <span class="material-symbols-outlined">inventory</span>
-                            <p>Đơn mua</p>
-                        </div>
+        fetchApiTotalProduct()
+        .then(data => {
+            const total = data.total_product || 0;
+            const totalProduct= document.querySelector('.total-product');
+            totalProduct && totalProduct.classList.add('active');
+            totalProduct.innerHTML = total;
+        })
+        box.innerHTML += `
+            <div class="user">
+                <span class="material-symbols-outlined">person</span>
+                <p>Tôi</p>
+                <div class='nav'>
+                    <div class="subNav info">
+                        <span class="material-symbols-outlined">manage_accounts</span>
+                        <p>Thông tin người dùng</p>
+                    </div>
+                    <div class="subNav pass">
+                        <span class="material-symbols-outlined">lock</span>
+                        <p>Đổi mật khẩu</p>
+                    </div>
+                    <div class="subNav order">
+                        <span class="material-symbols-outlined">inventory</span>
+                        <p>Đơn mua</p>
                     </div>
                 </div>
-                <div class="logout">
-                    <span class="material-symbols-outlined">logout</span>
-                    <p>Đăng xuất</p>
-                </div>
-            `;
-            const user = box.querySelector('.user');
-            const nav = user.querySelector('.nav');
-            const info = nav.querySelector('.info');
-            const pass = nav.querySelector('.pass');
-            const logout = box.querySelector('.logout');
-            const order = box.querySelector('.order');
-            logout.addEventListener('click', ()=>{
-                window.location.href ='/logout/';
-            });
-             order.addEventListener('click', ()=>{
-                window.location.href ='/purchase/';
-            });
-            nav.addEventListener('click', (e) => {
-                e.stopPropagation();
-            })
-            info.addEventListener('click', () => {
-                window.location.href = '/info_user/'
-            })
-            pass.addEventListener('click', () => {
-                window.location.href = '/change_password/'
-            })
+            </div>
+            <div class="logout">
+                <span class="material-symbols-outlined">logout</span>
+                <p>Đăng xuất</p>
+            </div>
+        `;
+        const user = box.querySelector('.user');
+        const nav = user.querySelector('.nav');
+        const info = nav.querySelector('.info');
+        const pass = nav.querySelector('.pass');
+        const logout = box.querySelector('.logout');
+        const order = box.querySelector('.order');
+        logout.addEventListener('click', ()=>{
+            window.location.href ='/logout/';
+        });
+         order.addEventListener('click', ()=>{
+            window.location.href ='/purchase/';
+        });
+        nav.addEventListener('click', (e) => {
+            e.stopPropagation();
+        })
+        info.addEventListener('click', () => {
+            window.location.href = '/info_user/'
+        })
+        pass.addEventListener('click', () => {
+            window.location.href = '/change_password/'
+        })
 
-        }
+
     })
     .catch(error => {
+         const totalProduct= document.querySelector('.total-product');
+         totalProduct && totalProduct.classList.remove('active');
         box.innerHTML += `
             <a class="loginBox" href="/login/">
                 <span class="material-symbols-outlined">person</span>

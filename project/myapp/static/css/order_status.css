@@ -41,24 +41,42 @@ main .orderStatusInfo{
         font-size: 40px;
         color: rgba(209, 206, 206, 1);
     }
+    > span.active{
+        color: #5667cd;
+    }
     .box{
         display: flex;
         flex-direction: column;
-        gap: 20px;
         align-items: center;
+        span{
+            margin-bottom:10px;
+        }
         span:first-child{
             width: 70px;
             height: 70px;
             line-height: 70px;
             font-size: 50px;
-            background-color:rgba(230, 230, 230, 1);
+            background-color: rgba(230, 230, 230, 1);
             border-radius: 50%;
-            text-align: center
+            text-align: center;
+            margin-bottom: 20px;
+            color: rgba(136, 135, 135, 1);
+        }
+    }
+    .box.after-active{
+        span:first-child{
+            background-color: white;
+            border: 3px solid #5667cd;
+            line-height: 67px;
+            color: #5667cd;
         }
     }
     .box.active{
         span:first-child{
-            background-color:rgba(185, 185, 185, 1);
+            background-color: #5667cd;
+            border: 3px solid #5667cd;
+            line-height: 67px;
+            color: white;
         }
     }
 }
