@@ -1,8 +1,15 @@
-import { fetchApiGet } from '../service/admin_order_detail/fetchApi.js';
+import { fetchApiGet, fetchApiCancelOrder } from '../service/admin_order_detail/fetchApi.js';
 
 const pathParts = window.location.pathname.split('/');
 const orderId = pathParts[3];
 console.log("Order ID:", orderId);
+const statusTextMap = {
+  pending: 'Chờ xác nhận',
+  processing: 'Đang xử lý',
+  shipping: 'Đang giao hàng',
+  shipped: 'Đã giao hàng',
+  cancelled: 'Đã hủy'
+};
 
 function formatPrice(value) {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
@@ -100,13 +107,139 @@ function renderTotalPrice(totalPrice) {
 
 fetchApiGet(orderId)
   .then(data => {
-    console.log('Order data:', data);
     if (!data) return;
 
-    renderCustomerInfo(data.order.user, data.order);
-    renderOrderItems(data.order.order_items);
-    renderTotalPrice(data.order.total_price);
+    const order = data.order;
+    renderCustomerInfo(order.user, order);
+    renderOrderItems(order.order_items);
+    renderTotalPrice(order.total_price);
+
+    setupCancelForm(order);
+
+    const statusSpan = document.querySelector('.orderStatus');
+    if (statusSpan) {
+      const statusClass = order.status;
+      const statusText = statusTextMap[statusClass] || statusClass;
+
+      statusSpan.textContent = statusText;
+      statusSpan.className = 'orderStatus ' + statusClass;  // để thêm style theo class
+    }
+
   })
   .catch(err => {
     console.error('Error fetching order:', err);
   });
+
+function setupCancelForm(order) {
+  const form = document.getElementById('form-cancelled');
+  const reasonInput = document.getElementById('reason');
+  const noteInput = document.getElementById('note');
+  const cancelBtn = document.getElementById('cancelBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const backBtn = document.getElementById('backBtn');
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const toStatus = urlParams.get('to');
+
+  const isForceCancelMode = toStatus === 'cancelled';
+  if (order.status === 'shipped') {
+      // Đơn đã hoàn tất - không cho hủy
+      form.style.display = 'none';
+      cancelBtn.style.display = 'none';
+      saveBtn.style.display = 'none';
+      backBtn.style.display = 'none';
+      return;
+    }
+
+  if (order.status === 'cancelled') {
+    // Đơn đã bị hủy
+    form.style.display = 'block';
+    reasonInput.value = order.order_cancellation.reason || '';
+    noteInput.value = order.order_cancellation.note || '';
+    reasonInput.readOnly = true;
+    noteInput.readOnly = true;
+
+    cancelBtn.style.display = 'none';
+    saveBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+  } else if (isForceCancelMode) {
+    // Trường hợp URL có ?to=cancelled => hiện form sẵn
+    form.style.display = 'block';
+    reasonInput.readOnly = false;
+    noteInput.readOnly = false;
+
+    cancelBtn.style.display = 'none';
+    saveBtn.style.display = 'inline-block';
+    backBtn.style.display = 'inline-block';
+  } else {
+    // Trạng thái bình thường
+    form.style.display = 'none';
+    cancelBtn.style.display = 'inline-block';
+    saveBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+
+    cancelBtn.addEventListener('click', () => {
+      form.style.display = 'block';
+      reasonInput.readOnly = false;
+      noteInput.readOnly = false;
+
+      cancelBtn.style.display = 'none';
+      saveBtn.style.display = 'inline-block';
+      backBtn.style.display = 'inline-block';
+    });
+
+    backBtn.addEventListener('click', () => {
+      form.style.display = 'none';
+      reasonInput.value = '';
+      noteInput.value = '';
+
+      cancelBtn.style.display = 'inline-block';
+      saveBtn.style.display = 'none';
+      backBtn.style.display = 'none';
+    });
+  }
+
+  // Xử lý khi nhấn "Lưu"
+  saveBtn.addEventListener('click', () => {
+    const cancelReason = reasonInput.value.trim();
+    const note = noteInput.value.trim();
+
+    if (!cancelReason) {
+      alert('Vui lòng nhập lý do hủy.');
+      return;
+    }
+    console.log(cancelReason);
+    console.log(note);
+    fetchApiCancelOrder(orderId, cancelReason, note)
+    .then(data => {
+    // Hiển thị popup thành công
+    const popupSuccess = document.querySelector(".popup-model.success.change_status_order");
+    popupSuccess.classList.add('active');
+
+    // Cập nhật trạng thái trong DOM
+    const statusSpan = document.querySelector('.orderStatus');
+    if (statusSpan) {
+        const statusText = statusTextMap['cancelled'];
+        statusSpan.textContent = statusText;
+        statusSpan.className = 'orderStatus cancelled';
+    }
+
+    // Cập nhật form: readonly và điền lại thông tin vừa gửi
+    reasonInput.value = cancelReason;
+    noteInput.value = note;
+    reasonInput.readOnly = true;
+    noteInput.readOnly = true;
+
+    // Hiển thị form readonly
+    form.style.display = 'block';
+    cancelBtn.style.display = 'none';
+    saveBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+})
+
+    .catch(err => {
+        const popupError= document.querySelector(".popup-model.error.change_status_order");
+        popupError.classList.add('active');
+    })
+  });
+}

@@ -126,6 +126,8 @@ function loadData(orders) {
         detailBtn.addEventListener('click', function () {
             window.location.href = `/quantri/orders/${order.id}`;
         });
+        let previousStatus = select.value; // Lưu trạng thái ban đầu
+
         select.addEventListener('change', function () {
             const newStatus = select.value;
 
@@ -133,23 +135,30 @@ function loadData(orders) {
                 return;
             }
 
-            if (newStatus !== order.status && newStatus === 'cancelled') {
+            if (newStatus !== previousStatus && newStatus === 'cancelled') {
+                select.value = previousStatus;
                 window.location.href = `/quantri/orders/${order.id}/?to=${newStatus}`;
                 return;
             }
 
-            // Các trường hợp còn lại thì gọi API (nếu muốn)
+            // Các trường hợp hợp lệ khác: gọi API cập nhật trạng thái
             fetchApiPatchOrderStatus(order.id, newStatus)
                 .then(data => {
                     console.log(data.detail);
                     select.className = '';
                     select.classList.add(newStatus);
                     updateSelectOptions(select, newStatus);
+
+                    // Cập nhật lại previousStatus sau khi thành công
+                    previousStatus = newStatus;
                 })
                 .catch(err => {
                     alert(err.message);
+                    // Revert nếu lỗi
+                    select.value = previousStatus;
                 });
         });
+
 
 
     });

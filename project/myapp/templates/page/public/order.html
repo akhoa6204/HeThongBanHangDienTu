@@ -2,6 +2,7 @@
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/order.css' %}">
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -28,12 +29,42 @@
     </section>
     <section class="orderContainer">
     </section>
+    <div class="popupContainer">
+        <div class="box">
+            <div class="form-cancelled" id="form-cancelled">
+                <div class="input-group">
+                    <label for="reason">Lí do hủy hàng</label>
+                    <input type="text" id="reason" placeholder="Nhập lí do hủy hàng">
+                </div>
+                <div class="input-group">
+                    <label for="note">Ghi chú (nếu có)</label>
+                    <textarea id="note" rows="3" placeholder="Ghi chú(nếu có)"></textarea>
+                </div>
+            </div>
+            <div class="buttonBox">
+                <button class="submit" id="confirmCancelBtn">Lưu</button>
+                <button class="back" id="closeCancelPopup">Hủy</button>
+            </div>
+        </div>
+    </div>
+    <div class="popup-model success change_status">
+        {% with title="Hủy đơn hàng thành công" status='' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+    <div class="popup-model error change_status">
+        {% with title="Hủy đơn hàng thất bại" status='error' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
 </main>
+
 {% endblock %}
 {% block extra_js %}
 <script>
     const urlEmptyOrder = "{% static 'assets/img/emptyOrder.png' %}";
 </script>
 <script src="{% static 'js/order/order.js' %}" type="module"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
 {% endblock %}
 

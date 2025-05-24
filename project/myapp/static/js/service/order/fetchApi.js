@@ -16,7 +16,7 @@ function fetchOrder(status, page){
         })
         .then(response => response.json())
 }
-function fetchUpdateStatusOrder(orderId){
+function fetchUpdateStatusOrder(orderId, reason, note){
     const url = `/api/order/patch/${orderId}/`;
     return cookieStore.get('csrftoken')
         .then(cookie =>{
@@ -30,6 +30,7 @@ function fetchUpdateStatusOrder(orderId){
                     'X-CSRFToken': cookie.value,
                 },
                 credentials: 'include',
+                body: JSON.stringify({reason, note})
             })
         })
         .then(response => response.json())

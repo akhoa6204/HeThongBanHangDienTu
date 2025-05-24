@@ -3,6 +3,22 @@ import {fetchApiOrder} from '../service/orderStatus/fetchApi.js';
 const path = window.location.pathname;
 const orderId = path.split('/')[2];
 const main = document.querySelector('main');
+function loadFormCancelled(reason, note = '') {
+    const formCancelled = document.createElement('div');
+    formCancelled.className = 'form-cancelled';
+    formCancelled.id = 'form-cancelled';
+    formCancelled.innerHTML = `
+        <div class="input-group">
+            <label for="reason">Lí do hủy hàng</label>
+            <input type="text" id="reason" placeholder="Nhập lí do hủy hàng" value="${reason}" readonly>
+        </div>
+        <div class="input-group">
+            <label for="note">Ghi chú (nếu có)</label>
+            <textarea id="note" rows="3" placeholder="Ghi chú(nếu có)" readonly>${note}</textarea>
+        </div>
+    `;
+    main.appendChild(formCancelled);
+}
 function formatDate(dateString) {
     // Loại bỏ phần microseconds nếu có (".247929")
     const cleanDateString = dateString.split('.')[0] + 'Z';
@@ -115,8 +131,6 @@ function loadStatus(order){
 
     main.innerHTML += html;
 }
-
-
 function loadProduct(data){
     const totalPrice = (Number(data.total_price)).toLocaleString('vn-VN');
     const html = `
@@ -182,9 +196,12 @@ function setUpEventListener(){
 fetchApiOrder(orderId)
 .then(data => {
     if(data){
-        console.log(data);
         loadHeader(data.order.id, data.order.status, data.order.need_invoice);
-        loadStatus(data.order);
+        if (data.order.status !== 'cancelled'){
+            loadStatus(data.order);
+        }else{
+            loadFormCancelled(data.order.order_cancellation.reason, data.order.order_cancellation.note);
+        }
         loadProduct(data.order);
         setUpEventListener();
     }else{

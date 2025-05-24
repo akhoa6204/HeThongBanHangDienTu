@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Option, OptionColor, OptionDetail
+from .models import Option, OptionColor, OptionDetail, OrderCancellation
 from .models import Order, Review, ReviewReply, OptionImage
 from .models import Product, ProductImage, Category, Brand
 from .serializers import ProductSerializer, CategorySerializer, BrandSerializer, ReviewSerializer, \
@@ -386,7 +386,7 @@ def api_admin_update_order_status(request):
     return Response({"detail": "Cập nhật đơn hàng thành công"}, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def api_update_review_reply(request):
     review_id = request.data.get('id')
@@ -412,7 +412,7 @@ def api_update_review_reply(request):
     return Response({"detail": message}, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 @permission_classes([IsAuthenticated])
 def admin_api_update_product_detail(request, productId):
     product = get_object_or_404(Product, id=productId)
@@ -451,7 +451,7 @@ def admin_api_update_product_detail(request, productId):
     return Response({'success': True, 'product': serializer.data}, status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
+@api_view(['PATCH'])
 @permission_classes([IsAuthenticated, IsAdminUser])
 def admin_api_update_option(request, product_id, option_id=None):
     """
@@ -665,3 +665,27 @@ def admin_api_restore_product(request, product_id):
     product.status = True
     product.save()
     return Response({"detail": "Khôi phục sản phẩm thành công"}, status=status.HTTP_200_OK)
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAdminUser])
+def admin_api_cancel_order(request, order_id):
+    cancelReason = request.data.get('cancelReason')
+    note = request.data.get('note')
+    user = request.user
+    if not cancelReason:
+        return Response({"detail": "Thiếu thông tin"}, status=status.HTTP_400_BAD_REQUEST)
+
+    order = get_object_or_404(Order, id=order_id)
+    if order.status == 'cancelled':
+        return Response({"detail": "Đơn hàng đã bị huỷ trước đó"}, status=status.HTTP_400_BAD_REQUEST)
+
+    order.status = 'cancelled'
+
+    order_cancellation = OrderCancellation.objects.create(order=order, reason=cancelReason, cancelled_by=user)
+    if note:
+        order_cancellation.note = note
+    order.save()
+    order_cancellation.save()
+
+    return Response({"detail": "Huỷ đơn hàng thành công"}, status=status.HTTP_200_OK)

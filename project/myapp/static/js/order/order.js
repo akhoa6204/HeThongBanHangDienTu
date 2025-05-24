@@ -14,6 +14,12 @@ let currentTag = 'all';
 let noMoreData = false;
 let isLoading = false;
 let first_time = false;
+let selectedOrderId = null;
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+const closeCancelPopup = document.getElementById('closeCancelPopup');
+const popupContainer= document.querySelector('.popupContainer');
+const box= popupContainer.querySelector('.box');
+
 function setIsLoading(value){
     isLoading = value;
 }
@@ -106,15 +112,21 @@ function attachEventListeners(data){
                 })
             }
             if (cancelBtn){
+//                cancelBtn.addEventListener('click', () => {
+//                    console.log(data[index]);
+//                    fetchUpdateStatusOrder(data[index].id)
+//                    .then(data=> {
+//                        if(data.detail == "Cập nhật trạng thái thành công"){
+//                            cancelled.click();
+//                        }
+//                    })
+//                })
                 cancelBtn.addEventListener('click', () => {
-                    console.log(data[index]);
-                    fetchUpdateStatusOrder(data[index].id)
-                    .then(data=> {
-                        if(data.detail == "Cập nhật trạng thái thành công"){
-                            cancelled.click();
-                        }
-                    })
-                })
+                  selectedOrderId = data[index].id;
+                  document.getElementById('reason').value = '';
+                  document.getElementById('note').value = '';
+                  document.querySelector('.popupContainer').classList.add('active');
+                });
             }
         }
     })
@@ -270,3 +282,42 @@ window.onload = () => {
         clickHeader(getCurrentTag());
     });
 }
+
+popupContainer.addEventListener('click', () =>{
+    if (popupContainer.classList.contains('active')){
+        popupContainer.classList.remove('active');
+    }
+})
+box.addEventListener('click', (event) => {
+    event.stopPropagation();
+})
+closeCancelPopup.addEventListener('click', () => {
+  document.querySelector('.popupContainer').classList.remove('active');
+});
+confirmCancelBtn.addEventListener('click', () => {
+  const reason = document.getElementById('reason').value.trim();
+  const note = document.getElementById('note').value.trim();
+
+  if (!reason) {
+    alert("Vui lòng nhập lý do hủy.");
+    return;
+  }
+  fetchUpdateStatusOrder(selectedOrderId, reason, note)
+    .then(data => {
+      if (data.detail === "Cập nhật trạng thái thành công") {
+        document.getElementById('reason').value = '';
+        document.getElementById('note').value = '';
+        popupContainer.classList.remove('active');
+        cancelled.click();
+        const popupSuccess = document.querySelector('.popup-model.success.change_status');
+        popupSuccess.classList.add('active');
+      }
+    })
+    .catch(err => {
+        document.getElementById('reason').value = '';
+        document.getElementById('note').value = '';
+        popupContainer.classList.remove('active');
+        const popupError= document.querySelector('.popup-model.error.change_status');
+        popupError.classList.add('active');
+    });
+});

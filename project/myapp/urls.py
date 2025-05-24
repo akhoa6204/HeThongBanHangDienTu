@@ -87,6 +87,7 @@ urlpatterns = [
     path('api/orders/', admin_api.admin_list_orders, name='admin-list-orders'),
     path('api/orders/patch/', admin_api.api_admin_update_order_status, name='admin_update_order_status'),
     path('api/orders/<int:order_id>/', admin_api.admin_view_order, name='admin-view-order'),
+    path('api/orders/cancel/<int:order_id>/', admin_api.admin_api_cancel_order, name='admin-cancel-order'),
 
     # ----------- API Quản trị đánh giá ----------
     path('api/reviews/', admin_api.admin_list_reviews, name='admin-list-reviews'),

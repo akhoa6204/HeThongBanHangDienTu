@@ -30,7 +30,7 @@ function fetchApiUpdateReviewReply(id, content){
     return cookieStore.get('csrftoken')
         .then(cookie => {
             return fetch(url, {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'X-CSRFToken': cookie ? cookie.value : '',
                     'Content-Type': 'application/json',

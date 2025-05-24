@@ -34,29 +34,9 @@
         </div>
     </div>
     <div id="pagination" class="pagination mt-4 flex gap-2 justify-center"></div>
-
 </div>
 {% endblock %}
-
 {% block extra_js %}
 <script type="module" src="{% static 'js/admin/admin_order.js' %}"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
 {% endblock %}
-<!--<tr>-->
-<!--    <td>1</td>-->
-<!--    <td>Phan Nguyễn Anh Khoa</td>-->
-<!--    <td>0562602721</td>-->
-<!--    <td>khoaanh662004@gmail.com</td>-->
-<!--    <td>21/5/2025</td>-->
-<!--    <td>-->
-<!--        <select name="status" id="status">-->
-<!--            <option value="pending" class="pending">Chờ xác nhận</option>-->
-<!--            <option value="processing" class="processing">Đang xử lí</option>-->
-<!--            <option value="shipping" class="shipping">Đang giao hàng</option>-->
-<!--            <option value="shipped" class="shipped">Đã giao hàng</option>-->
-<!--            <option value="cancelled" class="cancelled">Đã hủy</option>-->
-<!--        </select>-->
-<!--    </td>-->
-<!--    <td><span-->
-<!--            style='background-color:rgba(0, 142, 204, 0.37); color:rgba(44, 63, 132, 1);'>Chi tiết</span>-->
-<!--    </td>-->
-<!--</tr>-->

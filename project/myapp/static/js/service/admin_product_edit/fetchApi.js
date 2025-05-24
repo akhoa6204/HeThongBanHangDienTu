@@ -24,7 +24,7 @@ function fetchApiUpdateProduct(productId, formData) {
     return cookieStore.get('csrftoken')
         .then(cookie => {
             return fetch(url, {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'X-CSRFToken': cookie ? cookie.value : '',
                 },
@@ -48,7 +48,7 @@ function fetchApiUpdateOption(productId, optionId, formData) {
     return cookieStore.get('csrftoken')
         .then(cookie => {
             return fetch(url, {
-                method: 'POST',
+                method: 'PATCH',
                 headers: {
                     'X-CSRFToken': cookie ? cookie.value : '',
                 },

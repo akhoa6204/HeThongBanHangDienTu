@@ -3,6 +3,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/breadcrumb.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin_order_detail.css' %}">
+<link rel="stylesheet" href="{% static 'css/popupSuccess.css' %}">
 {% endblock %}
 {% block content %}
 <div class="adminContainer">
@@ -11,24 +12,37 @@
         <div class="customer-info" id="customer-info"></div>
         <div class="order-items" id="order-items"></div>
         <div class="total-price" id="total-price"></div>
+        <span class="orderStatus"></span>
     </div>
-    <div class="form-cancelled">
+    <div class="form-cancelled" id="form-cancelled">
         <div class="input-group">
             <label for="reason">Lí do hủy hàng</label>
             <input type="text" id="reason" placeholder="Nhập lí do hủy hàng">
         </div>
         <div class="input-group">
             <label for="note">Ghi chú (nếu có)</label>
-            <textarea name="" id="note" rows="3" placeholder="Ghi chú(nếu có)"></textarea>
+            <textarea id="note" rows="3" placeholder="Ghi chú(nếu có)"></textarea>
         </div>
     </div>
-    <div class="buttonBox">
-        <button class="cancelButton active">Hủy đơn hàng</button>
-        <button class="submit">Lưu</button>
-        <button class="back">Hủy</button>
+    <div class="buttonBox" id="buttonBox">
+        <button class="cancelButton" id="cancelBtn">Hủy đơn hàng</button>
+        <button class="submit" id="saveBtn" style="display:none;">Lưu</button>
+        <button class="back" id="backBtn" style="display:none;">Hủy</button>
+    </div>
+    <div class="popup-model success change_status_order">
+        {% with title="Hủy đơn hàng thành công" status='' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
+    </div>
+    <div class="popup-model error change_status_order">
+        {% with title="Xóa đơn hàng thất bại" status='error' %}
+        {% include 'components/components/popupSuccess.html' with status=status title=title %}
+        {% endwith %}
     </div>
 </div>
+
 {% endblock %}
 {% block extra_js %}
 <script type="module" src="{% static 'js/admin/admin_order_detail.js' %}"></script>
+<script src="{% static 'js/detail/popup.js' %}"></script>
 {% endblock %}

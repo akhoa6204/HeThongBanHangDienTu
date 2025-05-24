@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import Product, Option, Category, Brand, Review, ReviewReply, User, Cart, OrderItem, Order, OptionDetail, \
-    OptionColor, OptionImage, ProductImage, ReviewImage
+    OptionColor, OptionImage, ProductImage, ReviewImage, OrderCancellation
 from .utils import serialize_product_with_option
 
 
@@ -244,14 +244,22 @@ class OrderItemSerializer(serializers.ModelSerializer):
         return serialize_product_with_option(option, selected_color=selected_color, context=self.context)
 
 
+class OrderCancellationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderCancellation
+        fields = '__all__'
+
+
 class OrderSerializer(serializers.ModelSerializer):
     orderItem = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
+    order_cancellation = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
         fields = ['id', 'need_invoice', 'status', 'total_price', 'update_at', 'orderItem', 'has_review', 'address',
-                  'user', 'pending_at', 'processing_at', 'shipping_at', 'shipped_at', 'cancelled_at']
+                  'user', 'pending_at', 'processing_at', 'shipping_at', 'shipped_at', 'cancelled_at',
+                  'order_cancellation']
 
     def get_user(self, obj):
         return {
@@ -264,6 +272,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_orderItem(self, obj):
         return OrderItemSerializer(obj.order_items.all(), many=True, context=self.context).data
+
+    def get_order_cancellation(self, obj):
+        if obj.status == 'cancelled' and hasattr(obj, 'cancellation'):
+            return OrderCancellationSerializer(obj.cancellation).data
+        return None
 
 
 class OrderWithAdminSerializer(serializers.ModelSerializer):
@@ -282,6 +295,11 @@ class OrderWithAdminSerializer(serializers.ModelSerializer):
             "address": obj.user.address,
         }
 
+    def get_order_cancellation(self, obj):
+        if obj.status == 'cancelled' and hasattr(obj, 'cancellation'):
+            return OrderCancellationSerializer(obj.cancellation).data
+        return None
+
 
 class ReviewWithAdminSerializer(serializers.ModelSerializer):
     review_reply = ReviewReplySerializer()
@@ -294,10 +312,12 @@ class ReviewWithAdminSerializer(serializers.ModelSerializer):
 class OrderWithItemsForAdminSerializer(serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
     order_items = OrderItemSerializer(many=True)
+    order_cancellation = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'status', 'created_at', 'order_items', 'need_invoice', 'total_price', 'address']
+        fields = ['id', 'user', 'status', 'created_at', 'order_items', 'need_invoice', 'total_price', 'address',
+                  'order_cancellation']
 
     def get_user(self, obj):
         return {
@@ -307,3 +327,8 @@ class OrderWithItemsForAdminSerializer(serializers.ModelSerializer):
             "email": obj.user.email,
             "address": obj.user.address,
         }
+
+    def get_order_cancellation(self, obj):
+        if obj.status == 'cancelled' and hasattr(obj, 'cancellation'):
+            return OrderCancellationSerializer(obj.cancellation).data
+        return None

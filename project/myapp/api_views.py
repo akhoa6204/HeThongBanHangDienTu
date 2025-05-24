@@ -13,7 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import Option, Category, ReviewReply, Cart, User, ReviewImage, OptionColor
+from .models import Option, Category, ReviewReply, Cart, User, ReviewImage, OptionColor, OrderCancellation
 from .models import Order, Review
 from .models import OrderItem
 from .models import Product
@@ -530,9 +530,18 @@ class searchApiView(APIView):
 @permission_classes([IsAuthenticated])
 class orderApiView(APIView):
     def patch(self, request, orderId):
+        reason = request.data.get('reason')
+        note = request.data.get('note')
+        if not reason or reason == '':
+            return Response({"detail": "Cập nhật trạng thái thất bại"}, status=status.HTTP_400_BAD_REQUEST)
         order = get_object_or_404(Order, id=orderId)
+        if order.status == 'cancelled':
+            return Response({"detail": "Đơn hàng đã bị huỷ trước đó"}, status=status.HTTP_400_BAD_REQUEST)
         order.status = 'cancelled'
+        order_cancellation = OrderCancellation.objects.create(order=order, cancelled_by=request.user, reason=reason)
+        order_cancellation.note = note
         order.save()
+        order_cancellation.save()
         return Response({"detail": "Cập nhật trạng thái thành công"}, status=status.HTTP_200_OK)
 
 
